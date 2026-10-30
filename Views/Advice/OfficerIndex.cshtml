@@ -1,0 +1,208 @@
+@model IEnumerable<UFSStayConnect.Models.FinancialAdvice>
+
+@{
+    ViewData["Title"] = "Advice & Inputs";
+    var items = Model.ToList();
+
+    var total = items.Count;
+    var reviewed = items.Count(x => x.Status == "Reviewed");
+    var pending = items.Count(x => x.Status != "Reviewed");
+}
+
+<div class="advice-management-page">
+
+    <!-- HEADER -->
+    <div class="advice-management-header">
+
+        <div>
+            <div class="advice-eyebrow">
+                <i class="fa-solid fa-comments"></i>
+                Financial Communication
+            </div>
+
+            <h1>Advice & Inputs</h1>
+
+            <p>
+                Submit and track financial officer advice, operational
+                suggestions and customer inputs.
+            </p>
+        </div>
+
+        <a asp-action="CreateAdvice"
+           class="advice-create-btn">
+
+            <i class="fa-solid fa-plus"></i>
+            Submit Advice
+
+        </a>
+
+    </div>
+
+
+    <!-- STATISTICS -->
+    <div class="advice-stats">
+
+        <div class="advice-stat-card">
+
+            <div class="advice-stat-icon blue">
+                <i class="fa-solid fa-inbox"></i>
+            </div>
+
+            <div>
+                <span>Total Inputs</span>
+                <strong>@total</strong>
+            </div>
+
+        </div>
+
+
+        <div class="advice-stat-card">
+
+            <div class="advice-stat-icon orange">
+                <i class="fa-solid fa-clock"></i>
+            </div>
+
+            <div>
+                <span>Pending Review</span>
+                <strong>@pending</strong>
+            </div>
+
+        </div>
+
+
+        <div class="advice-stat-card">
+
+            <div class="advice-stat-icon green">
+                <i class="fa-solid fa-circle-check"></i>
+            </div>
+
+            <div>
+                <span>Reviewed</span>
+                <strong>@reviewed</strong>
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ADVICE LIST -->
+    <div class="advice-list-card">
+
+        <div class="advice-list-header">
+
+            <div>
+                <h2>Submitted Advice & Inputs</h2>
+                <p>
+                    Review previous operational and financial submissions.
+                </p>
+            </div>
+
+        </div>
+
+
+        @if (items.Any())
+        {
+            <div class="advice-list">
+
+                @foreach (var a in items)
+                {
+                    var isReviewed = a.Status == "Reviewed";
+
+                    <article class="advice-item">
+
+                        <div class="advice-item-main">
+
+                            <div class="advice-item-title-row">
+
+                                <h3>@a.Title</h3>
+
+                                <span class="advice-status @(isReviewed ? "reviewed" : "pending")">
+
+                                    <i class="fa-solid @(isReviewed ? "fa-check" : "fa-clock")"></i>
+
+                                    @a.Status
+
+                                </span>
+
+                            </div>
+
+
+                            <div class="advice-item-date">
+
+                                <i class="fa-regular fa-calendar"></i>
+
+                                @a.DateCreated.ToLocalTime().ToString("dd MMM yyyy")
+
+                                <span>•</span>
+
+                                @a.DateCreated.ToLocalTime().ToString("HH:mm")
+
+                            </div>
+
+
+                            <p class="advice-item-text">
+                                @a.Advice
+                            </p>
+
+
+                            @if (!string.IsNullOrWhiteSpace(a.AdminResponse))
+                            {
+                                <div class="admin-response">
+
+                                    <div class="admin-response-heading">
+
+                                        <i class="fa-solid fa-reply"></i>
+
+                                        Administrator Response
+
+                                    </div>
+
+                                    <p>
+                                        @a.AdminResponse
+                                    </p>
+
+                                </div>
+                            }
+
+                        </div>
+
+                    </article>
+                }
+
+            </div>
+        }
+        else
+        {
+            <div class="advice-empty-state">
+
+                <div class="advice-empty-icon">
+                    <i class="fa-solid fa-comments"></i>
+                </div>
+
+                <h3>No Advice or Inputs Yet</h3>
+
+                <p>
+                    There are currently no financial advice or operational
+                    inputs to display.
+                </p>
+
+                <a asp-action="CreateAdvice"
+                   class="advice-create-empty-btn">
+
+                    <i class="fa-solid fa-plus"></i>
+                    Submit First Advice
+
+                </a>
+
+            </div>
+        }
+
+    </div>
+
+</div>
+
+
+<style>
+
+    </style>

@@ -1,0 +1,521 @@
+@model IEnumerable<UFSStayConnect.Models.Payment>
+
+@{
+    ViewData["Title"] = "Transaction History";
+
+    var payments = Model?.OrderByDescending(p => p.PaymentDate).ToList()
+                   ?? new List<UFSStayConnect.Models.Payment>();
+
+    var totalTransactions = payments.Count;
+
+    var paidPayments = payments
+        .Where(p => string.Equals(p.PaymentStatus, "Paid", StringComparison.OrdinalIgnoreCase))
+        .ToList();
+
+    var pendingPayments = payments
+        .Where(p => string.Equals(p.PaymentStatus, "Pending", StringComparison.OrdinalIgnoreCase))
+        .ToList();
+
+    var rejectedPayments = payments
+        .Where(p => string.Equals(p.PaymentStatus, "Rejected", StringComparison.OrdinalIgnoreCase))
+        .ToList();
+
+    var totalPaid = paidPayments.Sum(p => p.Amount);
+    var totalPending = pendingPayments.Sum(p => p.Amount);
+    var totalRejected = rejectedPayments.Sum(p => p.Amount);
+}
+
+<div class="customer-history-page">
+
+    <!-- =========================================================
+         PAGE HEADER
+         ========================================================= -->
+
+    <div class="history-page-header">
+
+        <div>
+
+            <div class="history-eyebrow">
+                <i class="fas fa-clock-rotate-left"></i>
+                ACCOUNT ACTIVITY
+            </div>
+
+            <h1>Transaction History</h1>
+
+            <p>
+                View your accommodation payment transactions,
+                references, payment methods and receipts.
+            </p>
+
+        </div>
+
+
+        <a asp-action="Index"
+           class="history-back-button">
+
+            <i class="fas fa-wallet"></i>
+            Back to Payments
+
+        </a>
+
+    </div>
+
+
+    <!-- =========================================================
+         SUMMARY
+         ========================================================= -->
+
+    <div class="history-summary-grid">
+
+        <div class="history-summary-card">
+
+            <div class="history-summary-icon blue">
+                <i class="fas fa-receipt"></i>
+            </div>
+
+            <div>
+                <span>Total Transactions</span>
+                <strong>@totalTransactions</strong>
+                <small>Payment submissions</small>
+            </div>
+
+        </div>
+
+
+        <div class="history-summary-card">
+
+            <div class="history-summary-icon green">
+                <i class="fas fa-circle-check"></i>
+            </div>
+
+            <div>
+                <span>Verified Payments</span>
+                <strong>@paidPayments.Count</strong>
+                <small>R @totalPaid.ToString("N2") received</small>
+            </div>
+
+        </div>
+
+
+        <div class="history-summary-card">
+
+            <div class="history-summary-icon gold">
+                <i class="fas fa-clock"></i>
+            </div>
+
+            <div>
+                <span>Pending</span>
+                <strong>@pendingPayments.Count</strong>
+                <small>R @totalPending.ToString("N2") awaiting verification</small>
+            </div>
+
+        </div>
+
+
+        <div class="history-summary-card">
+
+            <div class="history-summary-icon red">
+                <i class="fas fa-circle-xmark"></i>
+            </div>
+
+            <div>
+                <span>Rejected</span>
+                <strong>@rejectedPayments.Count</strong>
+                <small>R @totalRejected.ToString("N2") rejected</small>
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =========================================================
+         TRANSACTION PANEL
+         ========================================================= -->
+
+    <div class="history-panel">
+
+        <div class="history-panel-header">
+
+            <div>
+
+                <span class="history-section-label">
+                    PAYMENT RECORDS
+                </span>
+
+                <h2>Your Transactions</h2>
+
+                <p>
+                    Your most recent accommodation payment activity
+                    is shown below.
+                </p>
+
+            </div>
+
+            <div class="transaction-count">
+                @totalTransactions
+                @(totalTransactions == 1 ? "transaction" : "transactions")
+            </div>
+
+        </div>
+
+
+        @if (payments.Any())
+        {
+            <div class="history-table-wrapper">
+
+                <table class="customer-history-table">
+
+                    <thead>
+
+                        <tr>
+
+                            <th>Transaction</th>
+
+                            <th>Payment Type</th>
+
+                            <th>Amount</th>
+
+                            <th>Method</th>
+
+                            <th>Submitted</th>
+
+                            <th>Due Date</th>
+
+                            <th>Status</th>
+
+                            <th class="text-end">Receipt</th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody>
+
+                        @foreach (var payment in payments)
+                        {
+                            var isPaid = string.Equals(
+                            payment.PaymentStatus,
+                            "Paid",
+                            StringComparison.OrdinalIgnoreCase);
+
+                            var isPending = string.Equals(
+                            payment.PaymentStatus,
+                            "Pending",
+                            StringComparison.OrdinalIgnoreCase);
+
+                            var isRejected = string.Equals(
+                            payment.PaymentStatus,
+                            "Rejected",
+                            StringComparison.OrdinalIgnoreCase);
+
+                            var statusClass =
+                            isPaid
+                            ? "paid"
+                            : isRejected
+                            ? "rejected"
+                            : "pending";
+
+                            <tr>
+
+                                <!-- TRANSACTION -->
+
+                                <td>
+
+                                    <div class="transaction-cell">
+
+                                        <div class="transaction-icon">
+
+                                            @if (isPaid)
+                                            {
+                                                <i class="fas fa-circle-check"></i>
+                                            }
+                                            else if (isRejected)
+                                            {
+                                                <i class="fas fa-circle-xmark"></i>
+                                            }
+                                            else
+                                            {
+                                                <i class="fas fa-clock"></i>
+                                            }
+
+                                        </div>
+
+                                        <div>
+
+                                            <strong>
+                                                Payment #@payment.PaymentID
+                                            </strong>
+
+                                            <span class="transaction-reference">
+                                                @payment.ReferenceNumber
+                                            </span>
+
+                                        </div>
+
+                                    </div>
+
+                                </td>
+
+
+                                <!-- PAYMENT TYPE -->
+
+                                <td>
+
+                                    <div class="history-payment-type">
+
+                                        <div class="history-type-icon">
+
+                                            @if (payment.PaymentType?.Name?.Contains(
+                                                                                "rent",
+                                                                                StringComparison.OrdinalIgnoreCase) == true)
+                                            {
+                                                <i class="fas fa-house"></i>
+                                            }
+                                            else if (payment.PaymentType?.Name?.Contains(
+                                            "water",
+                                            StringComparison.OrdinalIgnoreCase) == true)
+                                            {
+                                                <i class="fas fa-droplet"></i>
+                                            }
+                                            else if (payment.PaymentType?.Name?.Contains(
+                                            "electric",
+                                            StringComparison.OrdinalIgnoreCase) == true)
+                                            {
+                                                <i class="fas fa-bolt"></i>
+                                            }
+                                            else if (payment.PaymentType?.Name?.Contains(
+                                            "parking",
+                                            StringComparison.OrdinalIgnoreCase) == true)
+                                            {
+                                                <i class="fas fa-car"></i>
+                                            }
+                                            else
+                                            {
+                                                <i class="fas fa-file-invoice-dollar"></i>
+                                            }
+
+                                        </div>
+
+                                        <span>
+                                            @(payment.PaymentType?.Name ?? "Unknown")
+                                        </span>
+
+                                    </div>
+
+                                </td>
+
+
+                                <!-- AMOUNT -->
+
+                                <td>
+
+                                    <strong class="history-amount">
+                                        R @payment.Amount.ToString("N2")
+                                    </strong>
+
+                                </td>
+
+
+                                <!-- METHOD -->
+
+                                <td>
+
+                                    <span class="payment-method">
+
+                                        @if (string.Equals(
+                                                                        payment.PaymentMethod,
+                                                                        "Card",
+                                                                        StringComparison.OrdinalIgnoreCase))
+                                        {
+                                            <i class="fas fa-credit-card"></i>
+                                        }
+                                        else
+                                        {
+                                            <i class="fas fa-building-columns"></i>
+                                        }
+
+                                        @payment.PaymentMethod
+
+                                    </span>
+
+                                </td>
+
+
+                                <!-- SUBMITTED -->
+
+                                <td>
+
+                                    <div class="history-date">
+
+                                        <strong>
+                                            @payment.PaymentDate.ToLocalTime().ToString("dd MMM yyyy")
+                                        </strong>
+
+                                        <span>
+                                            @payment.PaymentDate.ToLocalTime().ToString("HH:mm")
+                                        </span>
+
+                                    </div>
+
+                                </td>
+
+
+                                <!-- DUE DATE -->
+
+                                <td>
+
+                                    @if (payment.DueDate.HasValue)
+                                    {
+                                        <div class="history-due-date">
+
+                                            <i class="far fa-calendar"></i>
+
+                                            @payment.DueDate.Value.ToLocalTime().ToString("dd MMM yyyy")
+
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <span class="history-empty">
+                                            —
+                                        </span>
+                                    }
+
+                                </td>
+
+
+                                <!-- STATUS -->
+
+                                <td>
+
+                                    <span class="history-status @statusClass">
+
+                                        @if (isPaid)
+                                        {
+                                            <i class="fas fa-circle-check"></i>
+                                        }
+                                        else if (isRejected)
+                                        {
+                                            <i class="fas fa-circle-xmark"></i>
+                                        }
+                                        else
+                                        {
+                                            <i class="fas fa-clock"></i>
+                                        }
+
+                                        @payment.PaymentStatus
+
+                                    </span>
+
+                                </td>
+
+
+                                <!-- RECEIPT -->
+
+                                <td class="text-end">
+
+                                    @if (isPaid)
+                                    {
+                                        <a asp-action="Receipt"
+                                           asp-route-id="@payment.PaymentID"
+                                           class="receipt-button"
+                                           title="View receipt">
+
+                                            <i class="fas fa-file-invoice"></i>
+                                            Receipt
+
+                                        </a>
+                                    }
+                                    else if (isPending)
+                                    {
+                                        <span class="receipt-unavailable">
+                                            <i class="fas fa-hourglass-half"></i>
+                                            Awaiting verification
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="receipt-unavailable">
+                                            —
+                                        </span>
+                                    }
+
+                                </td>
+
+                            </tr>
+                        }
+
+                    </tbody>
+
+                </table>
+
+            </div>
+        }
+        else
+        {
+            <!-- =================================================
+                 EMPTY STATE
+                 ================================================== -->
+
+            <div class="history-empty-state">
+
+                <div class="history-empty-icon">
+                    <i class="fas fa-receipt"></i>
+                </div>
+
+                <h3>No payment transactions yet</h3>
+
+                <p>
+                    Once you submit an accommodation payment,
+                    your transaction will appear here.
+                </p>
+
+                <a asp-action="Index"
+                   class="history-empty-button">
+
+                    <i class="fas fa-wallet"></i>
+                    Go to Payments
+
+                </a>
+
+            </div>
+        }
+
+    </div>
+
+
+    <!-- =========================================================
+         INFORMATION
+         ========================================================= -->
+    @if (payments.Any())
+    {
+        <div class="history-information">
+
+            <div class="history-information-icon">
+                <i class="fas fa-circle-info"></i>
+            </div>
+
+            <div>
+
+                <strong>About your payment status</strong>
+
+                <p>
+                    Payments submitted through UFS StayConnect initially
+                    remain <b>Pending</b> while they are verified.
+                    Once a payment has been verified, it will appear as
+                    <b>Paid</b> and a receipt will become available.
+                </p>
+
+            </div>
+
+        </div>
+    }
+
+</div>
+
+
+<style>
+
+   </style>

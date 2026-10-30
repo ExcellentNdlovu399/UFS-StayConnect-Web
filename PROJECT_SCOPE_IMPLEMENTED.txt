@@ -1,0 +1,58 @@
+UFS STAYCONNECT - CSIQ 3784 SCOPE IMPLEMENTATION
+=================================================
+
+Roles
+-----
+ADMIN
+- Manage customer accounts: create, view, edit, activate/deactivate, reset password and safe deletion.
+- Manage Financial Officers: create/authorize, activate/deactivate and safe deletion.
+- View/manage accommodation, rooms, services and residence-specific charges.
+- Review accommodation applications and allocate an available room when approving.
+- Reject applications with a reason.
+- Payment management: approve/reject customer payments.
+- Payment Types management.
+- Reports with filters and CSV export.
+- Notifications with unread count.
+- Officer Advice & Inputs: review financial officer recommendations and respond.
+
+FINANCIAL OFFICER
+- Login and own password change through Account/Profile.
+- Customer management: create, view, edit, activate/deactivate and reset customer password.
+- View accommodation applications and supporting PDFs.
+- Payment verification: approve/reject payments.
+- Transactions/payment history.
+- Reports and CSV export.
+- Customer ratings and reviews.
+- Notifications with unread count.
+- Advice & Inputs: submit operational/financial advice to the Administrator.
+
+CUSTOMER
+- Register/login/profile/password change.
+- Browse/filter accommodation and view facilities, rooms and configured charges.
+- Submit complete application with ID, registration and funding PDFs.
+- Apply to multiple residences while applications are pending.
+- Cannot submit a new application after one has been approved.
+- Cannot submit duplicate active applications for the same residence.
+- Customer can withdraw a pending application.
+- Administrator approval allocates a room; other pending applications are automatically closed.
+- View application status and documents.
+- View configured charges, due dates and payment status.
+- Pay one, several or all current charges by Card/EFT; card details are not stored.
+- Payment remains Pending until staff verification.
+- View payment history and paid receipts.
+- Receive application/payment/reminder notifications.
+- Submit/update a residence review after approval.
+
+CREATIVE / REALISTIC FEATURES
+-----------------------------
+- One-approved-accommodation rule.
+- Automatic closure of alternative pending applications after room allocation.
+- Room occupancy automatically updates accommodation availability.
+- Residence-specific payment charges and activation/deactivation.
+- Recurring charge due dates and payment-cycle matching.
+- Before-due and overdue payment reminders with duplicate-reminder protection.
+- Customer dashboard shows overdue and upcoming payment attention.
+- Financial reports can be filtered and exported to CSV.
+- Financial officer advice/input workflow with administrator response.
+- Historical accounts with financial/application history are protected from destructive deletion.
+- Application declaration confirms document ownership/accuracy before submission.

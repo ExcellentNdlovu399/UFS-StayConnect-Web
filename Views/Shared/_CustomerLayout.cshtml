@@ -1,0 +1,565 @@
+@using Microsoft.AspNetCore.Identity
+@using UFSStayConnect.Models
+
+@inject UserManager<ApplicationUser> UserManager
+@inject UFSStayConnect.DataAccess.IRepositoryWrapper Repository
+
+@{
+    var currentUser = await UserManager.GetUserAsync(User);
+
+    var customerName = currentUser != null
+        ? $"{currentUser.FirstName} {currentUser.Surname}".Trim()
+        : "Customer";
+
+    if (string.IsNullOrWhiteSpace(customerName))
+    {
+        customerName = "Customer";
+    }
+
+    var initials = string.Join("",
+        customerName
+            .Split(' ', StringSplitOptions.RemoveEmptyEntries)
+            .Take(2)
+            .Select(x => x[0])
+    ).ToUpper();
+
+    var unreadNotifications = currentUser == null
+        ? 0
+        : Repository.Notification
+            .FindByUser(currentUser.Id)
+            .Count(n => !n.IsRead);
+
+    var currentController =
+        ViewContext.RouteData.Values["controller"]?.ToString();
+
+    var currentAction =
+        ViewContext.RouteData.Values["action"]?.ToString();
+
+    bool IsActive(string controller, string? action = null)
+    {
+        if (!string.Equals(
+                currentController,
+                controller,
+                StringComparison.OrdinalIgnoreCase))
+        {
+            return false;
+        }
+
+        if (action == null)
+        {
+            return true;
+        }
+
+        return string.Equals(
+            currentAction,
+            action,
+            StringComparison.OrdinalIgnoreCase);
+    }
+}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8" />
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0" />
+
+    <title>
+        @ViewData["Title"] - UFS StayConnect
+    </title>
+
+    <!-- Bootstrap -->
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+
+    <!-- Outfit -->
+    <link rel="preconnect"
+          href="https://fonts.googleapis.com">
+
+    <link rel="preconnect"
+          href="https://fonts.gstatic.com"
+          crossorigin>
+
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap"
+          rel="stylesheet">
+
+    <!-- Global CSS -->
+    <link rel="stylesheet"
+          href="~/css/site.css"
+          asp-append-version="true" />
+
+    <!-- Customer CSS -->
+    <link rel="stylesheet"
+          href="~/css/customer.css"
+          asp-append-version="true" />
+
+
+    <link rel="stylesheet"
+          href="~/css/admin.css"
+          asp-append-version="true" />
+
+    @RenderSection("Styles", required: false)
+
+</head>
+
+<body class="customer-body">
+
+    <div class="customer-wrapper">
+
+        <!-- =====================================================
+             CUSTOMER SIDEBAR
+             ===================================================== -->
+
+        <aside class="customer-sidebar"
+               id="customerSidebar">
+
+            <!-- Background image -->
+            <div class="customer-sidebar-image"></div>
+
+            <div class="customer-sidebar-overlay"></div>
+
+            <div class="customer-sidebar-content">
+
+                <!-- BRAND -->
+                <div class="customer-brand">
+
+                    <div class="customer-brand-logo">
+
+                        <img src="~/images/ufs-emblem.png"
+                             alt="University of the Free State"
+                             class="customer-ufs-emblem" />
+
+                    </div>
+
+                    <div class="customer-brand-text">
+
+                        <div class="customer-brand-title">
+                            UFS StayConnect
+                        </div>
+
+                        <div class="customer-brand-subtitle">
+                            QwaQwa Campus
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- NAVIGATION -->
+                <nav class="customer-navigation">
+
+                    <!-- MY STAY -->
+
+                    <div class="customer-nav-section">
+                        MY STAY
+                    </div>
+
+                    <a asp-controller="Dashboard"
+                       asp-action="Index"
+                       class="customer-nav-link @(IsActive("Dashboard", "Index") ? "active" : "")">
+
+                        <i class="fa-solid fa-house"></i>
+
+                        <span>
+                            My Stay
+                        </span>
+
+                    </a>
+
+
+                    <a asp-controller="Accommodation"
+                       asp-action="Index"
+                       class="customer-nav-link @(IsActive("Accommodation") ? "active" : "")">
+
+                        <i class="fa-solid fa-building"></i>
+
+                        <span>
+                            Find Accommodation
+                        </span>
+
+                    </a>
+
+
+                    <a asp-controller="Application"
+                       asp-action="Index"
+                       class="customer-nav-link @(IsActive("Application") ? "active" : "")">
+
+                        <i class="fa-solid fa-file-lines"></i>
+
+                        <span>
+                            My Applications
+                        </span>
+
+                    </a>
+
+
+                    <!-- MONEY -->
+
+                    <div class="customer-nav-section">
+                        MONEY
+                    </div>
+
+
+                    <a asp-controller="Payment"
+                       asp-action="Index"
+                       class="customer-nav-link @(IsActive("Payment") ? "active" : "")">
+
+                        <i class="fa-solid fa-credit-card"></i>
+
+                        <span>
+                            Payments
+                        </span>
+
+                    </a>
+
+
+                    <a asp-controller="Payment"
+                       asp-action="History"
+                       class="customer-nav-link @(IsActive("Payment", "History") ? "active" : "")">
+
+                        <i class="fa-solid fa-receipt"></i>
+
+                        <span>
+                            Transaction History
+                        </span>
+
+                    </a>
+
+
+                    <!-- COMMUNITY -->
+
+                    <div class="customer-nav-section">
+                        COMMUNITY
+                    </div>
+
+
+                    <a asp-controller="Review"
+                       asp-action="Index"
+                       class="customer-nav-link @(IsActive("Review", "Customer") ? "active" : "")">
+
+                        <i class="fa-solid fa-star"></i>
+
+                        <span>
+                            My Reviews
+                        </span>
+
+                    </a>
+
+
+                    <a asp-controller="Notification"
+                       asp-action="Index"
+                       class="customer-nav-link @(IsActive("Notification") ? "active" : "")">
+
+                        <i class="fa-solid fa-bell"></i>
+
+                        <span>
+                            Notifications
+                        </span>
+
+                        @if (unreadNotifications > 0)
+                        {
+                            <span class="customer-notification-count">
+                                @unreadNotifications
+                            </span>
+                        }
+
+                    </a>
+
+
+                    <!-- ACCOUNT -->
+
+                    <div class="customer-nav-section">
+                        ACCOUNT
+                    </div>
+
+
+                    <a asp-controller="Account"
+                       asp-action="Profile"
+                       class="customer-nav-link @(IsActive("Account", "Profile") ? "active" : "")">
+
+                        <i class="fa-solid fa-user"></i>
+
+                        <span>
+                            My Profile
+                        </span>
+
+                    </a>
+
+
+                    <a asp-controller="Account"
+                       asp-action="ChangePassword"
+                       class="customer-nav-link @(IsActive("Account", "ChangePassword") ? "active" : "")">
+
+                        <i class="fa-solid fa-lock"></i>
+
+                        <span>
+                            Change Password
+                        </span>
+
+                    </a>
+
+                </nav>
+
+
+                <!-- CUSTOMER PROFILE -->
+
+                <div class="customer-sidebar-profile">
+
+                    <div class="customer-profile-avatar">
+                        @initials
+                    </div>
+
+                    <div class="customer-profile-info">
+
+                        <strong>
+                            @customerName
+                        </strong>
+
+                        <span>
+                            Customer
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <!-- LOGOUT -->
+
+                <div class="customer-logout">
+
+                    <form asp-controller="Account"
+                          asp-action="Logout"
+                          method="post"
+                          id="customerLogoutForm">
+
+                        @Html.AntiForgeryToken()
+
+                        <button type="button"
+                                class="customer-logout-button"
+                                onclick="openCustomerLogoutModal()">
+
+                            <i class="fa-solid fa-right-from-bracket"></i>
+
+                            <span>
+                                Logout
+                            </span>
+
+                        </button>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </aside>
+
+
+        <!-- =====================================================
+             MAIN AREA
+             ===================================================== -->
+
+        <main class="customer-main">
+
+            <!-- TOP BAR -->
+
+            <header class="customer-topbar">
+
+                <div class="customer-topbar-left">
+
+                    <button type="button"
+                            class="customer-sidebar-toggle"
+                            onclick="toggleCustomerSidebar()">
+
+                        <i class="fa-solid fa-bars"></i>
+
+                    </button>
+
+                    <div class="customer-page-label">
+
+                        <span>
+                            UFS StayConnect
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <div class="customer-topbar-right">
+
+                    <!-- Notifications -->
+
+                    <a asp-controller="Notification"
+                       asp-action="Index"
+                       class="customer-notification-button">
+
+                        <i class="fa-regular fa-bell"></i>
+
+                        @if (unreadNotifications > 0)
+                        {
+                            <span class="customer-topbar-badge">
+                                @unreadNotifications
+                            </span>
+                        }
+
+                    </a>
+
+
+                    <!-- User -->
+
+                    <a asp-controller="Account"
+                       asp-action="Profile"
+                       class="customer-user">
+
+                        <div class="customer-user-avatar">
+                            @initials
+                        </div>
+
+                        <div class="customer-user-details">
+
+                            <strong>
+                                @customerName
+                            </strong>
+
+                            <small>
+                                Customer
+                            </small>
+
+                        </div>
+
+                    </a>
+
+                </div>
+
+            </header>
+
+
+            <!-- PAGE -->
+
+            <div class="customer-page-content">
+
+                @RenderBody()
+
+            </div>
+
+        </main>
+
+    </div>
+
+
+    <!-- =====================================================
+         LOGOUT MODAL
+         ===================================================== -->
+
+    <div class="customer-modal"
+         id="customerLogoutModal">
+
+        <div class="customer-modal-backdrop"
+             onclick="closeCustomerLogoutModal()">
+        </div>
+
+        <div class="customer-modal-dialog">
+
+            <div class="customer-modal-icon">
+
+                <i class="fa-solid fa-right-from-bracket"></i>
+
+            </div>
+
+            <h3>
+                Sign out?
+            </h3>
+
+            <p>
+                Are you sure you want to sign out of UFS StayConnect?
+            </p>
+
+            <div class="customer-modal-actions">
+
+                <button type="button"
+                        class="customer-modal-cancel"
+                        onclick="closeCustomerLogoutModal()">
+
+                    Stay signed in
+
+                </button>
+
+                <button type="button"
+                        class="customer-modal-confirm"
+                        onclick="document.getElementById('customerLogoutForm').submit()">
+
+                    Sign out
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <script>
+
+        function toggleCustomerSidebar() {
+
+            const sidebar =
+                document.getElementById("customerSidebar");
+
+            sidebar.classList.toggle("show");
+        }
+
+
+        function openCustomerLogoutModal() {
+
+            document
+                .getElementById("customerLogoutModal")
+                .classList.add("show");
+
+            document.body.classList.add("modal-open");
+        }
+
+
+        function closeCustomerLogoutModal() {
+
+            document
+                .getElementById("customerLogoutModal")
+                .classList.remove("show");
+
+            document.body.classList.remove("modal-open");
+        }
+
+
+        document.addEventListener("keydown", function (event) {
+
+            if (event.key === "Escape") {
+
+                closeCustomerLogoutModal();
+
+            }
+
+        });
+
+    </script>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js">
+    </script>
+
+    @await RenderSectionAsync(
+    "Scripts",
+        required: false)
+
+</body>
+
+</html>

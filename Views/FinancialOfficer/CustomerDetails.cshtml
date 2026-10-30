@@ -1,0 +1,1016 @@
+@model UFSStayConnect.Models.ApplicationUser
+
+@{
+    ViewData["Title"] = "Customer Details";
+
+    var fullName = $"{Model.FirstName} {Model.Surname}".Trim();
+    var initials = $"{Model.FirstName?.FirstOrDefault()}{Model.Surname?.FirstOrDefault()}".ToUpper();
+
+    var isActive = Model.AccountStatus == "Active";
+
+    var applicationCount = ViewBag.ApplicationCount ?? 0;
+    var paymentCount = ViewBag.PaymentCount ?? 0;
+    var paidAmount = ViewBag.PaidAmount is decimal amount ? amount : 0m;
+}
+
+<style>
+
+    /* =========================================================
+           CUSTOMER DETAILS PAGE
+           ========================================================= */
+
+    .customer-details-page {
+        padding: 10px 0 45px;
+        max-width: 1500px;
+        margin: 0 auto;
+    }
+
+
+    /* =========================================================
+           HEADER
+           ========================================================= */
+
+    .customer-details-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 25px;
+        margin-bottom: 28px;
+    }
+
+    .customer-details-heading {
+        display: flex;
+        align-items: center;
+        gap: 18px;
+    }
+
+    .customer-profile-avatar {
+        width: 68px;
+        height: 68px;
+        min-width: 68px;
+        border-radius: 18px;
+        background: linear-gradient(135deg, #1769ff, #4f8cff);
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 22px;
+        font-weight: 800;
+        box-shadow: 0 10px 25px rgba(23, 105, 255, .20);
+    }
+
+    .customer-details-eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        color: #1769ff;
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: 1px;
+        margin-bottom: 5px;
+    }
+
+    .customer-details-header h1 {
+        margin: 0;
+        color: #10233f;
+        font-size: 29px;
+        font-weight: 800;
+        letter-spacing: -.5px;
+    }
+
+    .customer-details-header p {
+        margin: 5px 0 0;
+        color: #718096;
+        font-size: 14px;
+    }
+
+
+    /* =========================================================
+           HEADER ACTIONS
+           ========================================================= */
+
+    .customer-header-actions {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+        .customer-header-actions .btn {
+            border-radius: 10px;
+            padding: 10px 16px;
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .customer-header-actions .btn-primary {
+            background: #1769ff;
+            border-color: #1769ff;
+        }
+
+            .customer-header-actions .btn-primary:hover {
+                background: #0d58dc;
+                border-color: #0d58dc;
+            }
+
+        .customer-header-actions .btn-outline-warning {
+            color: #b77900;
+            border-color: #e8c56a;
+            background: #fffaf0;
+        }
+
+            .customer-header-actions .btn-outline-warning:hover {
+                background: #fff3cd;
+                color: #8a6100;
+            }
+
+
+    /* =========================================================
+           STATUS CARD
+           ========================================================= */
+
+    .customer-status-card {
+        background: #fff;
+        border: 1px solid #edf1f7;
+        border-radius: 16px;
+        padding: 20px 22px;
+        margin-bottom: 22px;
+        box-shadow: 0 8px 28px rgba(15, 23, 42, .045);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 20px;
+    }
+
+    .customer-status-left {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+    }
+
+    .status-icon {
+        width: 46px;
+        height: 46px;
+        border-radius: 13px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+    }
+
+        .status-icon.active {
+            background: #eaf8ef;
+            color: #198754;
+        }
+
+        .status-icon.inactive {
+            background: #f1f3f5;
+            color: #6c757d;
+        }
+
+    .status-label {
+        display: block;
+        color: #718096;
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: .6px;
+        margin-bottom: 3px;
+    }
+
+    .status-value {
+        color: #10233f;
+        font-size: 16px;
+        font-weight: 800;
+    }
+
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        padding: 8px 13px;
+        border-radius: 30px;
+        font-size: 12px;
+        font-weight: 800;
+    }
+
+        .status-badge.active {
+            background: #eaf8ef;
+            color: #198754;
+        }
+
+        .status-badge.inactive {
+            background: #f1f3f5;
+            color: #6c757d;
+        }
+
+    .status-dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: currentColor;
+    }
+
+
+    /* =========================================================
+           MAIN GRID
+           ========================================================= */
+
+    .customer-details-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1.6fr) minmax(320px, .9fr);
+        gap: 22px;
+    }
+
+
+    /* =========================================================
+           INFORMATION CARD
+           ========================================================= */
+
+    .details-card {
+        background: #fff;
+        border: 1px solid #edf1f7;
+        border-radius: 17px;
+        box-shadow: 0 8px 28px rgba(15, 23, 42, .045);
+        overflow: hidden;
+    }
+
+    .details-card-header {
+        padding: 20px 23px;
+        border-bottom: 1px solid #edf1f7;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 15px;
+    }
+
+    .details-card-title {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .details-card-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 11px;
+        background: #eef4ff;
+        color: #1769ff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .details-card-header h3 {
+        margin: 0;
+        color: #10233f;
+        font-size: 16px;
+        font-weight: 800;
+    }
+
+    .details-card-header span {
+        display: block;
+        margin-top: 2px;
+        color: #8a96a8;
+        font-size: 12px;
+    }
+
+    .details-card-body {
+        padding: 23px;
+    }
+
+
+    /* =========================================================
+           INFORMATION ITEMS
+           ========================================================= */
+
+    .information-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 0;
+    }
+
+    .information-item {
+        padding: 17px 18px;
+        border-bottom: 1px solid #f0f2f6;
+    }
+
+        .information-item:nth-child(odd) {
+            border-right: 1px solid #f0f2f6;
+        }
+
+        .information-item:nth-last-child(-n+2) {
+            border-bottom: 0;
+        }
+
+    .information-label {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        color: #8a96a8;
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: .5px;
+        margin-bottom: 7px;
+    }
+
+        .information-label i {
+            color: #1769ff;
+            font-size: 11px;
+        }
+
+    .information-value {
+        color: #1f2d3d;
+        font-size: 14px;
+        font-weight: 700;
+        word-break: break-word;
+    }
+
+
+    /* =========================================================
+           TYPE BADGE
+           ========================================================= */
+
+    .customer-type-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        padding: 7px 11px;
+        border-radius: 9px;
+        font-size: 12px;
+        font-weight: 800;
+    }
+
+        .customer-type-badge.student {
+            color: #1769ff;
+            background: #eef4ff;
+        }
+
+        .customer-type-badge.staff {
+            color: #7950f2;
+            background: #f1edff;
+        }
+
+
+    /* =========================================================
+           STATISTICS
+           ========================================================= */
+
+    .activity-column {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .activity-stat {
+        background: #fff;
+        border: 1px solid #edf1f7;
+        border-radius: 16px;
+        padding: 19px;
+        box-shadow: 0 8px 28px rgba(15, 23, 42, .045);
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        transition: .2s ease;
+    }
+
+        .activity-stat:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 30px rgba(15, 23, 42, .07);
+        }
+
+    .activity-stat-icon {
+        width: 48px;
+        height: 48px;
+        min-width: 48px;
+        border-radius: 13px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+    }
+
+        .activity-stat-icon.applications {
+            color: #1769ff;
+            background: #eef4ff;
+        }
+
+        .activity-stat-icon.payments {
+            color: #198754;
+            background: #eaf8ef;
+        }
+
+        .activity-stat-icon.paid {
+            color: #b77900;
+            background: #fff6dc;
+        }
+
+    .activity-stat-label {
+        display: block;
+        color: #8a96a8;
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: .5px;
+        margin-bottom: 3px;
+    }
+
+    .activity-stat-value {
+        color: #10233f;
+        font-size: 24px;
+        font-weight: 800;
+        line-height: 1.1;
+    }
+
+    .activity-stat-description {
+        color: #a0aaba;
+        font-size: 11px;
+        margin-top: 3px;
+    }
+
+
+    /* =========================================================
+           ACCOUNT ACTIONS
+           ========================================================= */
+
+    .quick-actions-card {
+        background: #fff;
+        border: 1px solid #edf1f7;
+        border-radius: 16px;
+        padding: 20px;
+        box-shadow: 0 8px 28px rgba(15, 23, 42, .045);
+    }
+
+    .quick-actions-title {
+        color: #10233f;
+        font-size: 14px;
+        font-weight: 800;
+        margin-bottom: 15px;
+    }
+
+    .quick-action {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        gap: 11px;
+        padding: 11px 12px;
+        margin-bottom: 8px;
+        border-radius: 10px;
+        text-decoration: none;
+        color: #44546a;
+        background: #f8fafc;
+        border: 1px solid #edf1f7;
+        font-size: 13px;
+        font-weight: 700;
+        transition: .2s ease;
+    }
+
+        .quick-action:last-child {
+            margin-bottom: 0;
+        }
+
+        .quick-action:hover {
+            color: #1769ff;
+            background: #eef4ff;
+            border-color: #dbe7ff;
+        }
+
+        .quick-action i {
+            width: 25px;
+            text-align: center;
+            color: #1769ff;
+        }
+
+        .quick-action.warning i {
+            color: #b77900;
+        }
+
+
+    /* =========================================================
+           RESPONSIVE
+           ========================================================= */
+
+    @@media (max-width: 992px) {
+
+        .customer-details-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .activity-column {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+        }
+
+        .quick-actions-card {
+            grid-column: 1 / -1;
+        }
+    }
+
+
+    @@media (max-width: 768px) {
+
+        .customer-details-page {
+            padding: 5px 0 30px;
+        }
+
+        .customer-details-header {
+            flex-direction: column;
+        }
+
+        .customer-header-actions {
+            width: 100%;
+        }
+
+            .customer-header-actions .btn {
+                flex: 1;
+            }
+
+        .customer-details-heading {
+            align-items: flex-start;
+        }
+
+        .customer-details-header h1 {
+            font-size: 24px;
+        }
+
+        .customer-status-card {
+            align-items: flex-start;
+        }
+
+        .information-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .information-item:nth-child(odd) {
+            border-right: 0;
+        }
+
+        .information-item:nth-last-child(-n+2) {
+            border-bottom: 1px solid #f0f2f6;
+        }
+
+        .information-item:last-child {
+            border-bottom: 0;
+        }
+
+        .activity-column {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+
+<div class="customer-details-page">
+
+    <!-- =====================================================
+         PAGE HEADER
+         ===================================================== -->
+
+    <div class="customer-details-header">
+
+        <div class="customer-details-heading">
+
+            <div class="customer-profile-avatar">
+                @initials
+            </div>
+
+            <div>
+
+                <div class="customer-details-eyebrow">
+                    <i class="fa-solid fa-user"></i>
+                    CUSTOMER PROFILE
+                </div>
+
+                <h1>
+                    @fullName
+                </h1>
+
+                <p>
+                    Customer account and activity overview.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="customer-header-actions">
+
+            <a asp-action="EditCustomer"
+               asp-route-id="@Model.Id"
+               class="btn btn-primary">
+
+                <i class="fa-solid fa-user-pen me-2"></i>
+                Edit Customer
+
+            </a>
+
+
+            <a asp-action="ResetCustomerPassword"
+               asp-route-id="@Model.Id"
+               class="btn btn-outline-warning">
+
+                <i class="fa-solid fa-key me-2"></i>
+                Reset Password
+
+            </a>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         ACCOUNT STATUS
+         ===================================================== -->
+
+    <div class="customer-status-card">
+
+        <div class="customer-status-left">
+
+            <div class="status-icon @(isActive ? "active" : "inactive")">
+
+                <i class="fa-solid @(isActive
+                                       ? "fa-circle-check"
+                                       : "fa-circle-xmark")"></i>
+
+            </div>
+
+            <div>
+
+                <span class="status-label">
+                    Account Status
+                </span>
+
+                <span class="status-value">
+                    Customer account is @(isActive ? "currently active" : "currently inactive")
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <span class="status-badge @(isActive ? "active" : "inactive")">
+
+            <span class="status-dot"></span>
+
+            @Model.AccountStatus
+
+        </span>
+
+    </div>
+
+
+    <!-- =====================================================
+         MAIN CONTENT
+         ===================================================== -->
+
+    <div class="customer-details-grid">
+
+
+        <!-- =================================================
+             PERSONAL INFORMATION
+             ================================================= -->
+
+        <div class="details-card">
+
+            <div class="details-card-header">
+
+                <div class="details-card-title">
+
+                    <div class="details-card-icon">
+                        <i class="fa-solid fa-id-card"></i>
+                    </div>
+
+                    <div>
+
+                        <h3>
+                            Personal Information
+                        </h3>
+
+                        <span>
+                            Customer account information
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="details-card-body">
+
+                <div class="information-grid">
+
+
+                    <!-- FULL NAME -->
+
+                    <div class="information-item">
+
+                        <div class="information-label">
+                            <i class="fa-solid fa-user"></i>
+                            Full Name
+                        </div>
+
+                        <div class="information-value">
+                            @fullName
+                        </div>
+
+                    </div>
+
+
+                    <!-- EMAIL -->
+
+                    <div class="information-item">
+
+                        <div class="information-label">
+                            <i class="fa-solid fa-envelope"></i>
+                            Email Address
+                        </div>
+
+                        <div class="information-value">
+                            @Model.Email
+                        </div>
+
+                    </div>
+
+
+                    <!-- CUSTOMER TYPE -->
+
+                    <div class="information-item">
+
+                        <div class="information-label">
+                            <i class="fa-solid fa-user-tag"></i>
+                            Customer Type
+                        </div>
+
+                        <div class="information-value">
+
+                            @if (Model.UserType == "Student")
+                            {
+                                <span class="customer-type-badge student">
+
+                                    <i class="fa-solid fa-graduation-cap"></i>
+
+                                    Student
+
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="customer-type-badge staff">
+
+                                    <i class="fa-solid fa-briefcase"></i>
+
+                                    Staff
+
+                                </span>
+                            }
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- NUMBER -->
+
+                    <div class="information-item">
+
+                        <div class="information-label">
+
+                            <i class="fa-solid fa-hashtag"></i>
+
+                            @(Model.UserType == "Student"
+                                                        ? "Student Number"
+                                                        : "Employee Number")
+
+                        </div>
+
+                        <div class="information-value">
+
+                            @(Model.StudentNumber
+                                                        ?? Model.EmployeeNumber
+                                                        ?? "Not provided")
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- PHONE -->
+
+                    <div class="information-item">
+
+                        <div class="information-label">
+
+                            <i class="fa-solid fa-phone"></i>
+
+                            Phone Number
+
+                        </div>
+
+                        <div class="information-value">
+
+                            @(Model.PhoneNumber ?? "Not provided")
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- ACCOUNT STATUS -->
+
+                    <div class="information-item">
+
+                        <div class="information-label">
+
+                            <i class="fa-solid fa-shield-halved"></i>
+
+                            Account Status
+
+                        </div>
+
+                        <div class="information-value">
+
+                            @if (isActive)
+                            {
+                                <span class="status-badge active">
+
+                                    <span class="status-dot"></span>
+
+                                    Active
+
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="status-badge inactive">
+
+                                    <span class="status-dot"></span>
+
+                                    Inactive
+
+                                </span>
+                            }
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- =================================================
+             ACTIVITY
+             ================================================= -->
+
+        <div class="activity-column">
+
+
+            <!-- APPLICATIONS -->
+
+            <div class="activity-stat">
+
+                <div class="activity-stat-icon applications">
+
+                    <i class="fa-solid fa-file-lines"></i>
+
+                </div>
+
+                <div>
+
+                    <span class="activity-stat-label">
+                        Applications
+                    </span>
+
+                    <div class="activity-stat-value">
+                        @applicationCount
+                    </div>
+
+                    <div class="activity-stat-description">
+                        Accommodation applications
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- PAYMENTS -->
+
+            <div class="activity-stat">
+
+                <div class="activity-stat-icon payments">
+
+                    <i class="fa-solid fa-credit-card"></i>
+
+                </div>
+
+                <div>
+
+                    <span class="activity-stat-label">
+                        Payments
+                    </span>
+
+                    <div class="activity-stat-value">
+                        @paymentCount
+                    </div>
+
+                    <div class="activity-stat-description">
+                        Payment records
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- PAID -->
+
+            <div class="activity-stat">
+
+                <div class="activity-stat-icon paid">
+
+                    <i class="fa-solid fa-money-bill-wave"></i>
+
+                </div>
+
+                <div>
+
+                    <span class="activity-stat-label">
+                        Total Paid
+                    </span>
+
+                    <div class="activity-stat-value">
+                        R @paidAmount.ToString("N2")
+                    </div>
+
+                    <div class="activity-stat-description">
+                        Recorded paid amount
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- =================================================
+                 QUICK ACTIONS
+                 ================================================= -->
+
+            <div class="quick-actions-card">
+
+                <div class="quick-actions-title">
+
+                    <i class="fa-solid fa-bolt me-2"></i>
+
+                    Quick Actions
+
+                </div>
+
+
+                <a asp-action="EditCustomer"
+                   asp-route-id="@Model.Id"
+                   class="quick-action">
+
+                    <i class="fa-solid fa-user-pen"></i>
+
+                    Edit Customer Details
+
+                </a>
+
+
+                <a asp-action="ResetCustomerPassword"
+                   asp-route-id="@Model.Id"
+                   class="quick-action warning">
+
+                    <i class="fa-solid fa-key"></i>
+
+                    Reset Customer Password
+
+                </a>
+
+
+                <a asp-action="Customers"
+                   class="quick-action">
+
+                    <i class="fa-solid fa-arrow-left"></i>
+
+                    Back to Customers
+
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>

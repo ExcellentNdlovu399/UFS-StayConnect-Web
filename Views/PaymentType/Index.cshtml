@@ -1,0 +1,1069 @@
+@model IEnumerable<UFSStayConnect.Models.PaymentType>
+
+@{
+    ViewData["Title"] = "Payment Types";
+    Layout = "~/Views/Admin/_AdminLayout.cshtml";
+
+    var paymentTypes = Model?.ToList() ?? new List<UFSStayConnect.Models.PaymentType>();
+
+    var totalTypes = paymentTypes.Count;
+    var activeTypes = paymentTypes.Count(x => x.IsActive);
+    var inactiveTypes = paymentTypes.Count(x => !x.IsActive);
+}
+
+<div class="payment-types-page">
+
+    <!-- PAGE HEADER -->
+    <div class="page-header">
+        <div>
+            <div class="eyebrow">
+                <i class="fas fa-sliders-h"></i>
+                FINANCIAL CONFIGURATION
+            </div>
+
+            <h1>Payment Types</h1>
+
+            <p>
+                Manage the charge categories available across UFS residences.
+            </p>
+        </div>
+
+        <a asp-action="Create" class="btn-add-type">
+            <i class="fas fa-plus"></i>
+            <span>Add Payment Type</span>
+        </a>
+    </div>
+
+
+    <!-- ALERTS -->
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="system-alert success-alert">
+            <div class="alert-icon">
+                <i class="fas fa-check"></i>
+            </div>
+
+            <div>
+                <strong>Success</strong>
+                <p>@TempData["SuccessMessage"]</p>
+            </div>
+
+            <button type="button"
+                    class="alert-close"
+                    onclick="this.parentElement.remove()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="system-alert error-alert">
+            <div class="alert-icon">
+                <i class="fas fa-exclamation-triangle"></i>
+            </div>
+
+            <div>
+                <strong>Action could not be completed</strong>
+                <p>@TempData["ErrorMessage"]</p>
+            </div>
+
+            <button type="button"
+                    class="alert-close"
+                    onclick="this.parentElement.remove()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+    }
+
+
+    <!-- STAT CARDS -->
+    <div class="stats-grid">
+
+        <div class="stat-card">
+            <div class="stat-icon blue">
+                <i class="fas fa-receipt"></i>
+            </div>
+
+            <div class="stat-content">
+                <span>Total Payment Types</span>
+                <strong>@totalTypes</strong>
+                <small>Configured charge categories</small>
+            </div>
+        </div>
+
+
+        <div class="stat-card">
+            <div class="stat-icon green">
+                <i class="fas fa-check-circle"></i>
+            </div>
+
+            <div class="stat-content">
+                <span>Active Types</span>
+                <strong>@activeTypes</strong>
+                <small>Currently available for use</small>
+            </div>
+        </div>
+
+
+        <div class="stat-card">
+            <div class="stat-icon orange">
+                <i class="fas fa-pause-circle"></i>
+            </div>
+
+            <div class="stat-content">
+                <span>Inactive Types</span>
+                <strong>@inactiveTypes</strong>
+                <small>Temporarily unavailable</small>
+            </div>
+        </div>
+
+    </div>
+
+
+    <!-- MAIN CARD -->
+    <div class="management-card">
+
+        <div class="management-header">
+
+            <div>
+                <h2>
+                    <i class="fas fa-list-ul"></i>
+                    Charge Categories
+                </h2>
+
+                <p>
+                    Payment types determine what customers can be charged for.
+                </p>
+            </div>
+
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+
+                <input type="text"
+                       id="paymentTypeSearch"
+                       placeholder="Search payment types..."
+                       autocomplete="off" />
+            </div>
+
+        </div>
+
+
+        @if (!paymentTypes.Any())
+        {
+            <div class="empty-state">
+
+                <div class="empty-icon">
+                    <i class="fas fa-receipt"></i>
+                </div>
+
+                <h3>No Payment Types Yet</h3>
+
+                <p>
+                    Create your first payment type to start configuring
+                    residence charges.
+                </p>
+
+                <a asp-action="Create" class="btn-add-type empty-button">
+                    <i class="fas fa-plus"></i>
+                    Add Payment Type
+                </a>
+
+            </div>
+        }
+        else
+        {
+            <div class="table-wrapper">
+
+                <table class="payment-table">
+
+                    <thead>
+                        <tr>
+                            <th>Payment Type</th>
+                            <th>Description</th>
+                            <th>Status</th>
+                            <th class="actions-column">Actions</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="paymentTypeTable">
+
+                        @foreach (var paymentType in paymentTypes)
+                        {
+                            <tr class="payment-row">
+
+                                <!-- PAYMENT TYPE -->
+                                <td>
+
+                                    <div class="type-cell">
+
+                                        <div class="type-icon">
+                                            @if (paymentType.Name.Equals(
+                                                                                "Rent",
+                                                                                StringComparison.OrdinalIgnoreCase))
+                                            {
+                                                <i class="fas fa-home"></i>
+                                            }
+                                            else if (paymentType.Name.Equals(
+                                            "Water",
+                                            StringComparison.OrdinalIgnoreCase))
+                                            {
+                                                <i class="fas fa-tint"></i>
+                                            }
+                                            else if (paymentType.Name.Equals(
+                                            "Electricity",
+                                            StringComparison.OrdinalIgnoreCase))
+                                            {
+                                                <i class="fas fa-bolt"></i>
+                                            }
+                                            else if (paymentType.Name.Equals(
+                                            "Parking",
+                                            StringComparison.OrdinalIgnoreCase))
+                                            {
+                                                <i class="fas fa-car"></i>
+                                            }
+                                            else if (paymentType.Name.Equals(
+                                            "Laundry",
+                                            StringComparison.OrdinalIgnoreCase))
+                                            {
+                                                <i class="fas fa-tshirt"></i>
+                                            }
+                                            else if (paymentType.Name.Equals(
+                                            "Refuse",
+                                            StringComparison.OrdinalIgnoreCase))
+                                            {
+                                                <i class="fas fa-trash"></i>
+                                            }
+                                            else
+                                            {
+                                                <i class="fas fa-receipt"></i>
+                                            }
+                                        </div>
+
+                                        <div>
+                                            <strong class="type-name">
+                                                @paymentType.Name
+                                            </strong>
+
+                                            <span>
+                                                Charge category
+                                            </span>
+                                        </div>
+
+                                    </div>
+
+                                </td>
+
+
+                                <!-- DESCRIPTION -->
+                                <td>
+
+                                    <div class="description-cell">
+
+                                        @if (string.IsNullOrWhiteSpace(paymentType.Description))
+                                        {
+                                            <span class="no-description">
+                                                No description provided
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            @paymentType.Description
+                                        }
+
+                                    </div>
+
+                                </td>
+
+
+                                <!-- STATUS -->
+                                <td>
+
+                                    @if (paymentType.IsActive)
+                                    {
+                                        <span class="status-badge active">
+                                            <span class="status-dot"></span>
+                                            Active
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="status-badge inactive">
+                                            <span class="status-dot"></span>
+                                            Inactive
+                                        </span>
+                                    }
+
+                                </td>
+
+
+                                <!-- ACTIONS -->
+                                <td class="actions-column">
+
+                                    <div class="action-buttons">
+
+                                        <a asp-action="Edit"
+                                           asp-route-id="@paymentType.PaymentTypeID"
+                                           class="action-btn edit"
+                                           title="Edit payment type">
+
+                                            <i class="fas fa-edit"></i>
+                                            <span>Edit</span>
+
+                                        </a>
+
+
+                                        <form asp-action="ToggleStatus"
+                                              method="post"
+                                              class="toggle-form">
+
+                                            @Html.AntiForgeryToken()
+
+                                            <input type="hidden"
+                                                   name="id"
+                                                   value="@paymentType.PaymentTypeID" />
+
+                                            @if (paymentType.IsActive)
+                                            {
+                                                <button type="submit"
+                                                        class="action-btn disable"
+                                                        title="Disable payment type">
+
+                                                    <i class="fas fa-ban"></i>
+                                                    <span>Disable</span>
+
+                                                </button>
+                                            }
+                                            else
+                                            {
+                                                <button type="submit"
+                                                        class="action-btn activate"
+                                                        title="Activate payment type">
+
+                                                    <i class="fas fa-check"></i>
+                                                    <span>Activate</span>
+
+                                                </button>
+                                            }
+
+                                        </form>
+
+                                    </div>
+
+                                </td>
+
+                            </tr>
+                        }
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+            <!-- NO SEARCH RESULTS -->
+            <div id="noSearchResults" class="no-search-results">
+
+                <div>
+                    <i class="fas fa-search"></i>
+                </div>
+
+                <h3>No payment types found</h3>
+
+                <p>
+                    Try searching using another payment type.
+                </p>
+
+            </div>
+        }
+
+    </div>
+
+</div>
+
+
+<style>
+
+    /* =========================================================
+           PAGE
+           ========================================================= */
+
+    .payment-types-page {
+        padding: 30px 34px 50px;
+        background: #f6f8fb;
+        min-height: calc(100vh - 70px);
+    }
+
+
+    /* =========================================================
+           HEADER
+           ========================================================= */
+
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        gap: 25px;
+        margin-bottom: 28px;
+    }
+
+    .eyebrow {
+        color: #2563eb;
+        font-size: 12px;
+        font-weight: 800;
+        letter-spacing: 1.5px;
+        margin-bottom: 7px;
+    }
+
+        .eyebrow i {
+            margin-right: 6px;
+        }
+
+    .page-header h1 {
+        margin: 0;
+        font-size: 32px;
+        font-weight: 800;
+        color: #172033;
+        letter-spacing: -0.6px;
+    }
+
+    .page-header p {
+        margin: 7px 0 0;
+        color: #7a8496;
+        font-size: 14px;
+    }
+
+
+    /* =========================================================
+           ADD BUTTON
+           ========================================================= */
+
+    .btn-add-type {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 9px;
+        background: #2563eb;
+        color: #fff;
+        border: 0;
+        border-radius: 10px;
+        padding: 12px 18px;
+        font-size: 14px;
+        font-weight: 700;
+        text-decoration: none;
+        box-shadow: 0 7px 18px rgba(37, 99, 235, 0.20);
+        transition: all .2s ease;
+    }
+
+        .btn-add-type:hover {
+            background: #1d4ed8;
+            color: #fff;
+            transform: translateY(-1px);
+            box-shadow: 0 10px 22px rgba(37, 99, 235, 0.25);
+        }
+
+
+    /* =========================================================
+           ALERTS
+           ========================================================= */
+
+    .system-alert {
+        display: flex;
+        align-items: center;
+        gap: 13px;
+        padding: 14px 16px;
+        border-radius: 11px;
+        margin-bottom: 20px;
+        border: 1px solid;
+    }
+
+        .system-alert > div:nth-child(2) {
+            flex: 1;
+        }
+
+        .system-alert strong {
+            display: block;
+            font-size: 13px;
+            margin-bottom: 2px;
+        }
+
+        .system-alert p {
+            margin: 0;
+            font-size: 13px;
+        }
+
+    .alert-icon {
+        width: 36px;
+        height: 36px;
+        border-radius: 9px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .success-alert {
+        background: #effcf4;
+        border-color: #bce8cb;
+        color: #166534;
+    }
+
+        .success-alert .alert-icon {
+            background: #d8f7e3;
+        }
+
+    .error-alert {
+        background: #fff1f2;
+        border-color: #fecdd3;
+        color: #b42332;
+    }
+
+        .error-alert .alert-icon {
+            background: #ffe0e3;
+        }
+
+    .alert-close {
+        border: 0;
+        background: transparent;
+        color: inherit;
+        opacity: .65;
+        cursor: pointer;
+        font-size: 14px;
+    }
+
+
+    /* =========================================================
+           STATS
+           ========================================================= */
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 18px;
+        margin-bottom: 24px;
+    }
+
+    .stat-card {
+        background: #fff;
+        border: 1px solid #e7ebf1;
+        border-radius: 14px;
+        padding: 20px;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        box-shadow: 0 5px 18px rgba(20, 30, 50, 0.04);
+    }
+
+    .stat-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+        flex-shrink: 0;
+    }
+
+        .stat-icon.blue {
+            background: #eaf2ff;
+            color: #2563eb;
+        }
+
+        .stat-icon.green {
+            background: #eaf9ef;
+            color: #16a34a;
+        }
+
+        .stat-icon.orange {
+            background: #fff4df;
+            color: #d97706;
+        }
+
+    .stat-content span {
+        display: block;
+        color: #7b8495;
+        font-size: 12px;
+        font-weight: 600;
+        margin-bottom: 3px;
+    }
+
+    .stat-content strong {
+        display: block;
+        color: #172033;
+        font-size: 24px;
+        line-height: 1.1;
+        margin-bottom: 3px;
+    }
+
+    .stat-content small {
+        color: #9aa3b2;
+        font-size: 11px;
+    }
+
+
+    /* =========================================================
+           MAIN MANAGEMENT CARD
+           ========================================================= */
+
+    .management-card {
+        background: #fff;
+        border: 1px solid #e7ebf1;
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 7px 25px rgba(20, 30, 50, 0.045);
+    }
+
+    .management-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 20px;
+        padding: 22px 24px;
+        border-bottom: 1px solid #edf0f4;
+    }
+
+        .management-header h2 {
+            color: #172033;
+            font-size: 17px;
+            font-weight: 800;
+            margin: 0 0 4px;
+        }
+
+            .management-header h2 i {
+                color: #2563eb;
+                margin-right: 7px;
+            }
+
+        .management-header p {
+            color: #8a93a3;
+            font-size: 12px;
+            margin: 0;
+        }
+
+
+    /* =========================================================
+           SEARCH
+           ========================================================= */
+
+    .search-box {
+        position: relative;
+        width: 280px;
+    }
+
+        .search-box i {
+            position: absolute;
+            left: 13px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #9aa3b2;
+            font-size: 13px;
+        }
+
+        .search-box input {
+            width: 100%;
+            border: 1px solid #dfe4eb;
+            background: #f8fafc;
+            border-radius: 9px;
+            padding: 10px 12px 10px 36px;
+            font-size: 13px;
+            outline: none;
+            transition: .2s ease;
+        }
+
+            .search-box input:focus {
+                border-color: #2563eb;
+                background: #fff;
+                box-shadow: 0 0 0 3px rgba(37, 99, 235, .08);
+            }
+
+
+    /* =========================================================
+           TABLE
+           ========================================================= */
+
+    .table-wrapper {
+        overflow-x: auto;
+    }
+
+    .payment-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+        .payment-table thead th {
+            background: #f8fafc;
+            color: #7b8495;
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: .5px;
+            text-transform: uppercase;
+            padding: 14px 22px;
+            border-bottom: 1px solid #e9edf2;
+            white-space: nowrap;
+        }
+
+        .payment-table tbody td {
+            padding: 17px 22px;
+            border-bottom: 1px solid #f0f2f5;
+            vertical-align: middle;
+        }
+
+    .payment-row {
+        transition: background .15s ease;
+    }
+
+        .payment-row:hover {
+            background: #fafcff;
+        }
+
+
+    /* =========================================================
+           TYPE
+           ========================================================= */
+
+    .type-cell {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .type-icon {
+        width: 42px;
+        height: 42px;
+        border-radius: 11px;
+        background: #eef4ff;
+        color: #2563eb;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+
+    .type-name {
+        display: block;
+        color: #202939;
+        font-size: 14px;
+        margin-bottom: 3px;
+    }
+
+    .type-cell span {
+        color: #9aa3b2;
+        font-size: 11px;
+    }
+
+
+    /* =========================================================
+           DESCRIPTION
+           ========================================================= */
+
+    .description-cell {
+        max-width: 420px;
+        color: #626d7e;
+        font-size: 13px;
+        line-height: 1.5;
+    }
+
+    .no-description {
+        color: #a3abb8;
+        font-style: italic;
+    }
+
+
+    /* =========================================================
+           STATUS
+           ========================================================= */
+
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        padding: 6px 10px;
+        border-radius: 999px;
+        font-size: 11px;
+        font-weight: 800;
+    }
+
+    .status-dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+    }
+
+    .status-badge.active {
+        background: #eaf9ef;
+        color: #16803c;
+    }
+
+        .status-badge.active .status-dot {
+            background: #16a34a;
+        }
+
+    .status-badge.inactive {
+        background: #f0f1f3;
+        color: #68707d;
+    }
+
+        .status-badge.inactive .status-dot {
+            background: #8b929d;
+        }
+
+
+    /* =========================================================
+           ACTIONS
+           ========================================================= */
+
+    .actions-column {
+        text-align: right;
+        white-space: nowrap;
+    }
+
+    .action-buttons {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        gap: 7px;
+    }
+
+    .toggle-form {
+        display: inline;
+        margin: 0;
+    }
+
+    .action-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        border-radius: 8px;
+        padding: 7px 10px;
+        font-size: 11px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all .18s ease;
+        text-decoration: none;
+        background: #fff;
+    }
+
+        .action-btn.edit {
+            color: #2563eb;
+            border: 1px solid #cbdcff;
+        }
+
+            .action-btn.edit:hover {
+                background: #eef4ff;
+                color: #1d4ed8;
+            }
+
+        .action-btn.disable {
+            color: #d97706;
+            border: 1px solid #f5d49c;
+        }
+
+            .action-btn.disable:hover {
+                background: #fff7e8;
+            }
+
+        .action-btn.activate {
+            color: #15803d;
+            border: 1px solid #b9e4c6;
+        }
+
+            .action-btn.activate:hover {
+                background: #edf9f0;
+            }
+
+
+    /* =========================================================
+           EMPTY STATES
+           ========================================================= */
+
+    .empty-state {
+        padding: 70px 25px;
+        text-align: center;
+    }
+
+    .empty-icon {
+        width: 70px;
+        height: 70px;
+        border-radius: 18px;
+        background: #eef4ff;
+        color: #2563eb;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 27px;
+        margin: 0 auto 18px;
+    }
+
+    .empty-state h3 {
+        color: #202939;
+        font-size: 18px;
+        margin-bottom: 7px;
+        font-weight: 800;
+    }
+
+    .empty-state p {
+        color: #8b94a3;
+        font-size: 13px;
+        margin-bottom: 20px;
+    }
+
+    .empty-button {
+        display: inline-flex;
+    }
+
+    .no-search-results {
+        display: none;
+        padding: 60px 20px;
+        text-align: center;
+    }
+
+        .no-search-results > div {
+            width: 55px;
+            height: 55px;
+            border-radius: 50%;
+            background: #f0f3f7;
+            color: #8992a1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 14px;
+        }
+
+        .no-search-results h3 {
+            font-size: 16px;
+            color: #303949;
+            margin-bottom: 5px;
+        }
+
+        .no-search-results p {
+            color: #8d96a5;
+            font-size: 13px;
+            margin: 0;
+        }
+
+
+    /* =========================================================
+           RESPONSIVE
+           ========================================================= */
+
+    @@media (max-width: 1000px) {
+
+        .stats-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .management-header {
+            align-items: flex-start;
+            flex-direction: column;
+        }
+
+        .search-box {
+            width: 100%;
+        }
+    }
+
+
+    @@media (max-width: 700px) {
+
+        .payment-types-page {
+            padding: 22px 16px 40px;
+        }
+
+        .page-header {
+            align-items: flex-start;
+            flex-direction: column;
+        }
+
+            .page-header h1 {
+                font-size: 27px;
+            }
+
+        .btn-add-type {
+            width: 100%;
+        }
+
+        .management-header {
+            padding: 18px;
+        }
+
+        .payment-table thead th,
+        .payment-table tbody td {
+            padding-left: 14px;
+            padding-right: 14px;
+        }
+
+        .action-btn span {
+            display: none;
+        }
+
+        .action-btn {
+            width: 34px;
+            height: 34px;
+            padding: 0;
+        }
+    }
+
+</style>
+
+
+<script>
+
+    document.addEventListener("DOMContentLoaded", function () {
+
+        const searchInput =
+            document.getElementById("paymentTypeSearch");
+
+        const rows =
+            document.querySelectorAll(".payment-row");
+
+        const noResults =
+            document.getElementById("noSearchResults");
+
+
+        if (!searchInput) {
+            return;
+        }
+
+
+        searchInput.addEventListener("input", function () {
+
+            const searchTerm =
+                this.value.toLowerCase().trim();
+
+            let visibleRows = 0;
+
+
+            rows.forEach(function (row) {
+
+                const text =
+                    row.innerText.toLowerCase();
+
+                if (text.includes(searchTerm)) {
+
+                    row.style.display = "";
+
+                    visibleRows++;
+
+                }
+                else {
+
+                    row.style.display = "none";
+
+                }
+
+            });
+
+
+            if (noResults) {
+
+                noResults.style.display =
+                    visibleRows === 0 ? "block" : "none";
+
+            }
+
+        });
+
+    });
+
+</script>

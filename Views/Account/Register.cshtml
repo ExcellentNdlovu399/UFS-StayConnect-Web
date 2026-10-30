@@ -1,0 +1,691 @@
+@model UFSStayConnect.ViewModels.RegisterViewModel
+
+@{
+    Layout = null;
+    ViewData["Title"] = "Create Account";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Create Account | UFS StayConnect</title>
+
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
+
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" />
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: "Inter", "Segoe UI", Arial, sans-serif;
+            background: #f4f6f8;
+            color: #17213c;
+        }
+
+        .register-page {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 35px;
+        }
+
+        .register-shell {
+            width: min(1180px, 100%);
+            min-height: 690px;
+            display: grid;
+            grid-template-columns: 1fr 1.15fr;
+            background: white;
+            border-radius: 30px;
+            overflow: hidden;
+            box-shadow: 0 25px 70px rgba(15, 31, 56, .18);
+        }
+
+        /* LEFT SIDE */
+
+        .register-image {
+            position: relative;
+            background: linear-gradient( to top, rgba(8, 20, 38, .88), rgba(8, 20, 38, .08) 70% ), url('/images/auth/signup-residence.jpg');
+            background-size: cover;
+            background-position: center;
+            color: white;
+            padding: 35px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .brand-logo {
+            width: 44px;
+            height: 44px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 5px 18px rgba(0, 0, 0, .18);
+        }
+
+            .brand-logo img {
+                width: 35px;
+                height: 35px;
+                object-fit: contain;
+            }
+
+        .register-image-content {
+            max-width: 470px;
+        }
+
+        .campus-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 9px 15px;
+            border-radius: 30px;
+            background: rgba(255, 255, 255, .15);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, .25);
+            margin-bottom: 20px;
+            font-size: 13px;
+        }
+
+        .register-image-content h1 {
+            font-size: clamp(40px, 4vw, 58px);
+            line-height: .98;
+            font-weight: 800;
+            letter-spacing: -2px;
+            margin-bottom: 20px;
+        }
+
+        .register-image-content p {
+            max-width: 430px;
+            font-size: 15px;
+            line-height: 1.75;
+            color: rgba(255,255,255,.9);
+        }
+
+        /* RIGHT SIDE */
+
+        .register-form {
+            padding: 45px clamp(40px, 5vw, 75px);
+            overflow-y: auto;
+        }
+
+        .top-login {
+            text-align: right;
+            margin-bottom: 25px;
+        }
+
+            .top-login a {
+                display: inline-block;
+                border: 1px solid #17213c;
+                color: #17213c;
+                padding: 9px 21px;
+                border-radius: 30px;
+                text-decoration: none;
+                font-size: 13px;
+                font-weight: 600;
+                transition: .25s ease;
+            }
+
+                .top-login a:hover {
+                    background: #17213c;
+                    color: white;
+                }
+
+        .form-heading {
+            margin-bottom: 28px;
+        }
+
+            .form-heading h2 {
+                font-size: 32px;
+                font-weight: 800;
+                letter-spacing: -1px;
+                margin-bottom: 8px;
+            }
+
+            .form-heading p {
+                color: #8b93a7;
+                margin: 0;
+            }
+
+        .form-label {
+            font-size: 13px;
+            font-weight: 700;
+            color: #313b52;
+            margin-bottom: 7px;
+        }
+
+        .form-control,
+        .form-select {
+            min-height: 50px;
+            border: 1px solid #dfe3ea;
+            border-radius: 10px;
+            padding-left: 15px;
+            padding-right: 15px;
+            font-size: 14px;
+            transition: .2s ease;
+        }
+
+            .form-control:focus,
+            .form-select:focus {
+                border-color: #1769e0;
+                box-shadow: 0 0 0 4px rgba(23,105,224,.10);
+            }
+
+        .account-type {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .account-type-option {
+            position: relative;
+        }
+
+            .account-type-option input {
+                position: absolute;
+                opacity: 0;
+            }
+
+        .account-type-label {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-height: 62px;
+            border: 1px solid #dfe3ea;
+            border-radius: 12px;
+            padding: 12px 15px;
+            cursor: pointer;
+            transition: .2s ease;
+        }
+
+            .account-type-label i {
+                font-size: 20px;
+                color: #1769e0;
+            }
+
+            .account-type-label strong {
+                display: block;
+                font-size: 14px;
+            }
+
+            .account-type-label small {
+                color: #8b93a7;
+                font-size: 11px;
+            }
+
+        .account-type-option input:checked + .account-type-label {
+            border-color: #1769e0;
+            background: #f2f7ff;
+            box-shadow: 0 0 0 3px rgba(23,105,224,.08);
+        }
+
+        .create-btn {
+            width: 100%;
+            height: 54px;
+            border: 0;
+            border-radius: 10px;
+            background: #111;
+            color: white;
+            font-weight: 700;
+            transition: .25s ease;
+        }
+
+            .create-btn:hover {
+                background: #1769e0;
+                transform: translateY(-1px);
+                box-shadow: 0 10px 25px rgba(23,105,224,.20);
+            }
+
+        .security-note {
+            margin-top: 16px;
+            padding: 13px 15px;
+            border-radius: 10px;
+            background: #f5f8fc;
+            color: #697386;
+            font-size: 12px;
+        }
+
+        .student-fields,
+        .employee-fields {
+            display: none;
+        }
+
+            .student-fields.active,
+            .employee-fields.active {
+                display: block;
+            }
+
+        @@media (max-width: 850px) {
+
+            .register-page {
+                padding: 15px;
+            }
+
+            .register-shell {
+                grid-template-columns: 1fr;
+            }
+
+            .register-image {
+                min-height: 320px;
+            }
+
+            .register-form {
+                padding: 40px 30px;
+            }
+        }
+
+        @@media (max-width: 500px) {
+
+            .register-page {
+                padding: 0;
+            }
+
+            .register-shell {
+                border-radius: 0;
+                min-height: 100vh;
+            }
+
+            .register-form {
+                padding: 30px 20px;
+            }
+
+            .account-type {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="register-page">
+
+        <div class="register-shell">
+
+            <!-- LEFT IMAGE -->
+
+            <section class="register-image">
+
+                <div class="brand">
+
+                    <div class="brand-logo">
+                        <img src="/images/ufs-emblem.png"
+                             alt="UFS StayConnect">
+                    </div>
+
+                    <span>UFS StayConnect</span>
+
+                </div>
+
+                <div class="register-image-content">
+
+                    <div class="campus-badge">
+
+                        <i class="fas fa-house"></i>
+
+                        UFS Accommodation
+
+                    </div>
+
+                    <h1>
+                        Your New<br />
+                        Home Awaits.
+                    </h1>
+
+                    <p>
+                        Create your StayConnect account and take
+                        control of your accommodation journey at
+                        the University of the Free State, QwaQwa Campus.
+                    </p>
+
+                </div>
+
+            </section>
+
+
+            <!-- RIGHT FORM -->
+
+            <section class="register-form">
+
+                <div class="top-login">
+
+                    <a asp-controller="Account"
+                       asp-action="Login">
+
+                        Sign In
+
+                    </a>
+
+                </div>
+
+
+                <div class="form-heading">
+
+                    <h2>Create Your Account</h2>
+
+                    <p>
+                        Join UFS StayConnect and manage your
+                        accommodation in one place.
+                    </p>
+
+                </div>
+
+
+                <form asp-controller="Account"
+                      asp-action="Register"
+                      method="post">
+
+                    @Html.AntiForgeryToken()
+
+
+                    <div asp-validation-summary="ModelOnly"
+                         class="alert alert-danger">
+                    </div>
+
+
+                    <!-- NAME -->
+
+                    <div class="row">
+
+                        <div class="col-md-6 mb-3">
+
+                            <label asp-for="FirstName"
+                                   class="form-label">
+                                First Name
+                            </label>
+
+                            <input asp-for="FirstName"
+                                   class="form-control"
+                                   placeholder="First name" />
+
+                            <span asp-validation-for="FirstName"
+                                  class="text-danger small">
+                            </span>
+
+                        </div>
+
+
+                        <div class="col-md-6 mb-3">
+
+                            <label asp-for="Surname"
+                                   class="form-label">
+                                Surname
+                            </label>
+
+                            <input asp-for="Surname"
+                                   class="form-control"
+                                   placeholder="Surname" />
+
+                            <span asp-validation-for="Surname"
+                                  class="text-danger small">
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- EMAIL -->
+
+                    <div class="mb-3">
+
+                        <label asp-for="Email"
+                               class="form-label">
+                            UFS Email Address
+                        </label>
+
+                        <input asp-for="Email"
+                               class="form-control"
+                               placeholder="example@ufs.ac.za"
+                               autocomplete="email" />
+
+                        <span asp-validation-for="Email"
+                              class="text-danger small">
+                        </span>
+
+                    </div>
+
+
+                    <!-- USER TYPE -->
+
+                    <div class="mb-3">
+
+                        <label class="form-label">
+                            Account Type
+                        </label>
+
+                        <div class="account-type">
+
+                            <div class="account-type-option">
+
+                                <input type="radio"
+                                       asp-for="UserType"
+                                       value="Student"
+                                       id="studentType" />
+
+                                <label for="studentType"
+                                       class="account-type-label">
+
+                                    <i class="fas fa-graduation-cap"></i>
+
+                                    <span>
+                                        <strong>Student</strong>
+                                        <small>UFS Student</small>
+                                    </span>
+
+                                </label>
+
+                            </div>
+
+
+                            <div class="account-type-option">
+
+                                <input type="radio"
+                                       asp-for="UserType"
+                                       value="Staff"
+                                       id="staffType" />
+
+                                <label for="staffType"
+                                       class="account-type-label">
+
+                                    <i class="fas fa-user-tie"></i>
+
+                                    <span>
+                                        <strong>Staff</strong>
+                                        <small>UFS Staff Member</small>
+                                    </span>
+
+                                </label>
+
+                            </div>
+
+                        </div>
+
+                        <span asp-validation-for="UserType"
+                              class="text-danger small">
+                        </span>
+
+                    </div>
+
+
+                    <!-- STUDENT NUMBER -->
+
+                    <div id="studentFields"
+                         class="student-fields active mb-3">
+
+                        <label asp-for="StudentNumber"
+                               class="form-label">
+                            Student Number
+                        </label>
+
+                        <input asp-for="StudentNumber"
+                               class="form-control"
+                               placeholder="e.g. 2024123456" />
+
+                        <span asp-validation-for="StudentNumber"
+                              class="text-danger small">
+                        </span>
+
+                    </div>
+
+
+                    <!-- EMPLOYEE NUMBER -->
+
+                    <div id="employeeFields"
+                         class="employee-fields mb-3">
+
+                        <label asp-for="EmployeeNumber"
+                               class="form-label">
+                            Employee Number
+                        </label>
+
+                        <input asp-for="EmployeeNumber"
+                               class="form-control"
+                               placeholder="Enter your employee number" />
+
+                        <span asp-validation-for="EmployeeNumber"
+                              class="text-danger small">
+                        </span>
+
+                    </div>
+
+
+                    <!-- PASSWORD -->
+
+                    <div class="mb-3">
+
+                        <label asp-for="Password"
+                               class="form-label">
+                            Password
+                        </label>
+
+                        <input asp-for="Password"
+                               class="form-control"
+                               placeholder="Create a strong password"
+                               autocomplete="new-password" />
+
+                        <span asp-validation-for="Password"
+                              class="text-danger small">
+                        </span>
+
+                    </div>
+
+
+                    <!-- CONFIRM PASSWORD -->
+
+                    <div class="mb-4">
+
+                        <label asp-for="ConfirmPassword"
+                               class="form-label">
+                            Confirm Password
+                        </label>
+
+                        <input asp-for="ConfirmPassword"
+                               class="form-control"
+                               placeholder="Confirm your password"
+                               autocomplete="new-password" />
+
+                        <span asp-validation-for="ConfirmPassword"
+                              class="text-danger small">
+                        </span>
+
+                    </div>
+
+
+                    <button type="submit"
+                            class="create-btn">
+
+                        <i class="fas fa-user-plus me-2"></i>
+
+                        Create Account
+
+                    </button>
+
+
+                    <div class="security-note">
+
+                        <i class="fas fa-shield-halved me-2"></i>
+
+                        Your account information is protected by
+                        UFS StayConnect security controls.
+
+                    </div>
+
+                </form>
+
+            </section>
+
+        </div>
+
+    </div>
+
+
+    <script>
+
+        const studentType =
+            document.getElementById("studentType");
+
+        const staffType =
+            document.getElementById("staffType");
+
+        const studentFields =
+            document.getElementById("studentFields");
+
+        const employeeFields =
+            document.getElementById("employeeFields");
+
+
+        function updateAccountType() {
+
+            if (studentType.checked) {
+
+                studentFields.classList.add("active");
+                employeeFields.classList.remove("active");
+
+            }
+            else if (staffType.checked) {
+
+                employeeFields.classList.add("active");
+                studentFields.classList.remove("active");
+
+            }
+        }
+
+
+        studentType.addEventListener(
+            "change",
+            updateAccountType
+        );
+
+        staffType.addEventListener(
+            "change",
+            updateAccountType
+        );
+
+
+        updateAccountType();
+
+    </script>
+
+</body>
+</html>

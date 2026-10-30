@@ -1,0 +1,1026 @@
+@model IEnumerable<UFSStayConnect.Models.AccommodationCharge>
+
+@{
+    ViewData["Title"] = "Manage Accommodation Charges";
+    var accommodation = ViewBag.Accommodation as UFSStayConnect.Models.Accommodation;
+
+    var charges = Model?.ToList() ?? new List<UFSStayConnect.Models.AccommodationCharge>();
+
+    var activeCharges = charges.Count(x => x.IsActive);
+    var inactiveCharges = charges.Count(x => !x.IsActive);
+    var totalValue = charges.Where(x => x.IsActive).Sum(x => x.Amount);
+}
+
+
+<div class="charges-page">
+
+    <!-- Header -->
+    <div class="page-header">
+
+        <div>
+
+            <div class="page-eyebrow">
+                <i class="fas fa-file-invoice-dollar"></i>
+                ACCOMMODATION MANAGEMENT
+            </div>
+
+            <h1>Accommodation Charges</h1>
+
+            <p>
+                Manage payment charges assigned to
+                <strong>@(accommodation?.Name ?? "this accommodation")</strong>.
+            </p>
+
+        </div>
+
+
+        <div class="header-actions">
+
+            <a asp-controller="Accommodation"
+               asp-action="Manage"
+               class="btn-secondary">
+                <i class="fas fa-arrow-left"></i>
+                Back to Accommodations
+            </a>
+
+            <a asp-action="Create"
+               asp-route-accommodationId="@accommodation?.AccommodationID"
+               class="btn-primary">
+                <i class="fas fa-plus"></i>
+                Add Charge
+            </a>
+
+        </div>
+
+    </div>
+
+
+    <!-- Alerts -->
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert-custom success">
+
+            <div class="alert-icon">
+                <i class="fas fa-circle-check"></i>
+            </div>
+
+            <div>
+                <strong>Success</strong>
+                <span>@TempData["SuccessMessage"]</span>
+            </div>
+
+        </div>
+    }
+
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert-custom danger">
+
+            <div class="alert-icon">
+                <i class="fas fa-circle-exclamation"></i>
+            </div>
+
+            <div>
+                <strong>Action could not be completed</strong>
+                <span>@TempData["ErrorMessage"]</span>
+            </div>
+
+        </div>
+    }
+
+
+    <!-- Residence Banner -->
+    <div class="residence-banner">
+
+        <div class="residence-icon">
+            <i class="fas fa-building"></i>
+        </div>
+
+        <div class="residence-details">
+
+            <span>Residence</span>
+
+            <h2>
+                @(accommodation?.Name ?? "Accommodation")
+            </h2>
+
+            @if (accommodation != null)
+            {
+                <div class="location">
+                    <i class="fas fa-location-dot"></i>
+                    @accommodation.Location
+                </div>
+            }
+
+        </div>
+
+        <div class="residence-status">
+
+            <span>Current Status</span>
+
+            <strong>
+                @(accommodation?.Available == true ? "Available" : "Unavailable")
+            </strong>
+
+        </div>
+
+    </div>
+
+
+    <!-- Statistics -->
+    <div class="stats-grid">
+
+        <div class="stat-card">
+
+            <div class="stat-icon blue">
+                <i class="fas fa-file-invoice"></i>
+            </div>
+
+            <div>
+                <span>Total Charges</span>
+                <strong>@charges.Count</strong>
+            </div>
+
+        </div>
+
+
+        <div class="stat-card">
+
+            <div class="stat-icon green">
+                <i class="fas fa-circle-check"></i>
+            </div>
+
+            <div>
+                <span>Active Charges</span>
+                <strong>@activeCharges</strong>
+            </div>
+
+        </div>
+
+
+        <div class="stat-card">
+
+            <div class="stat-icon gray">
+                <i class="fas fa-circle-pause"></i>
+            </div>
+
+            <div>
+                <span>Inactive Charges</span>
+                <strong>@inactiveCharges</strong>
+            </div>
+
+        </div>
+
+
+        <div class="stat-card">
+
+            <div class="stat-icon gold">
+                <i class="fas fa-money-bill-wave"></i>
+            </div>
+
+            <div>
+                <span>Active Charge Value</span>
+                <strong>R @totalValue.ToString("N2")</strong>
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- Main Management Card -->
+    <div class="management-card">
+
+        <div class="management-header">
+
+            <div>
+
+                <h2>Payment Charges</h2>
+
+                <p>
+                    Charges configured for this accommodation.
+                </p>
+
+            </div>
+
+
+            @if (charges.Any())
+            {
+                <div class="charge-count">
+                    @charges.Count charge@(charges.Count == 1 ? "" : "s")
+                </div>
+            }
+
+        </div>
+
+
+        @if (!charges.Any())
+        {
+            <!-- Empty State -->
+            <div class="empty-state">
+
+                <div class="empty-icon">
+                    <i class="fas fa-file-circle-plus"></i>
+                </div>
+
+                <h3>No charges configured</h3>
+
+                <p>
+                    This accommodation does not have any payment charges yet.
+                    Add a charge to allow customers to be billed for residence
+                    services or accommodation costs.
+                </p>
+
+                <a asp-action="Create"
+                   asp-route-accommodationId="@accommodation?.AccommodationID"
+                   class="btn-primary">
+                    <i class="fas fa-plus"></i>
+                    Add First Charge
+                </a>
+
+            </div>
+        }
+        else
+        {
+            <!-- Table -->
+            <div class="table-wrapper">
+
+                <table class="charges-table">
+
+                    <thead>
+
+                        <tr>
+
+                            <th>Charge Type</th>
+
+                            <th>Amount</th>
+
+                            <th>Frequency</th>
+
+                            <th>Description</th>
+
+                            <th>Status</th>
+
+                            <th class="actions-column">
+                                Actions
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody>
+
+                        @foreach (var charge in charges)
+                        {
+                            <tr>
+
+                                <!-- Charge -->
+                                <td>
+
+                                    <div class="charge-name">
+
+                                        <div class="charge-icon">
+                                            <i class="fas fa-receipt"></i>
+                                        </div>
+
+                                        <div>
+
+                                            <strong>
+                                                @(charge.PaymentType?.Name ?? "Unknown")
+                                            </strong>
+
+                                            <small>
+                                                Charge #@charge.AccommodationChargeID
+                                            </small>
+
+                                        </div>
+
+                                    </div>
+
+                                </td>
+
+
+                                <!-- Amount -->
+                                <td>
+
+                                    <div class="amount">
+                                        R @charge.Amount.ToString("N2")
+                                    </div>
+
+                                </td>
+
+
+                                <!-- Frequency -->
+                                <td>
+
+                                    <span class="frequency">
+                                        <i class="fas fa-repeat"></i>
+                                        @charge.Frequency
+                                    </span>
+
+                                </td>
+
+
+                                <!-- Description -->
+                                <td>
+
+                                    @if (!string.IsNullOrWhiteSpace(charge.Description))
+                                    {
+                                        <div class="description">
+                                            @charge.Description
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <span class="muted">
+                                            No description
+                                        </span>
+                                    }
+
+                                </td>
+
+
+                                <!-- Status -->
+                                <td>
+
+                                    @if (charge.IsActive)
+                                    {
+                                        <span class="status active">
+                                            <i class="fas fa-circle"></i>
+                                            Active
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="status inactive">
+                                            <i class="fas fa-circle"></i>
+                                            Inactive
+                                        </span>
+                                    }
+
+                                </td>
+
+
+                                <!-- Actions -->
+                                <td>
+
+                                    <div class="action-buttons">
+
+                                        <!-- Edit -->
+                                        <a asp-action="Edit"
+                                           asp-route-id="@charge.AccommodationChargeID"
+                                           class="action-btn edit"
+                                           title="Edit charge">
+                                            <i class="fas fa-pen"></i>
+                                        </a>
+
+
+                                        <!-- Toggle -->
+                                        <form asp-action="ToggleStatus"
+                                              method="post"
+                                              class="inline-form">
+
+                                            @Html.AntiForgeryToken()
+
+                                            <input type="hidden"
+                                                   name="id"
+                                                   value="@charge.AccommodationChargeID" />
+
+                                            <button type="submit"
+                                                    class="action-btn @(charge.IsActive ? "disable" : "enable")"
+                                                    title="@(charge.IsActive ? "Deactivate charge" : "Activate charge")">
+
+                                                @if (charge.IsActive)
+                                                {
+                                                    <i class="fas fa-pause"></i>
+                                                }
+                                                else
+                                                {
+                                                    <i class="fas fa-play"></i>
+                                                }
+
+                                            </button>
+
+                                        </form>
+
+
+                                        <!-- Delete -->
+                                        <form asp-action="Delete"
+                                              method="post"
+                                              class="inline-form"
+                                              onsubmit="return confirmDelete();">
+
+                                            @Html.AntiForgeryToken()
+
+                                            <input type="hidden"
+                                                   name="id"
+                                                   value="@charge.AccommodationChargeID" />
+
+                                            <button type="submit"
+                                                    class="action-btn delete"
+                                                    title="Delete charge">
+
+                                                <i class="fas fa-trash"></i>
+
+                                            </button>
+
+                                        </form>
+
+                                    </div>
+
+                                </td>
+
+                            </tr>
+                        }
+
+                    </tbody>
+
+                </table>
+
+            </div>
+        }
+
+    </div>
+
+</div>
+
+
+<style>
+
+    .charges-page {
+        background: #f6f8fb;
+        min-height: calc(100vh - 80px);
+        padding: 32px;
+        color: #172033;
+    }
+
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 20px;
+        margin-bottom: 24px;
+    }
+
+    .page-eyebrow {
+        color: #2563eb;
+        font-size: 12px;
+        font-weight: 800;
+        letter-spacing: 1.4px;
+        margin-bottom: 8px;
+    }
+
+        .page-eyebrow i {
+            margin-right: 6px;
+        }
+
+    .page-header h1 {
+        margin: 0;
+        font-size: 30px;
+        font-weight: 800;
+    }
+
+    .page-header p {
+        margin: 7px 0 0;
+        color: #6b7280;
+        font-size: 14px;
+    }
+
+        .page-header p strong {
+            color: #172033;
+        }
+
+    .header-actions {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .btn-primary,
+    .btn-secondary {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        min-height: 42px;
+        padding: 10px 16px;
+        border-radius: 9px;
+        text-decoration: none;
+        font-size: 13px;
+        font-weight: 750;
+        border: none;
+        cursor: pointer;
+        transition: .2s;
+    }
+
+    .btn-primary {
+        background: #2563eb;
+        color: #fff;
+        box-shadow: 0 4px 10px rgba(37,99,235,.18);
+    }
+
+        .btn-primary:hover {
+            background: #1d4ed8;
+            color: #fff;
+        }
+
+    .btn-secondary {
+        background: #fff;
+        color: #374151;
+        border: 1px solid #d9dee8;
+    }
+
+        .btn-secondary:hover {
+            color: #2563eb;
+            border-color: #2563eb;
+            background: #f8fbff;
+        }
+
+    .alert-custom {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 13px 16px;
+        border-radius: 10px;
+        margin-bottom: 18px;
+    }
+
+        .alert-custom.success {
+            background: #ecfdf3;
+            border: 1px solid #bbf7d0;
+            color: #166534;
+        }
+
+        .alert-custom.danger {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            color: #991b1b;
+        }
+
+    .alert-icon {
+        font-size: 18px;
+    }
+
+    .alert-custom strong {
+        display: block;
+        font-size: 13px;
+    }
+
+    .alert-custom span {
+        display: block;
+        font-size: 12px;
+        margin-top: 2px;
+    }
+
+    .residence-banner {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        padding: 20px 24px;
+        background: linear-gradient(135deg, #123b73, #1e4f91);
+        border-radius: 14px;
+        color: #fff;
+        margin-bottom: 20px;
+        box-shadow: 0 8px 24px rgba(18,59,115,.15);
+    }
+
+    .residence-icon {
+        width: 54px;
+        height: 54px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 12px;
+        background: rgba(255,255,255,.14);
+        border: 1px solid rgba(255,255,255,.2);
+        font-size: 21px;
+    }
+
+    .residence-details {
+        flex: 1;
+    }
+
+        .residence-details > span,
+        .residence-status span {
+            display: block;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 10px;
+            font-weight: 750;
+            opacity: .7;
+        }
+
+        .residence-details h2 {
+            margin: 3px 0 4px;
+            font-size: 20px;
+            font-weight: 800;
+        }
+
+    .location {
+        font-size: 12px;
+        opacity: .82;
+    }
+
+        .location i {
+            margin-right: 5px;
+        }
+
+    .residence-status {
+        text-align: right;
+        padding-left: 20px;
+        border-left: 1px solid rgba(255,255,255,.18);
+    }
+
+        .residence-status strong {
+            display: block;
+            margin-top: 4px;
+            font-size: 14px;
+        }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 14px;
+        margin-bottom: 20px;
+    }
+
+    .stat-card {
+        background: #fff;
+        border: 1px solid #e5e9f0;
+        border-radius: 12px;
+        padding: 17px;
+        display: flex;
+        align-items: center;
+        gap: 13px;
+        box-shadow: 0 4px 16px rgba(15,23,42,.04);
+    }
+
+    .stat-icon {
+        width: 42px;
+        height: 42px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 10px;
+        flex-shrink: 0;
+    }
+
+        .stat-icon.blue {
+            background: #eff6ff;
+            color: #2563eb;
+        }
+
+        .stat-icon.green {
+            background: #ecfdf3;
+            color: #16a34a;
+        }
+
+        .stat-icon.gray {
+            background: #f3f4f6;
+            color: #6b7280;
+        }
+
+        .stat-icon.gold {
+            background: #fffbeb;
+            color: #b8860b;
+        }
+
+    .stat-card span {
+        display: block;
+        color: #7b8494;
+        font-size: 11px;
+        font-weight: 650;
+        margin-bottom: 3px;
+    }
+
+    .stat-card strong {
+        display: block;
+        font-size: 18px;
+        font-weight: 800;
+        color: #172033;
+    }
+
+    .management-card {
+        background: #fff;
+        border: 1px solid #e5e9f0;
+        border-radius: 15px;
+        box-shadow: 0 5px 20px rgba(15,23,42,.05);
+        overflow: hidden;
+    }
+
+    .management-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 22px 24px;
+        border-bottom: 1px solid #edf0f4;
+    }
+
+        .management-header h2 {
+            margin: 0;
+            font-size: 18px;
+            font-weight: 800;
+        }
+
+        .management-header p {
+            margin: 4px 0 0;
+            color: #7b8494;
+            font-size: 12px;
+        }
+
+    .charge-count {
+        background: #eff6ff;
+        color: #2563eb;
+        border-radius: 20px;
+        padding: 7px 12px;
+        font-size: 11px;
+        font-weight: 750;
+    }
+
+    .table-wrapper {
+        width: 100%;
+        overflow-x: auto;
+    }
+
+    .charges-table {
+        width: 100%;
+        border-collapse: collapse;
+        min-width: 850px;
+    }
+
+        .charges-table th {
+            padding: 13px 18px;
+            background: #fafbfc;
+            color: #7b8494;
+            border-bottom: 1px solid #e9edf2;
+            text-align: left;
+            font-size: 10px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: .7px;
+            white-space: nowrap;
+        }
+
+        .charges-table td {
+            padding: 16px 18px;
+            border-bottom: 1px solid #edf0f4;
+            vertical-align: middle;
+            font-size: 13px;
+        }
+
+        .charges-table tbody tr {
+            transition: .15s;
+        }
+
+            .charges-table tbody tr:hover {
+                background: #fbfdff;
+            }
+
+    .charge-name {
+        display: flex;
+        align-items: center;
+        gap: 11px;
+    }
+
+    .charge-icon {
+        width: 38px;
+        height: 38px;
+        border-radius: 9px;
+        background: #eff6ff;
+        color: #2563eb;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+
+    .charge-name strong {
+        display: block;
+        color: #172033;
+        font-size: 13px;
+    }
+
+    .charge-name small {
+        display: block;
+        color: #9aa2b1;
+        margin-top: 3px;
+        font-size: 10px;
+    }
+
+    .amount {
+        font-weight: 800;
+        color: #172033;
+        white-space: nowrap;
+    }
+
+    .frequency {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        color: #4b5563;
+        font-size: 12px;
+        font-weight: 650;
+    }
+
+        .frequency i {
+            color: #2563eb;
+            font-size: 11px;
+        }
+
+    .description {
+        max-width: 240px;
+        color: #596273;
+        font-size: 12px;
+        line-height: 1.45;
+    }
+
+    .muted {
+        color: #a0a7b3;
+        font-size: 12px;
+    }
+
+    .status {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 9px;
+        border-radius: 20px;
+        font-size: 10px;
+        font-weight: 800;
+    }
+
+        .status i {
+            font-size: 6px;
+        }
+
+        .status.active {
+            color: #15803d;
+            background: #ecfdf3;
+        }
+
+        .status.inactive {
+            color: #6b7280;
+            background: #f3f4f6;
+        }
+
+    .actions-column {
+        text-align: right !important;
+    }
+
+    .action-buttons {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .inline-form {
+        display: inline;
+        margin: 0;
+    }
+
+    .action-btn {
+        width: 34px;
+        height: 34px;
+        border: 1px solid #e1e5eb;
+        border-radius: 8px;
+        background: #fff;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
+        cursor: pointer;
+        font-size: 11px;
+        transition: .18s;
+    }
+
+        .action-btn.edit {
+            color: #2563eb;
+        }
+
+            .action-btn.edit:hover {
+                background: #eff6ff;
+                border-color: #bfdbfe;
+            }
+
+        .action-btn.enable {
+            color: #16a34a;
+        }
+
+            .action-btn.enable:hover {
+                background: #ecfdf3;
+                border-color: #bbf7d0;
+            }
+
+        .action-btn.disable {
+            color: #d97706;
+        }
+
+            .action-btn.disable:hover {
+                background: #fffbeb;
+                border-color: #fde68a;
+            }
+
+        .action-btn.delete {
+            color: #dc2626;
+        }
+
+            .action-btn.delete:hover {
+                background: #fef2f2;
+                border-color: #fecaca;
+            }
+
+    .empty-state {
+        text-align: center;
+        padding: 70px 25px;
+        max-width: 620px;
+        margin: auto;
+    }
+
+    .empty-icon {
+        width: 68px;
+        height: 68px;
+        margin: 0 auto 18px;
+        border-radius: 18px;
+        background: #eff6ff;
+        color: #2563eb;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 26px;
+    }
+
+    .empty-state h3 {
+        margin: 0;
+        font-size: 19px;
+        font-weight: 800;
+    }
+
+    .empty-state p {
+        color: #7b8494;
+        font-size: 13px;
+        line-height: 1.6;
+        margin: 8px auto 20px;
+        max-width: 500px;
+    }
+
+    @@media (max-width: 1000px) {
+
+        .stats-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .residence-status {
+            display: none;
+        }
+    }
+
+    @@media (max-width: 700px) {
+
+        .charges-page {
+            padding: 20px 15px;
+        }
+
+        .page-header {
+            flex-direction: column;
+        }
+
+        .header-actions {
+            width: 100%;
+        }
+
+            .header-actions a {
+                flex: 1;
+            }
+
+        .stats-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .residence-banner {
+            padding: 17px;
+        }
+
+        .management-header {
+            padding: 18px;
+        }
+    }
+
+</style>
+
+
+<script>
+
+    function confirmDelete() {
+
+        return confirm(
+            "Are you sure you want to delete this accommodation charge?\n\n" +
+            "This action cannot be undone if the charge has not been used in payment records."
+        );
+
+    }
+
+</script>

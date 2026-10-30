@@ -1,0 +1,971 @@
+@model IEnumerable<UFSStayConnect.Models.Review>
+
+@{
+    ViewData["Title"] = "My Reviews";
+    var accommodation = ViewBag.ApprovedAccommodation as UFSStayConnect.Models.Accommodation;
+    var reviews = Model?.ToList() ?? new List<UFSStayConnect.Models.Review>();
+}
+
+<div class="customer-reviews-page">
+
+    <!-- Header -->
+    <div class="reviews-header">
+
+        <div>
+            <div class="reviews-eyebrow">
+                <i class="fas fa-star"></i>
+                YOUR EXPERIENCE
+            </div>
+
+            <h1>My Reviews</h1>
+
+            <p>
+                Share your experience and help fellow UFS students
+                make informed accommodation decisions.
+            </p>
+        </div>
+
+        <div class="reviews-header-icon">
+            <i class="fas fa-comments"></i>
+        </div>
+
+    </div>
+
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="reviews-alert reviews-alert-success">
+            <div class="reviews-alert-icon">
+                <i class="fas fa-check"></i>
+            </div>
+
+            <div>
+                <strong>Review saved</strong>
+                <span>@TempData["SuccessMessage"]</span>
+            </div>
+        </div>
+    }
+
+
+    @if (accommodation != null)
+    {
+        var existingReview = reviews
+        .FirstOrDefault(r => r.AccommodationID == accommodation.AccommodationID);
+
+        <!-- Review Residence -->
+        <div class="review-form-card">
+
+            <div class="review-form-heading">
+
+                <div class="review-residence-icon">
+                    <i class="fas fa-house"></i>
+                </div>
+
+                <div>
+                    <div class="review-form-eyebrow">
+                        APPROVED RESIDENCE
+                    </div>
+
+                    <h2>
+                        @accommodation.Name
+                    </h2>
+
+                    <p>
+                        @(existingReview != null
+                                            ? "Update your existing review."
+                                            : "Tell us about your experience at this residence.")
+                                                                                             </p>
+                                                                                         </div>
+
+            </div>
+
+
+            <form asp-action="Create" method="post">
+
+                @Html.AntiForgeryToken()
+
+                <input type="hidden"
+                       name="AccommodationID"
+                       value="@accommodation.AccommodationID" />
+
+
+                <div class="review-form-content">
+
+                    <!-- Rating -->
+                    <div class="rating-section">
+
+                        <label class="review-field-label">
+                            Your rating
+                        </label>
+
+                        <p class="review-field-help">
+                            How would you rate your overall accommodation experience?
+                        </p>
+
+                        <div class="rating-options">
+
+                            <label class="rating-option">
+                                <input type="radio"
+                                       name="Rating"
+                                       value="5"
+                                       @(existingReview?.Rating == 5 ? "checked" : "") />
+
+                                <span>
+                                    <strong>5</strong>
+                                    <i class="fas fa-star"></i>
+                                    <small>Excellent</small>
+                                </span>
+                            </label>
+
+
+                            <label class="rating-option">
+                                <input type="radio"
+                                       name="Rating"
+                                       value="4"
+                                       @(existingReview?.Rating == 4 ? "checked" : "") />
+
+                                <span>
+                                    <strong>4</strong>
+                                    <i class="fas fa-star"></i>
+                                    <small>Good</small>
+                                </span>
+                            </label>
+
+
+                            <label class="rating-option">
+                                <input type="radio"
+                                       name="Rating"
+                                       value="3"
+                                       @(existingReview?.Rating == 3 ? "checked" : "") />
+
+                                <span>
+                                    <strong>3</strong>
+                                    <i class="fas fa-star"></i>
+                                    <small>Average</small>
+                                </span>
+                            </label>
+
+
+                            <label class="rating-option">
+                                <input type="radio"
+                                       name="Rating"
+                                       value="2"
+                                       @(existingReview?.Rating == 2 ? "checked" : "") />
+
+                                <span>
+                                    <strong>2</strong>
+                                    <i class="fas fa-star"></i>
+                                    <small>Poor</small>
+                                </span>
+                            </label>
+
+
+                            <label class="rating-option">
+                                <input type="radio"
+                                       name="Rating"
+                                       value="1"
+                                       @(existingReview?.Rating == 1 ? "checked" : "") />
+
+                                <span>
+                                    <strong>1</strong>
+                                    <i class="fas fa-star"></i>
+                                    <small>Very poor</small>
+                                </span>
+                            </label>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- Comment -->
+                    <div class="comment-section">
+
+                        <label class="review-field-label" for="Comment">
+                            Your review
+                        </label>
+
+                        <p class="review-field-help">
+                            Tell us what you liked, what could be improved,
+                            or anything future residents should know.
+                        </p>
+
+                        <textarea id="Comment"
+                              name="Comment"
+                              class="review-textarea"
+                              maxlength="1000"
+                              rows="6"
+                              placeholder="Write your experience here...">@(existingReview?.Comment ?? "")</textarea>
+
+                        <div class="character-count">
+                            Maximum 1,000 characters
+                        </div>
+
+                    </div>
+
+
+                    <!-- Submit -->
+                    <div class="review-form-actions">
+
+                        <div class="review-guideline">
+                            <i class="fas fa-circle-info"></i>
+
+                            <span>
+                                Please keep your review respectful and relevant
+                                to the accommodation experience.
+                            </span>
+                        </div>
+
+                        <button type="submit" class="review-submit-btn">
+
+                            <i class="fas @(existingReview != null ? "fa-pen" : "fa-paper-plane")"></i>
+
+                            @(existingReview != null
+                                                    ? "Update Review"
+                                                    : "Submit Review")
+
+                    </button>
+
+                    </div>
+
+                </div>
+
+            </form>
+
+        </div>
+        }
+    else
+    {
+        <!-- No Approved Accommodation -->
+        <div class="reviews-empty-card">
+
+            <div class="reviews-empty-icon">
+                <i class="fas fa-house-circle-exclamation"></i>
+            </div>
+
+            <h2>No approved residence yet</h2>
+
+            <p>
+                You can submit an accommodation review after your
+                accommodation application has been approved.
+            </p>
+
+            <a asp-controller="Accommodation"
+               asp-action="Index"
+               class="reviews-browse-btn">
+
+                <i class="fas fa-magnifying-glass"></i>
+                Find Accommodation
+
+            </a>
+
+        </div>
+    }
+
+
+    <!-- Previous Reviews -->
+    <div class="previous-reviews-section">
+
+        <div class="previous-reviews-heading">
+
+            <div>
+                <div class="reviews-eyebrow">
+                    YOUR FEEDBACK
+                </div>
+
+                <h2>Review History</h2>
+            </div>
+
+            <span class="review-count">
+                @reviews.Count review@(reviews.Count == 1 ? "" : "s")
+            </span>
+
+        </div>
+
+
+        @if (reviews.Any())
+        {
+            <div class="review-history-list">
+
+                @foreach (var r in reviews)
+                {
+                    <div class="review-history-card">
+
+                        <div class="review-history-top">
+
+                            <div class="review-history-residence">
+
+                                <div class="history-residence-icon">
+                                    <i class="fas fa-building"></i>
+                                </div>
+
+                                <div>
+                                    <h3>
+                                        @(r.Accommodation?.Name ?? "Residence")
+                                    </h3>
+
+                                    <span>
+                                        Reviewed
+                                        @r.DateCreated.ToLocalTime().ToString("dd MMMM yyyy")
+                                    </span>
+                                </div>
+
+                            </div>
+
+
+                            <div class="review-stars"
+                                 aria-label="@r.Rating out of 5 stars">
+
+                                @for (var i = 1; i <= 5; i++)
+                                {
+                                    if (i <= r.Rating)
+                                    {
+                                        <i class="fas fa-star"></i>
+                                    }
+                                    else
+                                    {
+                                        <i class="far fa-star"></i>
+                                    }
+                                }
+
+                            <strong>
+                                @r.Rating/5
+                            </strong>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="review-comment">
+
+                        <i class="fas fa-quote-left"></i>
+
+                        <p>
+                            @(string.IsNullOrWhiteSpace(r.Comment)
+                                                    ? "No written comment was provided."
+                                                    : r.Comment)
+                    </p>
+
+                        </div>
+
+                    </div>
+                        }
+
+            </div>
+        }
+        else
+        {
+            <div class="no-review-history">
+
+                <div class="no-review-icon">
+                    <i class="far fa-star"></i>
+                </div>
+
+                <div>
+                    <strong>No reviews yet</strong>
+
+                    <p>
+                        Your submitted accommodation reviews will appear here.
+                    </p>
+                </div>
+
+            </div>
+        }
+
+    </div>
+
+</div>
+
+
+<style>
+
+    /* =========================================================
+           CUSTOMER REVIEWS
+           ========================================================= */
+
+    .customer-reviews-page {
+        max-width: 1180px;
+        margin: 0 auto;
+        padding: 34px 30px 60px;
+    }
+
+
+    /* =========================
+           HEADER
+           ========================= */
+
+    .reviews-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 25px;
+        margin-bottom: 25px;
+    }
+
+    .reviews-eyebrow {
+        color: #b8860b;
+        font-size: 0.72rem;
+        font-weight: 800;
+        letter-spacing: 1.4px;
+        margin-bottom: 7px;
+    }
+
+        .reviews-eyebrow i {
+            margin-right: 5px;
+        }
+
+    .reviews-header h1 {
+        margin: 0;
+        color: #123b73;
+        font-size: 2rem;
+        font-weight: 800;
+    }
+
+    .reviews-header p {
+        margin: 7px 0 0;
+        max-width: 650px;
+        color: #6b7280;
+        font-size: 0.93rem;
+    }
+
+    .reviews-header-icon {
+        width: 60px;
+        height: 60px;
+        flex-shrink: 0;
+        border-radius: 14px;
+        background: #123b73;
+        color: #f4c430;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.35rem;
+    }
+
+
+    /* =========================
+           ALERT
+           ========================= */
+
+    .reviews-alert {
+        display: flex;
+        align-items: center;
+        gap: 13px;
+        padding: 14px 17px;
+        margin-bottom: 20px;
+        border-radius: 10px;
+    }
+
+    .reviews-alert-success {
+        background: #edf9f2;
+        border: 1px solid #c9ecd7;
+        color: #176b3c;
+    }
+
+    .reviews-alert-icon {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: #d7f2e2;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .reviews-alert strong,
+    .reviews-alert span {
+        display: block;
+    }
+
+    .reviews-alert strong {
+        font-size: 0.83rem;
+    }
+
+    .reviews-alert span {
+        margin-top: 2px;
+        font-size: 0.78rem;
+    }
+
+
+    /* =========================
+           FORM CARD
+           ========================= */
+
+    .review-form-card {
+        background: #ffffff;
+        border: 1px solid #e2e7ee;
+        border-radius: 15px;
+        box-shadow: 0 8px 25px rgba(8, 20, 38, 0.06);
+        overflow: hidden;
+        margin-bottom: 42px;
+    }
+
+    .review-form-heading {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        padding: 23px 27px;
+        background: #123b73;
+        color: #ffffff;
+        border-bottom: 4px solid #f4c430;
+    }
+
+    .review-residence-icon {
+        width: 48px;
+        height: 48px;
+        flex-shrink: 0;
+        border-radius: 11px;
+        background: rgba(255,255,255,0.12);
+        border: 1px solid rgba(255,255,255,0.18);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #f4c430;
+        font-size: 1.05rem;
+    }
+
+    .review-form-eyebrow {
+        color: #f4c430;
+        font-size: 0.67rem;
+        font-weight: 800;
+        letter-spacing: 1.2px;
+    }
+
+    .review-form-heading h2 {
+        margin: 3px 0;
+        color: #ffffff;
+        font-size: 1.15rem;
+        font-weight: 800;
+    }
+
+    .review-form-heading p {
+        margin: 0;
+        color: rgba(255,255,255,0.72);
+        font-size: 0.78rem;
+    }
+
+    .review-form-content {
+        padding: 28px;
+    }
+
+
+    /* =========================
+           FIELDS
+           ========================= */
+
+    .review-field-label {
+        display: block;
+        margin-bottom: 4px;
+        color: #243246;
+        font-size: 0.88rem;
+        font-weight: 800;
+    }
+
+    .review-field-help {
+        margin: 0 0 15px;
+        color: #7a8491;
+        font-size: 0.78rem;
+    }
+
+    .rating-section {
+        margin-bottom: 28px;
+    }
+
+
+    /* =========================
+           RATING OPTIONS
+           ========================= */
+
+    .rating-options {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 10px;
+    }
+
+    .rating-option {
+        position: relative;
+        cursor: pointer;
+    }
+
+        .rating-option input {
+            position: absolute;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .rating-option span {
+            min-height: 78px;
+            padding: 12px 8px;
+            border: 1px solid #dfe5ec;
+            border-radius: 10px;
+            background: #ffffff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.18s ease;
+        }
+
+            .rating-option span strong {
+                color: #123b73;
+                font-size: 1.1rem;
+            }
+
+            .rating-option span i {
+                margin: 3px 0;
+                color: #d7a900;
+                font-size: 0.75rem;
+            }
+
+            .rating-option span small {
+                color: #7b8491;
+                font-size: 0.68rem;
+            }
+
+        .rating-option:hover span {
+            border-color: #b9c9dc;
+            transform: translateY(-1px);
+        }
+
+        .rating-option input:checked + span {
+            background: #f2f7fc;
+            border: 2px solid #123b73;
+            box-shadow: 0 0 0 3px rgba(18,59,115,0.08);
+        }
+
+
+    /* =========================
+           COMMENT
+           ========================= */
+
+    .comment-section {
+        margin-bottom: 25px;
+    }
+
+    .review-textarea {
+        width: 100%;
+        min-height: 145px;
+        padding: 13px 14px;
+        resize: vertical;
+        border: 1px solid #dfe5ec;
+        border-radius: 9px;
+        outline: none;
+        color: #27364a;
+        font-size: 0.87rem;
+        line-height: 1.6;
+        transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+        .review-textarea:focus {
+            border-color: #123b73;
+            box-shadow: 0 0 0 3px rgba(18,59,115,0.08);
+        }
+
+    .character-count {
+        margin-top: 6px;
+        text-align: right;
+        color: #8a94a2;
+        font-size: 0.7rem;
+    }
+
+
+    /* =========================
+           ACTIONS
+           ========================= */
+
+    .review-form-actions {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 20px;
+        padding-top: 20px;
+        border-top: 1px solid #edf0f4;
+    }
+
+    .review-guideline {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: #7a8491;
+        font-size: 0.73rem;
+    }
+
+        .review-guideline i {
+            color: #123b73;
+        }
+
+    .review-submit-btn,
+    .reviews-browse-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        min-height: 43px;
+        padding: 0 18px;
+        border: 0;
+        border-radius: 8px;
+        background: #123b73;
+        color: #ffffff;
+        text-decoration: none;
+        font-size: 0.82rem;
+        font-weight: 750;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        white-space: nowrap;
+    }
+
+        .review-submit-btn:hover,
+        .reviews-browse-btn:hover {
+            background: #0d2d58;
+            color: #ffffff;
+            transform: translateY(-1px);
+        }
+
+
+    /* =========================
+           EMPTY
+           ========================= */
+
+    .reviews-empty-card {
+        padding: 55px 30px;
+        margin-bottom: 42px;
+        text-align: center;
+        background: #ffffff;
+        border: 1px solid #e2e7ee;
+        border-radius: 15px;
+        box-shadow: 0 8px 25px rgba(8,20,38,0.05);
+    }
+
+    .reviews-empty-icon {
+        width: 68px;
+        height: 68px;
+        margin: 0 auto 18px;
+        border-radius: 50%;
+        background: #edf3f9;
+        color: #123b73;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+    }
+
+    .reviews-empty-card h2 {
+        margin: 0;
+        color: #25364d;
+        font-size: 1.15rem;
+        font-weight: 800;
+    }
+
+    .reviews-empty-card p {
+        max-width: 510px;
+        margin: 8px auto 20px;
+        color: #7a8491;
+        font-size: 0.83rem;
+        line-height: 1.6;
+    }
+
+
+    /* =========================
+           HISTORY
+           ========================= */
+
+    .previous-reviews-section {
+        margin-top: 10px;
+    }
+
+    .previous-reviews-heading {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        margin-bottom: 17px;
+    }
+
+        .previous-reviews-heading h2 {
+            margin: 0;
+            color: #123b73;
+            font-size: 1.25rem;
+            font-weight: 800;
+        }
+
+    .review-count {
+        padding: 6px 10px;
+        border-radius: 999px;
+        background: #eef3f8;
+        color: #123b73;
+        font-size: 0.72rem;
+        font-weight: 750;
+    }
+
+    .review-history-list {
+        display: grid;
+        gap: 13px;
+    }
+
+    .review-history-card {
+        padding: 21px 23px;
+        background: #ffffff;
+        border: 1px solid #e2e7ee;
+        border-radius: 12px;
+        box-shadow: 0 5px 17px rgba(8,20,38,0.04);
+    }
+
+    .review-history-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 20px;
+    }
+
+    .review-history-residence {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .history-residence-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 9px;
+        background: #edf3f9;
+        color: #123b73;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .review-history-residence h3 {
+        margin: 0;
+        color: #27364a;
+        font-size: 0.9rem;
+        font-weight: 800;
+    }
+
+    .review-history-residence span {
+        display: block;
+        margin-top: 3px;
+        color: #8a94a2;
+        font-size: 0.7rem;
+    }
+
+    .review-stars {
+        display: flex;
+        align-items: center;
+        gap: 3px;
+        color: #d7a900;
+    }
+
+        .review-stars i {
+            font-size: 0.77rem;
+        }
+
+        .review-stars strong {
+            margin-left: 6px;
+            color: #596579;
+            font-size: 0.74rem;
+        }
+
+    .review-comment {
+        display: flex;
+        gap: 12px;
+        margin-top: 18px;
+        padding-top: 16px;
+        border-top: 1px solid #edf0f4;
+    }
+
+        .review-comment > i {
+            color: #c8d4e1;
+            font-size: 0.85rem;
+            margin-top: 2px;
+        }
+
+        .review-comment p {
+            margin: 0;
+            color: #596579;
+            font-size: 0.82rem;
+            line-height: 1.65;
+        }
+
+
+    /* =========================
+           NO HISTORY
+           ========================= */
+
+    .no-review-history {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 24px;
+        background: #ffffff;
+        border: 1px solid #e2e7ee;
+        border-radius: 12px;
+    }
+
+    .no-review-icon {
+        width: 43px;
+        height: 43px;
+        flex-shrink: 0;
+        border-radius: 9px;
+        background: #f3f5f7;
+        color: #8b95a2;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .no-review-history strong {
+        color: #374151;
+        font-size: 0.82rem;
+    }
+
+    .no-review-history p {
+        margin: 3px 0 0;
+        color: #8a94a2;
+        font-size: 0.75rem;
+    }
+
+
+    /* =========================
+           RESPONSIVE
+           ========================= */
+
+    @@media (max-width: 768px) {
+
+        .customer-reviews-page {
+            padding: 25px 16px 45px;
+        }
+
+        .reviews-header {
+            align-items: flex-start;
+        }
+
+        .reviews-header-icon {
+            display: none;
+        }
+
+        .rating-options {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .review-form-content {
+            padding: 21px;
+        }
+
+        .review-form-actions {
+            align-items: stretch;
+            flex-direction: column;
+        }
+
+        .review-submit-btn {
+            width: 100%;
+        }
+
+        .review-history-top {
+            align-items: flex-start;
+            flex-direction: column;
+        }
+
+        .review-stars {
+            margin-left: 52px;
+        }
+    }
+</style>

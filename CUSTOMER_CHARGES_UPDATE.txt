@@ -1,0 +1,48 @@
+UFS StayConnect - individual customer charges update
+=====================================================
+
+Files changed
+-------------
+Web:
+- Models/CustomerCharge.cs: immutable assignment record for an individual customer, approved application, accommodation, category, amount and due date.
+- Models/Payment.cs: links a submitted payment to CustomerChargeID.
+- Data/AppDbContext.cs: DbSet and relationship configuration.
+- Controllers/CustomerChargeController.cs: Administrator assignment/cancellation and customer charge list/payment submission.
+- Controllers/Api/CustomerChargesController.cs: JWT API used by Android for customer charge list/payment and administrator assignment.
+- Views/CustomerCharge/AdminIndex.cshtml: Administrator assigns and monitors customer charges.
+- Views/Payment/Index.cshtml: ordinary accommodation charges and administrator-assigned charges appear in one table.
+- Views/Payment/Checkout.cshtml: checkout carries both charge ID types separately so overlapping numeric IDs cannot select the wrong record.
+- Views/CustomerCharge/Mine.cshtml: retained for compatibility, but the old customer URL redirects to the unified Payments page.
+- Migrations/AppDb/20261024180000_AddIndividualCustomerCharges.cs: database migration.
+- Customer navigation and public Admin navigation link updated.
+
+Android:
+- ApiClient.java: authenticated JSON GET/POST helpers.
+- PaymentsActivity.java: shows charges assigned specifically by the Administrator and allows the customer to submit them.
+- StaffSectionActivity.java: Administrator can assign an individual charge from the Charges workspace.
+
+Important behaviour
+-------------------
+- General residence charge rates remain separate from individual customer charge assignments.
+- Customers do not need a separate “My assigned charges” page; active assigned charges are displayed in the existing Payments list alongside accommodation charges.
+- Individual assignments are saved to the shared SQL database, so web and Android read the same record.
+- A payment submission is Pending until a Financial Officer approves it through the existing payment verification module.
+- The outstanding balance counts only payments marked Paid; pending submissions are shown separately and prevent duplicate submissions.
+- The app records Card/EFT submissions for the existing review workflow. This is not a live bank/card gateway integration. No card number or CVV is stored by the new charge form.
+- Customer charge payments are linked to the original approved application and category.
+- The existing roles remain Admin, FinancialOfficer and Customer.
+
+Database
+--------
+The web application startup runs AppDbContext migrations automatically in Program.cs. Back up the database before running the updated web project. If automatic migrations are disabled in your local environment, apply the AppDb migration using your normal EF Core migration deployment process.
+
+Testing checklist
+-----------------
+1. Start the ASP.NET Core web API using the existing configured SQL Server connection strings.
+2. Sign in as Admin and open Customer Charges on the web or Charges in Android.
+3. Assign a charge to a customer who has an approved application and allocated room.
+4. Sign in as that customer on web and open Payments. Verify the assigned title, amount, accommodation, due date and status appear as a row in the same table as accommodation charges. Also verify the Android customer sees the charge through the existing API-backed payment UI.
+5. Submit EFT or Card payment. Verify it shows Pending / awaiting verification.
+6. Sign in as FinancialOfficer and approve the payment in Payment Verification.
+7. Refresh the customer screens. Verify the amount is now included in Paid and removed from the remaining balance.
+8. Verify a customer cannot request another customer's charge by changing the charge ID.

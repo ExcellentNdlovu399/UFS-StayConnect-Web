@@ -1,0 +1,1249 @@
+@model UFSStayConnect.ViewModels.PaymentCheckoutViewModel
+
+@{
+    ViewData["Title"] = "Secure Payment";
+}
+
+<div class="customer-checkout-page">
+
+    <!-- =========================================================
+         CHECKOUT HEADER
+         ========================================================= -->
+
+    <div class="checkout-header">
+
+        <div>
+
+            <div class="checkout-eyebrow">
+                <i class="fas fa-shield-halved"></i>
+                SECURE PAYMENT
+            </div>
+
+            <h1>Complete Your Payment</h1>
+
+            <p>
+                Review your charges and choose how you would like
+                to submit your payment.
+            </p>
+
+        </div>
+
+        <a asp-action="Index"
+           class="checkout-cancel-button">
+
+            <i class="fas fa-arrow-left"></i>
+            Back to Payments
+
+        </a>
+
+    </div>
+
+
+    <!-- =========================================================
+         SECURITY NOTICE
+         ========================================================= -->
+
+    <div class="checkout-security-notice">
+
+        <div class="checkout-security-icon">
+            <i class="fas fa-shield-halved"></i>
+        </div>
+
+        <div>
+
+            <strong>Secure UFS StayConnect payment</strong>
+
+            <p>
+                Your payment details are used only for this checkout.
+                Card details are not stored by UFS StayConnect.
+                Submitted payments remain pending until verified.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <div class="checkout-layout">
+
+        <!-- =====================================================
+             LEFT — PAYMENT SUMMARY
+             ====================================================== -->
+
+        <div class="checkout-summary-column">
+
+            <div class="checkout-card">
+
+                <div class="checkout-card-header">
+
+                    <div>
+
+                        <span class="checkout-section-label">
+                            PAYMENT SUMMARY
+                        </span>
+
+                        <h2>Your Charges</h2>
+
+                    </div>
+
+                    <div class="checkout-summary-icon">
+                        <i class="fas fa-file-invoice-dollar"></i>
+                    </div>
+
+                </div>
+
+
+                <!-- ACCOMMODATION -->
+
+                <div class="checkout-accommodation">
+
+                    <div class="checkout-accommodation-icon">
+                        <i class="fas fa-house"></i>
+                    </div>
+
+                    <div>
+
+                        <span>ACCOMMODATION</span>
+
+                        <strong>
+                            @Model.AccommodationName
+                        </strong>
+
+                        <small>
+                            <i class="fas fa-door-open"></i>
+                            Room @Model.RoomNumber
+                        </small>
+
+                    </div>
+
+                </div>
+
+
+                <!-- SELECTED CHARGES -->
+
+                <div class="checkout-items">
+
+                    @foreach (var item in Model.Items)
+                    {
+                        <div class="checkout-item">
+
+                            <div class="checkout-item-left">
+
+                                <div class="checkout-item-icon">
+
+                                    @if (item.PaymentTypeName?.Contains(
+                                        "rent",
+                                        StringComparison.OrdinalIgnoreCase) == true)
+                                    {
+                                        <i class="fas fa-house"></i>
+                                    }
+                                    else if (item.PaymentTypeName?.Contains(
+                                        "water",
+                                        StringComparison.OrdinalIgnoreCase) == true)
+                                    {
+                                        <i class="fas fa-droplet"></i>
+                                    }
+                                    else if (item.PaymentTypeName?.Contains(
+                                        "electric",
+                                        StringComparison.OrdinalIgnoreCase) == true)
+                                    {
+                                        <i class="fas fa-bolt"></i>
+                                    }
+                                    else if (item.PaymentTypeName?.Contains(
+                                        "parking",
+                                        StringComparison.OrdinalIgnoreCase) == true)
+                                    {
+                                        <i class="fas fa-car"></i>
+                                    }
+                                    else
+                                    {
+                                        <i class="fas fa-file-invoice-dollar"></i>
+                                    }
+
+                                </div>
+
+                                <div>
+
+                                    <strong>
+                                        @(item.IsAssignedCustomerCharge && !string.IsNullOrWhiteSpace(item.ChargeTitle)
+                                            ? item.ChargeTitle
+                                            : item.PaymentTypeName)
+                                    </strong>
+                                    @if (item.IsAssignedCustomerCharge)
+                                    {
+                                        <small>Administrator-assigned · @item.PaymentTypeName</small>
+                                    }
+
+                                    <span>
+                                        @item.Frequency
+                                    </span>
+
+                                    <small>
+                                        Due
+                                        @item.DueDate.ToString("dd MMM yyyy")
+                                    </small>
+                                    @if (item.ParkingFeeAmount > 0m)
+                                    {
+                                        <small class="payment-parking-included">
+                                            Includes parking for additional vehicle(s): R @item.ParkingFeeAmount.ToString("N2")
+                                        </small>
+                                    }
+
+                                </div>
+
+                            </div>
+
+                            <strong class="checkout-item-amount">
+                                R @item.Amount.ToString("N2")
+                            </strong>
+
+                        </div>
+                    }
+
+                </div>
+
+
+                <!-- TOTAL -->
+
+                <div class="checkout-total">
+
+                    <div>
+
+                        <span>Total Amount</span>
+
+                        <small>
+                            @Model.Items.Count
+                            @(Model.Items.Count == 1 ? "charge" : "charges")
+                            selected
+                        </small>
+
+                    </div>
+
+                    <strong>
+                        R @Model.TotalAmount.ToString("N2")
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+            <!-- =====================================================
+                 PAYMENT PROCESS
+                 ====================================================== -->
+
+            <div class="checkout-process-card">
+
+                <div class="process-title">
+                    <i class="fas fa-circle-info"></i>
+                    What happens next?
+                </div>
+
+                <div class="process-step">
+
+                    <div class="process-number">
+                        1
+                    </div>
+
+                    <div>
+                        <strong>Submit payment</strong>
+
+                        <span>
+                            Complete the payment form on this page.
+                        </span>
+                    </div>
+
+                </div>
+
+                <div class="process-line"></div>
+
+                <div class="process-step">
+
+                    <div class="process-number">
+                        2
+                    </div>
+
+                    <div>
+                        <strong>Payment is recorded</strong>
+
+                        <span>
+                            Your transaction is recorded as pending.
+                        </span>
+                    </div>
+
+                </div>
+
+                <div class="process-line"></div>
+
+                <div class="process-step">
+
+                    <div class="process-number">
+                        3
+                    </div>
+
+                    <div>
+                        <strong>Verification</strong>
+
+                        <span>
+                            UFS StayConnect staff verify the payment.
+                        </span>
+                    </div>
+
+                </div>
+
+                <div class="process-line"></div>
+
+                <div class="process-step">
+
+                    <div class="process-number">
+                        4
+                    </div>
+
+                    <div>
+                        <strong>Receipt available</strong>
+
+                        <span>
+                            A receipt becomes available once the
+                            payment is verified.
+                        </span>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- =====================================================
+             RIGHT — PAYMENT FORM
+             ====================================================== -->
+
+        <div class="checkout-form-column">
+
+            <div class="checkout-card payment-form-card">
+
+                <div class="checkout-card-header">
+
+                    <div>
+
+                        <span class="checkout-section-label">
+                            PAYMENT METHOD
+                        </span>
+
+                        <h2>Choose how to pay</h2>
+
+                        <p>
+                            Select your preferred payment method below.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <form asp-action="Checkout"
+                      method="post"
+                      id="paymentForm">
+
+                    @Html.AntiForgeryToken()
+
+
+                    <!-- =================================================
+                         SELECTED CHARGES
+                         ================================================== -->
+
+                    @foreach (var id in Model.SelectedChargeIds)
+                    {
+                        <input type="hidden"
+                               name="SelectedChargeIds"
+                               value="@id" />
+                    }
+                    @foreach (var id in Model.SelectedCustomerChargeIds)
+                    {
+                        <input type="hidden"
+                               name="SelectedCustomerChargeIds"
+                               value="@id" />
+                    }
+
+
+                    <!-- =================================================
+                         PAYMENT METHOD
+                         ================================================== -->
+
+                    <div class="payment-method-selection">
+
+                        <label class="payment-method-option selected"
+                               id="cardOption">
+
+                            <input type="radio"
+                                   name="PaymentMethod"
+                                   value="Card"
+                                   id="cardMethod"
+                                   checked />
+
+                            <span class="payment-method-radio"></span>
+
+                            <span class="payment-method-content">
+
+                                <strong>
+                                    <i class="fas fa-credit-card"></i>
+                                    Bank Card
+                                </strong>
+
+                                <small>
+                                    Pay using your debit or credit card.
+                                </small>
+
+                            </span>
+
+                            <span class="payment-method-badge">
+                                Card
+                            </span>
+
+                        </label>
+
+
+                        <label class="payment-method-option"
+                               id="eftOption">
+
+                            <input type="radio"
+                                   name="PaymentMethod"
+                                   value="EFT"
+                                   id="eftMethod" />
+
+                            <span class="payment-method-radio"></span>
+
+                            <span class="payment-method-content">
+
+                                <strong>
+                                    <i class="fas fa-building-columns"></i>
+                                    EFT
+                                </strong>
+
+                                <small>
+                                    Enter your bank payment reference.
+                                </small>
+
+                            </span>
+
+                            <span class="payment-method-badge">
+                                Bank
+                            </span>
+
+                        </label>
+
+                    </div>
+
+
+                    <!-- =================================================
+                         CARD DETAILS
+                         ================================================== -->
+
+                    <div id="cardFields"
+                         class="payment-fields">
+
+                        <div class="payment-fields-heading">
+
+                            <div class="payment-fields-heading-icon">
+                                <i class="fas fa-credit-card"></i>
+                            </div>
+
+                            <div>
+
+                                <h3>Card Details</h3>
+
+                                <p>
+                                    Enter the details required for this
+                                    payment.
+                                </p>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- CARDHOLDER -->
+
+                        <div class="checkout-field">
+
+                            <label asp-for="CardHolderName">
+                                Cardholder Name
+                            </label>
+
+                            <div class="checkout-input-wrapper">
+
+                                <i class="fas fa-user"></i>
+
+                                <input asp-for="CardHolderName"
+                                       class="checkout-input"
+                                       autocomplete="cc-name"
+                                       placeholder="Name as shown on card" />
+
+                            </div>
+
+                            <span asp-validation-for="CardHolderName"
+                                  class="checkout-validation">
+                            </span>
+
+                        </div>
+
+
+                        <!-- CARD NUMBER -->
+
+                        <div class="checkout-field">
+
+                            <label asp-for="CardNumber">
+                                Card Number
+                            </label>
+
+                            <div class="checkout-input-wrapper">
+
+                                <i class="fas fa-credit-card"></i>
+
+                                <input asp-for="CardNumber"
+                                       class="checkout-input"
+                                       type="text"
+                                       inputmode="numeric"
+                                       autocomplete="cc-number"
+                                       placeholder="1234567890123456"
+                                       maxlength="16"
+                                       pattern="[0-9]{16}" />
+
+                            </div>
+
+                            <small class="checkout-field-help">
+                                Enter exactly 16 digits.
+                            </small>
+
+                            <span asp-validation-for="CardNumber"
+                                  class="checkout-validation">
+                            </span>
+
+                        </div>
+
+
+                        <!-- EXPIRY + CVV -->
+
+                        <div class="checkout-fields-row">
+
+                            <!-- EXPIRY -->
+
+                            <div class="checkout-field">
+
+                                <label asp-for="ExpiryDate">
+                                    Expiry Date
+                                </label>
+
+                                <div class="checkout-input-wrapper">
+
+                                    <i class="far fa-calendar"></i>
+
+                                    <input asp-for="ExpiryDate"
+                                           type="text"
+                                           class="checkout-input"
+                                           inputmode="numeric"
+                                           autocomplete="cc-exp"
+                                           placeholder="MM/YY"
+                                           maxlength="5"
+                                           pattern="(0[1-9]|1[0-2])/[0-9]{2}" />
+
+                                </div>
+
+                                <small class="checkout-field-help">
+                                    Example: 05/28
+                                </small>
+
+                                <span asp-validation-for="ExpiryDate"
+                                      class="checkout-validation">
+                                </span>
+
+                            </div>
+
+
+                            <!-- CVV -->
+
+                            <div class="checkout-field">
+
+                                <label asp-for="CVV">
+                                    CVV
+                                </label>
+
+                                <div class="checkout-input-wrapper">
+
+                                    <i class="fas fa-lock"></i>
+
+                                    <input asp-for="CVV"
+                                           id="CVV"
+                                           class="checkout-input checkout-cvv-input"
+                                           type="password"
+                                           inputmode="numeric"
+                                           autocomplete="cc-csc"
+                                           maxlength="3"
+                                           pattern="[0-9]{3}"
+                                           placeholder="•••" />
+
+                                    <button type="button"
+                                            id="toggleCvvVisibility"
+                                            class="checkout-cvv-toggle"
+                                            aria-label="Show CVV"
+                                            aria-pressed="false">
+                                        <i class="far fa-eye" aria-hidden="true"></i>
+                                    </button>
+
+                                </div>
+
+                                <small class="checkout-field-help">
+                                    3 digits
+                                </small>
+
+                                <span asp-validation-for="CVV"
+                                      class="checkout-validation">
+                                </span>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="card-security-note">
+
+                            <i class="fas fa-lock"></i>
+
+                            <span>
+                                Your full card details are not stored
+                                as part of your UFS StayConnect payment
+                                record.
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- =================================================
+                         EFT DETAILS
+                         ================================================== -->
+
+                    <div id="eftFields"
+                         class="payment-fields d-none">
+
+                        <div class="payment-fields-heading">
+
+                            <div class="payment-fields-heading-icon eft">
+                                <i class="fas fa-building-columns"></i>
+                            </div>
+
+                            <div>
+
+                                <h3>EFT Payment</h3>
+
+                                <p>
+                                    Enter the reference from your
+                                    electronic funds transfer.
+                                </p>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="checkout-field">
+
+                            <label asp-for="EFTReference">
+                                EFT Reference Number
+                            </label>
+
+                            <div class="checkout-input-wrapper">
+
+                                <i class="fas fa-hashtag"></i>
+
+                                <input asp-for="EFTReference"
+                                       class="checkout-input"
+                                       type="text"
+                                       inputmode="text"
+                                       autocomplete="off"
+                                       placeholder="T123456789"
+                                       maxlength="20"
+                                       pattern="T[0-9]+"
+                                       style="text-transform: uppercase;" />
+
+                            </div>
+
+                            <small class="checkout-field-help">
+                                Must start with T and contain digits only.
+                            </small>
+
+                            <span asp-validation-for="EFTReference"
+                                  class="checkout-validation">
+                            </span>
+
+                        </div>
+
+
+                        <div class="eft-information">
+
+                            <div class="eft-information-icon">
+                                <i class="fas fa-circle-info"></i>
+                            </div>
+
+                            <div>
+
+                                <strong>
+                                    EFT payment verification
+                                </strong>
+
+                                <p>
+                                    Make sure the reference you enter
+                                    matches the reference on your bank
+                                    transaction. Your payment will remain
+                                    pending until it is verified.
+                                </p>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- =================================================
+                         MODEL VALIDATION
+                         ================================================== -->
+
+                    <div asp-validation-summary="ModelOnly"
+                         class="checkout-validation-summary">
+                    </div>
+
+
+                    <!-- =================================================
+                         SUBMIT
+                         ================================================== -->
+
+                    <div class="checkout-submit-area">
+
+                        <div class="checkout-submit-total">
+
+                            <span>Total to submit</span>
+
+                            <strong>
+                                R @Model.TotalAmount.ToString("N2")
+                            </strong>
+
+                        </div>
+
+                        <button type="submit"
+                                class="checkout-submit-button"
+                                id="submitPayment">
+
+                            <i class="fas fa-lock"></i>
+
+                            Submit Payment
+
+                        </button>
+
+                        <p class="checkout-submit-note">
+
+                            <i class="fas fa-shield-halved"></i>
+
+                            By submitting, your payment will be recorded
+                            as pending for verification.
+
+                        </p>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+@section Scripts {
+
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+
+        document.addEventListener("DOMContentLoaded", function () {
+
+            // =========================================================
+            // ELEMENTS
+            // =========================================================
+
+            const cardMethod =
+                document.getElementById("cardMethod");
+
+            const eftMethod =
+                document.getElementById("eftMethod");
+
+            const cardFields =
+                document.getElementById("cardFields");
+
+            const eftFields =
+                document.getElementById("eftFields");
+
+            const cardOption =
+                document.getElementById("cardOption");
+
+            const eftOption =
+                document.getElementById("eftOption");
+
+            const paymentForm =
+                document.getElementById("paymentForm");
+
+            const submitButton =
+                document.getElementById("submitPayment");
+
+            const cardNumberInput =
+                document.querySelector('[name="CardNumber"]');
+
+            const expiryInput =
+                document.querySelector('[name="ExpiryDate"]');
+
+            const cvvInput =
+                document.querySelector('[name="CVV"]');
+
+            const toggleCvvVisibility =
+                document.getElementById("toggleCvvVisibility");
+
+            const eftInput =
+                document.querySelector('[name="EFTReference"]');
+
+
+            // =========================================================
+            // PAYMENT METHOD
+            // =========================================================
+
+            function togglePaymentMethod() {
+
+                const isCard =
+                    cardMethod.checked;
+
+                cardFields.classList.toggle(
+                    "d-none",
+                    !isCard
+                );
+
+                eftFields.classList.toggle(
+                    "d-none",
+                    isCard
+                );
+
+                cardOption.classList.toggle(
+                    "selected",
+                    isCard
+                );
+
+                eftOption.classList.toggle(
+                    "selected",
+                    !isCard
+                );
+
+            }
+
+
+            if (cardMethod) {
+
+                cardMethod.addEventListener(
+                    "change",
+                    togglePaymentMethod
+                );
+
+            }
+
+
+            if (eftMethod) {
+
+                eftMethod.addEventListener(
+                    "change",
+                    togglePaymentMethod
+                );
+
+            }
+
+
+            // =========================================================
+            // CARD NUMBER
+            // =========================================================
+            // Digits only.
+            // Maximum 16 digits.
+
+            if (cardNumberInput) {
+
+                cardNumberInput.addEventListener(
+                    "input",
+                    function () {
+
+                        this.value =
+                            this.value
+                                .replace(/\D/g, "")
+                                .slice(0, 16);
+
+                    }
+                );
+
+                cardNumberInput.addEventListener(
+                    "keypress",
+                    function (event) {
+
+                        if (!/[0-9]/.test(event.key)) {
+
+                            event.preventDefault();
+
+                        }
+
+                    }
+                );
+
+            }
+
+
+            // =========================================================
+            // CVV
+            // =========================================================
+            // CVV is hidden by default. The eye button only toggles visibility;
+            // the value is never persisted by the application.
+
+            if (cvvInput && toggleCvvVisibility) {
+                toggleCvvVisibility.addEventListener("click", function () {
+                    const reveal = cvvInput.type === "password";
+                    cvvInput.type = reveal ? "text" : "password";
+                    toggleCvvVisibility.setAttribute("aria-label", reveal ? "Hide CVV" : "Show CVV");
+                    toggleCvvVisibility.setAttribute("aria-pressed", String(reveal));
+                    toggleCvvVisibility.innerHTML = reveal
+                        ? '<i class="far fa-eye-slash" aria-hidden="true"></i>'
+                        : '<i class="far fa-eye" aria-hidden="true"></i>';
+                });
+            }
+
+            if (cvvInput) {
+
+                cvvInput.addEventListener(
+                    "input",
+                    function () {
+
+                        this.value =
+                            this.value
+                                .replace(/\D/g, "")
+                                .slice(0, 3);
+
+                    }
+                );
+
+                cvvInput.addEventListener(
+                    "keypress",
+                    function (event) {
+
+                        if (!/[0-9]/.test(event.key)) {
+
+                            event.preventDefault();
+
+                        }
+
+                    }
+                );
+
+            }
+
+
+            // =========================================================
+            // EXPIRY DATE
+            // =========================================================
+            // User enters digits only.
+            //
+            // 0       -> 0
+            // 05      -> 05
+            // 052     -> 05/2
+            // 0528    -> 05/28
+            //
+            // The slash is added automatically.
+
+            if (expiryInput) {
+
+                expiryInput.addEventListener(
+                    "input",
+                    function () {
+
+                        let value =
+                            this.value.replace(/\D/g, "");
+
+                        value =
+                            value.slice(0, 4);
+
+                        if (value.length >= 3) {
+
+                            value =
+                                value.substring(0, 2) +
+                                "/" +
+                                value.substring(2);
+
+                        }
+
+                        this.value =
+                            value;
+
+                    }
+                );
+
+                expiryInput.addEventListener(
+                    "keypress",
+                    function (event) {
+
+                        if (!/[0-9]/.test(event.key)) {
+
+                            event.preventDefault();
+
+                        }
+
+                    }
+                );
+
+            }
+
+
+            // =========================================================
+            // EFT REFERENCE
+            // =========================================================
+            // Must start with T.
+            // Everything after T must be digits.
+            //
+            // Example:
+            // T123456789
+            //
+            // Letters are not allowed after T.
+
+            function formatEFTReference(input) {
+
+                let value =
+                    input.value.toUpperCase();
+
+                // Remove spaces and invalid characters.
+                value =
+                    value.replace(/[^A-Z0-9]/g, "");
+
+                // Remove every T.
+                value =
+                    value.replace(/T/g, "");
+
+                // Keep digits only after the T.
+                value =
+                    value.replace(/\D/g, "");
+
+                // Always begin with T.
+                input.value =
+                    "T" + value.slice(0, 19);
+
+            }
+
+
+            if (eftInput) {
+
+                eftInput.addEventListener(
+                    "focus",
+                    function () {
+
+                        if (this.value.length === 0) {
+
+                            this.value = "T";
+
+                        }
+
+                    }
+                );
+
+
+                eftInput.addEventListener(
+                    "input",
+                    function () {
+
+                        formatEFTReference(this);
+
+                    }
+                );
+
+            }
+
+
+            // =========================================================
+            // FORM SUBMISSION
+            // =========================================================
+
+            if (paymentForm) {
+
+                paymentForm.addEventListener(
+                    "submit",
+                    function (event) {
+
+                        // ---------------------------------------------
+                        // CARD VALIDATION
+                        // ---------------------------------------------
+
+                        if (cardMethod.checked) {
+
+                            const cardNumber =
+                                cardNumberInput.value;
+
+                            const cvv =
+                                cvvInput.value;
+
+                            const expiry =
+                                expiryInput.value;
+
+
+                            if (!/^\d{16}$/.test(cardNumber)) {
+
+                                event.preventDefault();
+
+                                alert(
+                                    "Card number must contain exactly 16 digits."
+                                );
+
+                                cardNumberInput.focus();
+
+                                return;
+
+                            }
+
+
+                            if (!/^\d{3}$/.test(cvv)) {
+
+                                event.preventDefault();
+
+                                alert(
+                                    "CVV must contain exactly 3 digits."
+                                );
+
+                                cvvInput.focus();
+
+                                return;
+
+                            }
+
+
+                            if (!/^(0[1-9]|1[0-2])\/\d{2}$/.test(expiry)) {
+
+                                event.preventDefault();
+
+                                alert(
+                                    "Expiry date must be in MM/YY format, for example 05/28."
+                                );
+
+                                expiryInput.focus();
+
+                                return;
+
+                            }
+
+                        }
+
+
+                        // ---------------------------------------------
+                        // EFT VALIDATION
+                        // ---------------------------------------------
+
+                        if (eftMethod.checked) {
+
+                            formatEFTReference(eftInput);
+
+                            const eftReference =
+                                eftInput.value;
+
+
+                            if (!/^T\d+$/.test(eftReference)) {
+
+                                event.preventDefault();
+
+                                alert(
+                                    "EFT reference must start with T and contain digits only."
+                                );
+
+                                eftInput.focus();
+
+                                return;
+
+                            }
+
+                        }
+
+
+                        // ---------------------------------------------
+                        // DISABLE BUTTON
+                        // ---------------------------------------------
+
+                        if (submitButton) {
+
+                            submitButton.disabled =
+                                true;
+
+                            submitButton.innerHTML =
+                                '<i class="fas fa-spinner fa-spin"></i> ' +
+                                'Submitting Payment...';
+
+                        }
+
+                    }
+                );
+
+            }
+
+
+            // =========================================================
+            // INITIALISE
+            // =========================================================
+
+            togglePaymentMethod();
+
+        });
+
+    </script>
+}
+
+
+<style>
+
+    /* =========================================================
+       PAYMENT INPUT HELP
+       ========================================================= */
+
+    .checkout-field-help {
+        display: block;
+        margin-top: 5px;
+        color: #8a96a4;
+        font-size: 10px;
+    }
+
+    .checkout-cvv-input {
+        padding-right: 40px;
+    }
+
+    .checkout-cvv-toggle {
+        position: absolute;
+        right: 8px;
+        top: 50%;
+        transform: translateY(-50%);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 28px;
+        height: 28px;
+        padding: 0;
+        border: 0;
+        border-radius: 6px;
+        background: transparent;
+        color: #63758a;
+        cursor: pointer;
+        z-index: 2;
+    }
+
+    .checkout-cvv-toggle:focus-visible {
+        outline: 2px solid #7897b6;
+        outline-offset: 1px;
+    }
+
+</style>

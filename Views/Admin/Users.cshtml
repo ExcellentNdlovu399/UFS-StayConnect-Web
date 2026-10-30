@@ -1,0 +1,1450 @@
+@model IEnumerable<UFSStayConnect.ViewModels.AdminUserViewModel>
+
+@{
+    ViewData["Title"] = "User Management";
+    Layout = "_AdminLayout";
+
+    var users = Model?.ToList() ?? new List<UFSStayConnect.ViewModels.AdminUserViewModel>();
+
+    var totalUsers = users.Count;
+    var totalCustomers = users.Count(u => u.Role == "Customer");
+    var totalStudents = users.Count(u => u.UserType == "Student");
+    var totalStaff = users.Count(u => u.UserType == "Staff");
+    var activeUsers = users.Count(u => u.AccountStatus == "Active");
+    var inactiveUsers = users.Count(u => u.AccountStatus != "Active");
+}
+
+<style>
+
+    /* =========================================
+           USERS PAGE
+           ========================================= */
+
+    .users-page {
+        padding-bottom: 35px;
+    }
+
+    .users-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        gap: 20px;
+        margin-bottom: 25px;
+    }
+
+        .users-header h1 {
+            color: #15213b;
+            font-size: 30px;
+            font-weight: 800;
+            letter-spacing: -.7px;
+            margin: 0 0 7px;
+        }
+
+        .users-header p {
+            color: #7d8798;
+            margin: 0;
+            font-size: 14px;
+        }
+
+    .add-user-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: #1769e0;
+        border: none;
+        color: #fff;
+        padding: 11px 18px;
+        border-radius: 11px;
+        font-size: 13px;
+        font-weight: 700;
+        text-decoration: none;
+        box-shadow: 0 7px 18px rgba(23, 105, 224, .20);
+        transition: .2s ease;
+        white-space: nowrap;
+    }
+
+        .add-user-btn:hover {
+            background: #125bc4;
+            color: #fff;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 23px rgba(23, 105, 224, .25);
+        }
+
+
+    /* =========================================
+           ALERTS
+           ========================================= */
+
+    .users-alert {
+        border: none;
+        border-radius: 12px;
+        padding: 13px 17px;
+        margin-bottom: 18px;
+        font-size: 13px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+        .users-alert.success {
+            background: #eaf8f1;
+            color: #168653;
+        }
+
+        .users-alert.error {
+            background: #fceeee;
+            color: #c43d3d;
+        }
+
+
+    /* =========================================
+           STATISTICS
+           ========================================= */
+
+    .user-stat-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 17px;
+        margin-bottom: 22px;
+    }
+
+    .user-stat {
+        background: #fff;
+        border: 1px solid #e7eaf0;
+        border-radius: 16px;
+        padding: 19px;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        box-shadow: 0 7px 22px rgba(15, 31, 56, .045);
+        transition: .2s ease;
+    }
+
+        .user-stat:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 28px rgba(15, 31, 56, .075);
+        }
+
+    .user-stat-icon {
+        width: 46px;
+        height: 46px;
+        min-width: 46px;
+        border-radius: 13px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 17px;
+    }
+
+    .stat-blue {
+        background: #eaf2ff;
+        color: #1769e0;
+    }
+
+    .stat-green {
+        background: #e9f8f0;
+        color: #14945b;
+    }
+
+    .stat-purple {
+        background: #f1ebff;
+        color: #7956d8;
+    }
+
+    .stat-orange {
+        background: #fff4e6;
+        color: #ed8a12;
+    }
+
+    .user-stat-label {
+        color: #8b94a5;
+        font-size: 10px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: .5px;
+        margin-bottom: 2px;
+    }
+
+    .user-stat-value {
+        color: #17213c;
+        font-size: 22px;
+        font-weight: 800;
+        line-height: 1.2;
+    }
+
+
+    /* =========================================
+           MAIN CARD
+           ========================================= */
+
+    .users-card {
+        background: #fff;
+        border: 1px solid #e7eaf0;
+        border-radius: 18px;
+        box-shadow: 0 8px 25px rgba(15, 31, 56, .05);
+        overflow: hidden;
+    }
+
+
+    /* =========================================
+           FILTER BAR
+           ========================================= */
+
+    .users-toolbar {
+        padding: 20px 22px;
+        border-bottom: 1px solid #edf0f4;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 15px;
+        flex-wrap: wrap;
+    }
+
+    .users-toolbar-title h3 {
+        margin: 0;
+        color: #17213c;
+        font-size: 17px;
+        font-weight: 800;
+    }
+
+    .users-toolbar-title p {
+        margin: 4px 0 0;
+        color: #949cac;
+        font-size: 11px;
+    }
+
+    .user-search {
+        position: relative;
+        width: 290px;
+    }
+
+        .user-search i {
+            position: absolute;
+            left: 13px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #9ba3b1;
+            font-size: 13px;
+        }
+
+        .user-search input {
+            width: 100%;
+            border: 1px solid #e1e5eb;
+            border-radius: 10px;
+            padding: 10px 13px 10px 36px;
+            outline: none;
+            color: #344054;
+            font-size: 12px;
+            background: #fafbfc;
+            transition: .2s ease;
+        }
+
+            .user-search input:focus {
+                border-color: #1769e0;
+                background: #fff;
+                box-shadow: 0 0 0 3px rgba(23, 105, 224, .08);
+            }
+
+
+    /* =========================================
+           FILTERS
+           ========================================= */
+
+    .users-filters {
+        padding: 15px 22px;
+        background: #fafbfc;
+        border-bottom: 1px solid #edf0f4;
+        display: flex;
+        gap: 9px;
+        flex-wrap: wrap;
+    }
+
+    .filter-btn {
+        border: 1px solid #e0e4ea;
+        background: #fff;
+        color: #697386;
+        border-radius: 9px;
+        padding: 8px 13px;
+        font-size: 11px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: .15s ease;
+    }
+
+        .filter-btn:hover,
+        .filter-btn.active {
+            background: #edf4ff;
+            border-color: #c9dcfb;
+            color: #1769e0;
+        }
+
+
+    /* =========================================
+           TABLE
+           ========================================= */
+
+    .users-table-wrapper {
+        overflow-x: auto;
+    }
+
+    .users-table {
+        width: 100%;
+        border-collapse: collapse;
+        min-width: 1000px;
+    }
+
+        .users-table thead th {
+            background: #fff;
+            color: #8b94a5;
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            font-weight: 750;
+            padding: 14px 18px;
+            border-bottom: 1px solid #edf0f4;
+            white-space: nowrap;
+            text-align: left;
+        }
+
+        .users-table tbody tr {
+            border-bottom: 1px solid #f0f2f5;
+            transition: .15s ease;
+        }
+
+            .users-table tbody tr:hover {
+                background: #fafcff;
+            }
+
+            .users-table tbody tr:last-child {
+                border-bottom: none;
+            }
+
+        .users-table td {
+            padding: 15px 18px;
+            color: #596274;
+            font-size: 12px;
+            vertical-align: middle;
+        }
+
+
+    /* =========================================
+           USER IDENTITY
+           ========================================= */
+
+    .user-identity {
+        display: flex;
+        align-items: center;
+        gap: 11px;
+        min-width: 210px;
+    }
+
+    .user-avatar {
+        width: 40px;
+        height: 40px;
+        min-width: 40px;
+        border-radius: 12px;
+        background: linear-gradient(135deg, #1769e0, #4f8ff0);
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 13px;
+        font-weight: 800;
+        box-shadow: 0 5px 13px rgba(23, 105, 224, .18);
+    }
+
+    .user-name {
+        color: #27324a;
+        font-size: 12px;
+        font-weight: 750;
+        margin-bottom: 3px;
+    }
+
+    .user-email {
+        color: #929aaa;
+        font-size: 10px;
+        max-width: 190px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+
+    /* =========================================
+           TYPE / ROLE
+           ========================================= */
+
+    .type-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 5px 9px;
+        border-radius: 8px;
+        font-size: 10px;
+        font-weight: 700;
+    }
+
+    .type-student {
+        background: #edf4ff;
+        color: #1769e0;
+    }
+
+    .type-staff {
+        background: #f1ebff;
+        color: #7956d8;
+    }
+
+    .type-other {
+        background: #f2f3f5;
+        color: #697386;
+    }
+
+    .role-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 5px 9px;
+        border-radius: 8px;
+        background: #f4f5f7;
+        color: #697386;
+        font-size: 10px;
+        font-weight: 700;
+    }
+
+
+    /* =========================================
+           STATUS
+           ========================================= */
+
+    .account-status {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 10px;
+        font-weight: 700;
+    }
+
+    .status-dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+    }
+
+    .status-active {
+        color: #168653;
+    }
+
+        .status-active .status-dot {
+            background: #20a866;
+            box-shadow: 0 0 0 3px rgba(32,168,102,.10);
+        }
+
+    .status-inactive {
+        color: #7b8494;
+    }
+
+        .status-inactive .status-dot {
+            background: #98a1b1;
+        }
+
+
+    /* =========================================
+           PAYMENT STATUS
+           ========================================= */
+
+    .payment-status {
+        display: inline-flex;
+        flex-direction: column;
+        gap: 2px;
+    }
+
+    .payment-status-main {
+        font-size: 10px;
+        font-weight: 750;
+    }
+
+    .payment-status-amount {
+        font-size: 10px;
+        color: #d14343;
+        font-weight: 650;
+    }
+
+    .payment-up-to-date {
+        color: #168653;
+    }
+
+    .payment-outstanding {
+        color: #c77a00;
+    }
+
+    .payment-none {
+        color: #929aaa;
+    }
+
+
+    /* =========================================
+           ACTIONS
+           ========================================= */
+
+    .user-actions {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 5px;
+        white-space: nowrap;
+    }
+
+    .user-action {
+        width: 32px;
+        height: 32px;
+        border-radius: 9px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid #e1e5eb;
+        background: #fff;
+        text-decoration: none;
+        transition: .15s ease;
+        font-size: 11px;
+    }
+
+        .user-action.view {
+            color: #667085;
+        }
+
+        .user-action.edit {
+            color: #1769e0;
+        }
+
+        .user-action.password {
+            color: #c77a00;
+        }
+
+        .user-action:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 10px rgba(15,31,56,.08);
+        }
+
+        .user-action.view:hover {
+            background: #f4f5f7;
+        }
+
+        .user-action.edit:hover {
+            background: #edf4ff;
+            border-color: #c9dcfb;
+        }
+
+        .user-action.password:hover {
+            background: #fff5e6;
+            border-color: #f2d4a7;
+        }
+
+
+    /* =========================================
+           ACTIVATE / DEACTIVATE
+           ========================================= */
+
+    .status-action {
+        border: none;
+        border-radius: 8px;
+        padding: 7px 10px;
+        font-size: 10px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: .15s ease;
+    }
+
+        .status-action.deactivate {
+            background: #fff1f1;
+            color: #c43d3d;
+        }
+
+            .status-action.deactivate:hover {
+                background: #fde3e3;
+            }
+
+        .status-action.activate {
+            background: #eaf8f1;
+            color: #168653;
+        }
+
+            .status-action.activate:hover {
+                background: #dcf3e8;
+            }
+
+
+    /* =========================================
+           EMPTY STATE
+           ========================================= */
+
+    .users-empty {
+        text-align: center;
+        padding: 65px 20px;
+    }
+
+    .users-empty-icon {
+        width: 64px;
+        height: 64px;
+        margin: 0 auto 15px;
+        border-radius: 18px;
+        background: #edf4ff;
+        color: #1769e0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 25px;
+    }
+
+    .users-empty h4 {
+        color: #27324a;
+        font-size: 16px;
+        font-weight: 750;
+        margin-bottom: 5px;
+    }
+
+    .users-empty p {
+        color: #929aaa;
+        font-size: 12px;
+        margin: 0;
+    }
+
+
+    /* =========================================
+           FOOTER SUMMARY
+           ========================================= */
+
+    .users-footer {
+        padding: 14px 20px;
+        background: #fafbfc;
+        border-top: 1px solid #edf0f4;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        color: #929aaa;
+        font-size: 11px;
+    }
+
+        .users-footer strong {
+            color: #596274;
+        }
+
+
+    /* =========================================
+           RESPONSIVE
+           ========================================= */
+
+    @@media (max-width: 1100px) {
+
+        .user-stat-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    @@media (max-width: 700px) {
+
+        .users-header {
+            display: block;
+        }
+
+        .add-user-btn {
+            margin-top: 15px;
+        }
+
+        .user-stat-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .users-toolbar {
+            align-items: stretch;
+        }
+
+        .user-search {
+            width: 100%;
+        }
+
+        .users-footer {
+            display: block;
+        }
+
+            .users-footer div:last-child {
+                margin-top: 5px;
+            }
+    }
+</style>
+
+
+<div class="users-page">
+
+    <!-- =========================================
+         HEADER
+         ========================================= -->
+
+    <div class="users-header">
+
+        <div>
+
+            <h1>
+                User Management
+            </h1>
+
+            <p>
+                Manage customer accounts, access and account status.
+            </p>
+
+        </div>
+
+        <a asp-action="CreateCustomer"
+           class="add-user-btn">
+
+            <i class="fa-solid fa-user-plus"></i>
+
+            Add Customer
+
+        </a>
+
+    </div>
+
+
+    <!-- =========================================
+         ALERTS
+         ========================================= -->
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="users-alert success">
+
+            <i class="fa-solid fa-circle-check"></i>
+
+            <span>
+                @TempData["SuccessMessage"]
+            </span>
+
+        </div>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="users-alert error">
+
+            <i class="fa-solid fa-circle-exclamation"></i>
+
+            <span>
+                @TempData["ErrorMessage"]
+            </span>
+
+        </div>
+    }
+
+
+    <!-- =========================================
+         STATISTICS
+         ========================================= -->
+
+    <div class="user-stat-grid">
+
+        <div class="user-stat">
+
+            <div class="user-stat-icon stat-blue">
+                <i class="fa-solid fa-users"></i>
+            </div>
+
+            <div>
+
+                <div class="user-stat-label">
+                    Total Users
+                </div>
+
+                <div class="user-stat-value">
+                    @totalUsers.ToString("N0")
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="user-stat">
+
+            <div class="user-stat-icon stat-green">
+                <i class="fa-solid fa-user-graduate"></i>
+            </div>
+
+            <div>
+
+                <div class="user-stat-label">
+                    Students
+                </div>
+
+                <div class="user-stat-value">
+                    @totalStudents.ToString("N0")
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="user-stat">
+
+            <div class="user-stat-icon stat-purple">
+                <i class="fa-solid fa-user-tie"></i>
+            </div>
+
+            <div>
+
+                <div class="user-stat-label">
+                    Staff
+                </div>
+
+                <div class="user-stat-value">
+                    @totalStaff.ToString("N0")
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="user-stat">
+
+            <div class="user-stat-icon stat-orange">
+                <i class="fa-solid fa-user-check"></i>
+            </div>
+
+            <div>
+
+                <div class="user-stat-label">
+                    Active Accounts
+                </div>
+
+                <div class="user-stat-value">
+                    @activeUsers.ToString("N0")
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =========================================
+         USERS CARD
+         ========================================= -->
+
+    <div class="users-card">
+
+        <!-- TOOLBAR -->
+
+        <div class="users-toolbar">
+
+            <div class="users-toolbar-title">
+
+                <h3>
+                    All Users
+                </h3>
+
+                <p>
+                    @totalCustomers customer accounts
+                    · @inactiveUsers inactive accounts
+                </p>
+
+            </div>
+
+
+            <div class="user-search">
+
+                <i class="fa-solid fa-magnifying-glass"></i>
+
+                <input type="text"
+                       id="userSearch"
+                       placeholder="Search name, email or number..."
+                       autocomplete="off" />
+
+            </div>
+
+        </div>
+
+
+        <!-- FILTER BUTTONS -->
+
+        <div class="users-filters">
+
+            <button type="button"
+                    class="filter-btn active"
+                    data-filter="all">
+                All Users
+            </button>
+
+            <button type="button"
+                    class="filter-btn"
+                    data-filter="Student">
+                Students
+            </button>
+
+            <button type="button"
+                    class="filter-btn"
+                    data-filter="Staff">
+                Staff
+            </button>
+
+            <button type="button"
+                    class="filter-btn"
+                    data-filter="Active">
+                Active
+            </button>
+
+            <button type="button"
+                    class="filter-btn"
+                    data-filter="Inactive">
+                Inactive
+            </button>
+
+        </div>
+
+
+        <!-- TABLE -->
+
+        <div class="users-table-wrapper">
+
+            <table class="users-table">
+
+                <thead>
+
+                    <tr>
+
+                        <th>
+                            User
+                        </th>
+
+                        <th>
+                            Number
+                        </th>
+
+                        <th>
+                            Type
+                        </th>
+
+                        <th>
+                            Role
+                        </th>
+
+                        <th>
+                            Account Status
+                        </th>
+
+                        <th>
+                            Payment Status
+                        </th>
+
+                        <th class="text-end">
+                            Actions
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody id="usersTableBody">
+
+                    @foreach (var u in users)
+                    {
+                        var initials = "U";
+
+                        if (!string.IsNullOrWhiteSpace(u.Name))
+                        {
+                            var nameParts = u.Name
+                            .Split(
+                            ' ',
+                            StringSplitOptions.RemoveEmptyEntries);
+
+                            if (nameParts.Length >= 2)
+                            {
+                                initials =
+                                $"{nameParts[0][0]}{nameParts[^1][0]}"
+                                .ToUpperInvariant();
+                            }
+                            else
+                            {
+                                initials =
+                                nameParts[0][0]
+                                .ToString()
+                                .ToUpperInvariant();
+                            }
+                        }
+
+                        var typeClass =
+                        u.UserType == "Student"
+                        ? "type-student"
+                        : u.UserType == "Staff"
+                        ? "type-staff"
+                        : "type-other";
+
+                        var isActive =
+                        u.AccountStatus == "Active";
+
+                        var statusClass =
+                        isActive
+                        ? "status-active"
+                        : "status-inactive";
+
+                        var paymentClass =
+                        u.PaymentStatus == "Up to date"
+                        ? "payment-up-to-date"
+                        : u.PaymentStatus == "Outstanding"
+                        ? "payment-outstanding"
+                        : "payment-none";
+
+                        <tr class="user-row"
+                            data-name="@u.Name"
+                            data-email="@u.Email"
+                            data-number="@u.Number"
+                            data-type="@u.UserType"
+                            data-status="@u.AccountStatus">
+
+                            <!-- USER -->
+
+                            <td>
+
+                                <div class="user-identity">
+
+                                    <div class="user-avatar">
+                                        @initials
+                                    </div>
+
+                                    <div>
+
+                                        <div class="user-name">
+                                            @u.Name
+                                        </div>
+
+                                        <div class="user-email">
+                                            @u.Email
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            </td>
+
+
+                            <!-- NUMBER -->
+
+                            <td>
+
+                                @if (string.IsNullOrWhiteSpace(u.Number))
+                                {
+                                    <span class="text-muted">
+                                        —
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span>
+                                        @u.Number
+                                    </span>
+                                }
+
+                            </td>
+
+
+                            <!-- TYPE -->
+
+                            <td>
+
+                                <span class="type-badge @typeClass">
+
+                                    @if (u.UserType == "Student")
+                                    {
+                                        <i class="fa-solid fa-graduation-cap"></i>
+                                    }
+                                    else if (u.UserType == "Staff")
+                                    {
+                                        <i class="fa-solid fa-briefcase"></i>
+                                    }
+                                    else
+                                    {
+                                        <i class="fa-solid fa-user"></i>
+                                    }
+
+                                    @u.UserType
+
+                                </span>
+
+                            </td>
+
+
+                            <!-- ROLE -->
+
+                            <td>
+
+                                <span class="role-badge">
+
+                                    @if (u.Role == "Admin")
+                                    {
+                                        <i class="fa-solid fa-shield-halved me-1"></i>
+                                    }
+                                    else if (u.Role == "FinancialOfficer")
+                                    {
+                                        <i class="fa-solid fa-coins me-1"></i>
+                                    }
+                                    else
+                                    {
+                                        <i class="fa-solid fa-user me-1"></i>
+                                    }
+
+                                @(u.Role == "FinancialOfficer"
+                                                                ? "Financial Officer"
+                                                                : u.Role)
+
+                            </span>
+
+                            </td>
+
+
+                            <!-- ACCOUNT STATUS -->
+
+                            <td>
+
+                                <span class="account-status @statusClass">
+
+                                    <span class="status-dot"></span>
+
+                                    @u.AccountStatus
+
+                                </span>
+
+                            </td>
+
+
+                            <!-- PAYMENT -->
+
+                            <td>
+
+                                <div class="payment-status">
+
+                                    <span class="payment-status-main @paymentClass">
+
+                                        @u.PaymentStatus
+
+                                    </span>
+
+                                @if (u.OutstandingAmount > 0)
+                                    {
+                                        <span class="payment-status-amount">
+                                            R @u.OutstandingAmount.ToString("N2")
+                                        </span>
+                                    }
+
+                                </div>
+
+                            </td>
+
+
+                            <!-- ACTIONS -->
+
+                            <td>
+
+                                <div class="user-actions">
+
+                                    @if (u.Role == "Customer")
+                                    {
+                                        <!-- View -->
+
+                                        <a asp-action="CustomerDetails"
+                                           asp-route-id="@u.Id"
+                                           class="user-action view"
+                                           title="View customer">
+
+                                            <i class="fa-solid fa-eye"></i>
+
+                                        </a>
+
+
+                                        <!-- Edit -->
+
+                                        <a asp-action="EditCustomer"
+                                           asp-route-id="@u.Id"
+                                           class="user-action edit"
+                                           title="Edit customer">
+
+                                            <i class="fa-solid fa-pen"></i>
+
+                                        </a>
+
+
+                                        <!-- Password -->
+
+                                        <a asp-action="ResetCustomerPassword"
+                                           asp-route-id="@u.Id"
+                                           class="user-action password"
+                                           title="Reset password">
+
+                                            <i class="fa-solid fa-key"></i>
+
+                                        </a>
+                                    }
+
+
+                                    @if (u.Role != "Admin")
+                                    {
+                                        <form asp-action="ToggleUserStatus"
+                                              method="post"
+                                              class="d-inline">
+
+                                            @Html.AntiForgeryToken()
+
+                                            <input type="hidden"
+                                                   name="id"
+                                                   value="@u.Id" />
+
+                                            <button type="submit"
+                                                    class="status-action @(isActive ? "deactivate" : "activate")"
+                                                    title="@(isActive ? "Deactivate account" : "Activate account")">
+
+                                                <i class="fa-solid @(isActive ? "fa-user-slash" : "fa-user-check") me-1"></i>
+
+                                                @(isActive ? "Deactivate" : "Activate")
+
+                                            </button>
+
+                                        </form>
+                                    }
+
+                                </div>
+
+                            </td>
+
+                        </tr>
+                    }
+
+
+                    <!-- EMPTY / FILTER RESULT -->
+                    @if (!users.Any())
+                    {
+                        <tr>
+
+                            <td colspan="7">
+
+                                <div class="users-empty">
+
+                                    <div class="users-empty-icon">
+
+                                        <i class="fa-solid fa-users"></i>
+
+                                    </div>
+
+                                    <h4>
+                                        No users found
+                                    </h4>
+
+                                    <p>
+                                        There are currently no accounts to display.
+                                    </p>
+
+                                </div>
+
+                            </td>
+
+                        </tr>
+                    }
+
+
+                    <tr id="noSearchResults"
+                        style="display:none;">
+
+                        <td colspan="7">
+
+                            <div class="users-empty">
+
+                                <div class="users-empty-icon">
+
+                                    <i class="fa-solid fa-magnifying-glass"></i>
+
+                                </div>
+
+                                <h4>
+                                    No matching users
+                                </h4>
+
+                                <p>
+                                    Try changing your search or filter.
+                                </p>
+
+                            </div>
+
+                        </td>
+
+                    </tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+
+        <!-- FOOTER -->
+
+        <div class="users-footer">
+
+            <div>
+                Showing <strong id="visibleUserCount">@users.Count</strong>
+                users
+            </div>
+
+            <div>
+                <strong>@activeUsers</strong> active
+                ·
+                <strong>@inactiveUsers</strong> inactive
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<script>
+
+    document.addEventListener("DOMContentLoaded", function () {
+
+        const searchInput =
+            document.getElementById("userSearch");
+
+        const filterButtons =
+            document.querySelectorAll(".filter-btn");
+
+        const rows =
+            document.querySelectorAll(".user-row");
+
+        const countElement =
+            document.getElementById("visibleUserCount");
+
+        const noResults =
+            document.getElementById("noSearchResults");
+
+        let currentFilter = "all";
+
+
+        function filterUsers() {
+
+            const search =
+                searchInput.value
+                    .toLowerCase()
+                    .trim();
+
+            let visibleCount = 0;
+
+
+            rows.forEach(function (row) {
+
+                const name =
+                    (row.dataset.name || "")
+                        .toLowerCase();
+
+                const email =
+                    (row.dataset.email || "")
+                        .toLowerCase();
+
+                const number =
+                    (row.dataset.number || "")
+                        .toLowerCase();
+
+                const type =
+                    row.dataset.type || "";
+
+                const status =
+                    row.dataset.status || "";
+
+
+                const matchesSearch =
+                    !search ||
+                    name.includes(search) ||
+                    email.includes(search) ||
+                    number.includes(search);
+
+
+                let matchesFilter = true;
+
+
+                if (currentFilter !== "all") {
+
+                    if (
+                        currentFilter === "Student" ||
+                        currentFilter === "Staff"
+                    ) {
+                        matchesFilter =
+                            type === currentFilter;
+                    }
+
+                    if (
+                        currentFilter === "Active" ||
+                        currentFilter === "Inactive"
+                    ) {
+                        matchesFilter =
+                            status === currentFilter;
+                    }
+                }
+
+
+                const shouldShow =
+                    matchesSearch &&
+                    matchesFilter;
+
+
+                row.style.display =
+                    shouldShow ? "" : "none";
+
+
+                if (shouldShow) {
+                    visibleCount++;
+                }
+
+            });
+
+
+            countElement.textContent =
+                visibleCount;
+
+
+            noResults.style.display =
+                visibleCount === 0 &&
+                rows.length > 0
+                    ? ""
+                    : "none";
+        }
+
+
+        searchInput.addEventListener(
+            "input",
+            filterUsers
+        );
+
+
+        filterButtons.forEach(function (button) {
+
+            button.addEventListener(
+                "click",
+                function () {
+
+                    filterButtons.forEach(function (btn) {
+                        btn.classList.remove("active");
+                    });
+
+                    button.classList.add("active");
+
+                    currentFilter =
+                        button.dataset.filter;
+
+                    filterUsers();
+
+                }
+            );
+
+        });
+
+    });
+
+</script>

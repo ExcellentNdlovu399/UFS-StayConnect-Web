@@ -1,0 +1,1088 @@
+@model UFSStayConnect.ViewModels.AdminDashboardViewModel
+
+@{
+    ViewData["Title"] = "Administrator Dashboard";
+    Layout = "_AdminLayout";
+}
+
+<style>
+    .admin-command {
+        padding-bottom: 30px;
+    }
+
+    .command-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        margin-bottom: 28px;
+    }
+
+        .command-header h1 {
+            font-size: 30px;
+            font-weight: 800;
+            color: #15213b;
+            margin-bottom: 6px;
+            letter-spacing: -0.7px;
+        }
+
+        .command-header p {
+            color: #7d8798;
+            margin: 0;
+        }
+
+    .command-date {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 15px;
+        background: #fff;
+        border: 1px solid #e7eaf0;
+        border-radius: 10px;
+        color: #667085;
+        font-size: 13px;
+    }
+
+    /* ================================
+           KPI CARDS
+           ================================ */
+
+    .command-kpis {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 18px;
+        margin-bottom: 22px;
+    }
+
+    .command-card {
+        background: #fff;
+        border: 1px solid #e7eaf0;
+        border-radius: 18px;
+        padding: 22px;
+        box-shadow: 0 8px 25px rgba(15, 31, 56, .05);
+        transition: .25s ease;
+    }
+
+        .command-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 14px 35px rgba(15, 31, 56, .09);
+        }
+
+    .command-card-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+    }
+
+    .command-icon {
+        width: 46px;
+        height: 46px;
+        border-radius: 13px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+    }
+
+    .icon-blue {
+        background: #eaf2ff;
+        color: #1769e0;
+    }
+
+    .icon-green {
+        background: #e9f8f0;
+        color: #14945b;
+    }
+
+    .icon-orange {
+        background: #fff4e6;
+        color: #ed8a12;
+    }
+
+    .icon-purple {
+        background: #f1ebff;
+        color: #7956d8;
+    }
+
+    .command-label {
+        display: block;
+        color: #8992a4;
+        font-size: 12px;
+        font-weight: 600;
+        margin-top: 18px;
+        text-transform: uppercase;
+        letter-spacing: .5px;
+    }
+
+    .command-number {
+        display: block;
+        font-size: 27px;
+        font-weight: 800;
+        color: #17213c;
+        margin-top: 3px;
+    }
+
+    .command-description {
+        color: #98a1b2;
+        font-size: 12px;
+        margin-top: 4px;
+    }
+
+    /* ================================
+           MAIN GRID
+           ================================ */
+
+    .command-main-grid {
+        display: grid;
+        grid-template-columns: 1.4fr .8fr;
+        gap: 22px;
+        margin-bottom: 22px;
+    }
+
+    .command-panel {
+        background: #fff;
+        border: 1px solid #e7eaf0;
+        border-radius: 18px;
+        box-shadow: 0 8px 25px rgba(15, 31, 56, .05);
+        overflow: hidden;
+    }
+
+    .command-panel-header {
+        padding: 21px 23px;
+        border-bottom: 1px solid #edf0f4;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+        .command-panel-header h3 {
+            font-size: 17px;
+            font-weight: 750;
+            color: #17213c;
+            margin: 0 0 4px;
+        }
+
+        .command-panel-header p {
+            color: #929aaa;
+            font-size: 12px;
+            margin: 0;
+        }
+
+    .panel-link {
+        color: #1769e0;
+        text-decoration: none;
+        font-size: 12px;
+        font-weight: 700;
+    }
+
+        .panel-link:hover {
+            text-decoration: underline;
+        }
+
+    /* ================================
+           TABLE
+           ================================ */
+
+    .command-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+        .command-table th {
+            background: #fafbfc;
+            color: #8992a4;
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            font-weight: 700;
+            padding: 13px 20px;
+            text-align: left;
+            white-space: nowrap;
+        }
+
+        .command-table td {
+            padding: 15px 20px;
+            border-top: 1px solid #f0f2f5;
+            color: #596274;
+            font-size: 12px;
+            vertical-align: middle;
+        }
+
+        .command-table tbody tr {
+            transition: .15s ease;
+        }
+
+            .command-table tbody tr:hover {
+                background: #fafcff;
+            }
+
+    .customer-name {
+        font-weight: 700;
+        color: #27324a;
+    }
+
+    .status-pill {
+        display: inline-flex;
+        align-items: center;
+        padding: 5px 10px;
+        border-radius: 30px;
+        font-size: 10px;
+        font-weight: 700;
+    }
+
+        .status-pill.pending {
+            background: #fff4df;
+            color: #c77a00;
+        }
+
+        .status-pill.approved,
+        .status-pill.paid {
+            background: #e8f7ef;
+            color: #138a54;
+        }
+
+        .status-pill.rejected {
+            background: #fdecec;
+            color: #d14343;
+        }
+
+        .status-pill.cancelled,
+        .status-pill.withdrawn {
+            background: #f0f1f3;
+            color: #737b89;
+        }
+
+    /* ================================
+           OCCUPANCY
+           ================================ */
+
+    .occupancy-panel {
+        padding: 23px;
+    }
+
+    .occupancy-circle {
+        width: 175px;
+        height: 175px;
+        margin: 10px auto 20px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+    }
+
+        .occupancy-circle::after {
+            content: "";
+            width: 132px;
+            height: 132px;
+            background: white;
+            border-radius: 50%;
+            position: absolute;
+        }
+
+    .occupancy-value {
+        position: relative;
+        z-index: 2;
+        text-align: center;
+    }
+
+        .occupancy-value strong {
+            display: block;
+            font-size: 34px;
+            color: #17213c;
+            font-weight: 800;
+        }
+
+        .occupancy-value span {
+            font-size: 11px;
+            color: #8d96a6;
+        }
+
+    .occupancy-stats {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+    }
+
+    .occupancy-stat {
+        background: #f8fafc;
+        border-radius: 11px;
+        padding: 13px 8px;
+        text-align: center;
+    }
+
+        .occupancy-stat strong {
+            display: block;
+            font-size: 18px;
+            color: #17213c;
+        }
+
+        .occupancy-stat span {
+            color: #8b93a3;
+            font-size: 10px;
+        }
+
+    /* ================================
+           PAYMENT PANEL
+           ================================ */
+
+    .payment-summary {
+        padding: 22px;
+    }
+
+    .payment-total {
+        background: linear-gradient(135deg, #14213d, #203967);
+        color: white;
+        padding: 22px;
+        border-radius: 15px;
+        margin-bottom: 15px;
+    }
+
+        .payment-total span {
+            font-size: 11px;
+            opacity: .7;
+        }
+
+        .payment-total strong {
+            display: block;
+            font-size: 27px;
+            margin-top: 4px;
+        }
+
+    .payment-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 13px 3px;
+        border-bottom: 1px solid #edf0f4;
+    }
+
+        .payment-row:last-child {
+            border-bottom: 0;
+        }
+
+        .payment-row span {
+            color: #7c8596;
+            font-size: 12px;
+        }
+
+        .payment-row strong {
+            color: #17213c;
+            font-size: 13px;
+        }
+
+    /* ================================
+           QUICK ACTIONS
+           ================================ */
+
+    .command-bottom {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 18px;
+    }
+
+    .quick-card {
+        background: #fff;
+        border: 1px solid #e7eaf0;
+        border-radius: 16px;
+        padding: 19px;
+        display: flex;
+        align-items: center;
+        gap: 13px;
+        text-decoration: none;
+        transition: .2s ease;
+    }
+
+        .quick-card:hover {
+            transform: translateY(-2px);
+            border-color: #cbd8ee;
+            box-shadow: 0 10px 25px rgba(15,31,56,.07);
+        }
+
+    .quick-icon {
+        width: 42px;
+        height: 42px;
+        border-radius: 11px;
+        background: #edf4ff;
+        color: #1769e0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .quick-card strong {
+        display: block;
+        color: #27324a;
+        font-size: 12px;
+    }
+
+    .quick-card span {
+        color: #939baa;
+        font-size: 10px;
+    }
+
+    .empty-state {
+        padding: 45px 20px;
+        text-align: center;
+        color: #98a1b1;
+    }
+
+        .empty-state i {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .empty-state p {
+            margin: 0;
+            font-size: 12px;
+        }
+
+    @@media (max-width: 1100px) {
+        .command-kpis {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .command-main-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .command-bottom {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    @@media (max-width: 650px) {
+        .command-header {
+            display: block;
+        }
+
+        .command-date {
+            margin-top: 15px;
+            width: fit-content;
+        }
+
+        .command-kpis,
+        .command-bottom {
+            grid-template-columns: 1fr;
+        }
+
+        .command-table {
+            min-width: 650px;
+        }
+
+        .command-panel {
+            overflow-x: auto;
+        }
+
+        .occupancy-stats {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+
+<div class="admin-command">
+
+    <!-- =========================================
+         HEADER
+         ========================================= -->
+
+    <div class="command-header">
+
+        <div>
+            <h1>Accommodation Command Centre</h1>
+
+            <p>
+                Monitor UFS StayConnect accommodation,
+                applications and payments.
+            </p>
+        </div>
+
+        <div class="command-date">
+            <i class="fa-regular fa-calendar"></i>
+
+            @DateTime.Now.ToString("dd MMMM yyyy")
+        </div>
+
+    </div>
+
+
+    <!-- =========================================
+         KPI CARDS
+         ========================================= -->
+
+    <div class="command-kpis">
+
+        <!-- TOTAL USERS -->
+
+        <div class="command-card">
+
+            <div class="command-card-top">
+
+                <div class="command-icon icon-blue">
+                    <i class="fa-solid fa-users"></i>
+                </div>
+
+            </div>
+
+            <span class="command-label">
+                Total Customers
+            </span>
+
+            <strong class="command-number">
+                @Model.TotalUsers.ToString("N0")
+            </strong>
+
+            <div class="command-description">
+                @Model.TotalStudents students ·
+                @Model.TotalStaff staff
+            </div>
+
+        </div>
+
+
+        <!-- ROOMS -->
+
+        <div class="command-card">
+
+            <div class="command-card-top">
+
+                <div class="command-icon icon-green">
+                    <i class="fa-solid fa-bed"></i>
+                </div>
+
+            </div>
+
+            <span class="command-label">
+                Available Rooms
+            </span>
+
+            <strong class="command-number">
+                @Model.AvailableAccommodation.ToString("N0")
+            </strong>
+
+            <div class="command-description">
+                @Model.TotalRooms total rooms
+            </div>
+
+        </div>
+
+
+        <!-- APPLICATIONS -->
+
+        <div class="command-card">
+
+            <div class="command-card-top">
+
+                <div class="command-icon icon-orange">
+                    <i class="fa-solid fa-file-circle-exclamation"></i>
+                </div>
+
+            </div>
+
+            <span class="command-label">
+                Pending Applications
+            </span>
+
+            <strong class="command-number">
+                @Model.PendingApplications.ToString("N0")
+            </strong>
+
+            <div class="command-description">
+                @Model.TotalApplications total applications
+            </div>
+
+        </div>
+
+
+        <!-- PAYMENTS -->
+
+        <div class="command-card">
+
+            <div class="command-card-top">
+
+                <div class="command-icon icon-purple">
+                    <i class="fa-solid fa-credit-card"></i>
+                </div>
+
+            </div>
+
+            <span class="command-label">
+                Payments Collected
+            </span>
+
+            <strong class="command-number">
+                R @Model.TotalPayments.ToString("N2")
+            </strong>
+
+            <div class="command-description">
+                R @Model.OutstandingPayments.ToString("N2")
+                currently pending
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =========================================
+         APPLICATIONS + ACCOMMODATION
+         ========================================= -->
+
+    <div class="command-main-grid">
+
+        <!-- RECENT APPLICATIONS -->
+
+        <div class="command-panel">
+
+            <div class="command-panel-header">
+
+                <div>
+                    <h3>Recent Applications</h3>
+
+                    <p>
+                        Latest accommodation applications
+                    </p>
+                </div>
+
+                <a asp-controller="Application"
+                   asp-action="Index"
+                   class="panel-link">
+                    View all →
+                </a>
+
+            </div>
+
+
+            @if (Model.RecentApplications.Any())
+            {
+                <div class="table-responsive">
+
+                    <table class="command-table">
+
+                        <thead>
+
+                            <tr>
+                                <th>Applicant</th>
+                                <th>Accommodation</th>
+                                <th>Status</th>
+                                <th>Date</th>
+                            </tr>
+
+                        </thead>
+
+                        <tbody>
+
+                            @foreach (var application in Model.RecentApplications)
+                            {
+                                <tr>
+
+                                    <td>
+                                        <span class="customer-name">
+                                            @application.SafeApplicantName
+                                        </span>
+                                    </td>
+
+                                    <td>
+                                        @application.SafeAccommodationName
+                                    </td>
+
+                                    <td>
+
+                                        <span class="status-pill @application.SafeStatus.ToLowerInvariant()">
+                                            @application.SafeStatus
+                                        </span>
+
+                                    </td>
+
+                                    <td>
+                                        @application.DisplayDate
+                                    </td>
+
+                                </tr>
+                            }
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+            }
+            else
+            {
+                <div class="empty-state">
+
+                    <i class="fa-regular fa-folder-open"></i>
+
+                    <p>No applications found.</p>
+
+                </div>
+            }
+
+        </div>
+
+
+        <!-- ACCOMMODATION OCCUPANCY -->
+
+        <div class="command-panel">
+
+            <div class="command-panel-header">
+
+                <div>
+                    <h3>Accommodation</h3>
+
+                    <p>
+                        Current room availability
+                    </p>
+                </div>
+
+                <i class="fa-solid fa-house"
+                   style="color:#1769e0;"></i>
+
+            </div>
+
+            <div class="occupancy-panel">
+
+                <div class="occupancy-circle"
+                     style="background: conic-gradient(#1769e0 @(Model.OccupancyPercentage * 3.6)deg, #e8edf5 @(Model.OccupancyPercentage * 3.6)deg 360deg);">
+
+                    <div class="occupancy-value">
+
+                        <strong>
+                            @Model.OccupancyPercentage.ToString("0.0")%
+                        </strong>
+
+                        <span>
+                            occupied
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <div class="occupancy-stats">
+
+                    <div class="occupancy-stat">
+
+                        <strong>
+                            @Model.TotalRooms
+                        </strong>
+
+                        <span>
+                            Total
+                        </span>
+
+                    </div>
+
+                    <div class="occupancy-stat">
+
+                        <strong>
+                            @Model.OccupiedRooms
+                        </strong>
+
+                        <span>
+                            Occupied
+                        </span>
+
+                    </div>
+
+                    <div class="occupancy-stat">
+
+                        <strong>
+                            @Model.AvailableAccommodation
+                        </strong>
+
+                        <span>
+                            Available
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =========================================
+         PAYMENTS + FINANCIAL OVERVIEW
+         ========================================= -->
+
+    <div class="command-main-grid">
+
+        <!-- RECENT PAYMENTS -->
+
+        <div class="command-panel">
+
+            <div class="command-panel-header">
+
+                <div>
+                    <h3>Recent Payments</h3>
+
+                    <p>
+                        Latest financial activity
+                    </p>
+                </div>
+
+                <a asp-controller="PaymentManagement"
+                   asp-action="Index"
+                   class="panel-link">
+                    View all →
+                </a>
+
+            </div>
+
+
+            @if (Model.RecentPayments.Any())
+            {
+                <div class="table-responsive">
+
+                    <table class="command-table">
+
+                        <thead>
+
+                            <tr>
+                                <th>Customer</th>
+                                <th>Type</th>
+                                <th>Amount</th>
+                                <th>Status</th>
+                            </tr>
+
+                        </thead>
+
+                        <tbody>
+
+                            @foreach (var payment in Model.RecentPayments)
+                            {
+                                <tr>
+
+                                    <td>
+                                        <span class="customer-name">
+                                            @payment.SafeCustomerName
+                                        </span>
+                                    </td>
+
+                                    <td>
+                                        @payment.SafePaymentType
+                                    </td>
+
+                                    <td>
+                                        <strong>
+                                            R @payment.SafeAmount.ToString("N2")
+                                        </strong>
+                                    </td>
+
+                                    <td>
+
+                                        <span class="status-pill @payment.SafeStatus.ToLowerInvariant()">
+                                            @payment.SafeStatus
+                                        </span>
+
+                                    </td>
+
+                                </tr>
+                            }
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+            }
+            else
+            {
+                <div class="empty-state">
+
+                    <i class="fa-solid fa-receipt"></i>
+
+                    <p>No payments found.</p>
+
+                </div>
+            }
+
+        </div>
+
+
+        <!-- FINANCIAL OVERVIEW -->
+
+        <div class="command-panel">
+
+            <div class="command-panel-header">
+
+                <div>
+                    <h3>Financial Overview</h3>
+
+                    <p>
+                        Current payment position
+                    </p>
+                </div>
+
+                <i class="fa-solid fa-wallet"
+                   style="color:#7956d8;"></i>
+
+            </div>
+
+
+            <div class="payment-summary">
+
+                <div class="payment-total">
+
+                    <span>
+                        TOTAL PAID
+                    </span>
+
+                    <strong>
+                        R @Model.TotalPayments.ToString("N2")
+                    </strong>
+
+                </div>
+
+
+                <div class="payment-row">
+
+                    <span>
+                        Paid payments
+                    </span>
+
+                    <strong>
+                        R @Model.TotalPayments.ToString("N2")
+                    </strong>
+
+                </div>
+
+
+                <div class="payment-row">
+
+                    <span>
+                        Outstanding
+                    </span>
+
+                    <strong>
+                        R @Model.OutstandingPayments.ToString("N2")
+                    </strong>
+
+                </div>
+
+
+                <div class="payment-row">
+
+                    <span>
+                        Financial Officers
+                    </span>
+
+                    <strong>
+                        @Model.TotalFinancialOfficers
+                    </strong>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =========================================
+         QUICK ACTIONS
+         ========================================= -->
+
+    <div class="command-bottom">
+
+        <a asp-controller="Admin"
+           asp-action="Users"
+           class="quick-card">
+
+            <div class="quick-icon">
+                <i class="fa-solid fa-users"></i>
+            </div>
+
+            <div>
+
+                <strong>
+                    Manage Users
+                </strong>
+
+                <span>
+                    View customer accounts
+                </span>
+
+            </div>
+
+        </a>
+
+
+        <a asp-controller="Accommodation"
+           asp-action="Index"
+           class="quick-card">
+
+            <div class="quick-icon">
+                <i class="fa-solid fa-house"></i>
+            </div>
+
+            <div>
+
+                <strong>
+                    Accommodation
+                </strong>
+
+                <span>
+                    Manage residences
+                </span>
+
+            </div>
+
+        </a>
+
+
+        <a asp-controller="PaymentManagement"
+           asp-action="Index"
+           class="quick-card">
+
+            <div class="quick-icon">
+                <i class="fa-solid fa-money-check-dollar"></i>
+            </div>
+
+            <div>
+
+                <strong>
+                    Payments
+                </strong>
+
+                <span>
+                    Review transactions
+                </span>
+
+            </div>
+
+        </a>
+
+
+        <a asp-controller="Report"
+           asp-action="Index"
+           class="quick-card">
+
+            <div class="quick-icon">
+                <i class="fa-solid fa-chart-line"></i>
+            </div>
+
+            <div>
+
+                <strong>
+                    Reports
+                </strong>
+
+                <span>
+                    View system reports
+                </span>
+
+            </div>
+
+        </a>
+
+    </div>
+
+</div>

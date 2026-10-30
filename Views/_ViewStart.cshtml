@@ -1,0 +1,37 @@
+@{
+    /*
+       UFS StayConnect uses a role-based layout.
+
+       Anonymous visitors:
+           Shared/_Layout.cshtml
+
+       Customers:
+           Shared/_CustomerLayout.cshtml
+
+       Administrators:
+           Admin/_AdminLayout.cshtml
+
+       Financial Officers:
+           FinancialOfficer/_FinancialOfficerLayout.cshtml
+
+       Home/Login/Register explicitly use the public layout so the
+       landing/public interface never becomes the authenticated dashboard.
+    */
+
+    if (User.IsInRole("Admin"))
+    {
+        Layout = "~/Views/Admin/_AdminLayout.cshtml";
+    }
+    else if (User.IsInRole("FinancialOfficer"))
+    {
+        Layout = "~/Views/FinancialOfficer/_FinancialOfficerLayout.cshtml";
+    }
+    else if (User.IsInRole("Customer"))
+    {
+        Layout = "~/Views/Shared/_CustomerLayout.cshtml";
+    }
+    else
+    {
+        Layout = "~/Views/Shared/_Layout.cshtml";
+    }
+}

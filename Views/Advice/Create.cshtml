@@ -1,0 +1,265 @@
+@model UFSStayConnect.ViewModels.FinancialAdviceViewModel
+
+@{
+    ViewData["Title"] = "Submit Financial Advice";
+
+    if (User.IsInRole("FinancialOfficer"))
+    {
+        Layout = "~/Views/FinancialOfficer/_FinancialOfficerLayout.cshtml";
+    }
+    else if (User.IsInRole("Admin"))
+    {
+        Layout = "~/Views/Admin/_AdminLayout.cshtml";
+    }
+}
+
+<div class="advice-page">
+
+    <!-- HEADER -->
+    <div class="advice-page-header">
+
+        <div>
+            <div class="advice-eyebrow">
+                <i class="fa-solid fa-comments"></i>
+                Advice & Inputs
+            </div>
+
+            <h1>Submit Financial Advice</h1>
+
+            <p>
+                Send an operational suggestion, customer issue or financial
+                input to the Administrator.
+            </p>
+        </div>
+
+        <a asp-action="Advice"
+           class="advice-back-btn">
+
+            <i class="fa-solid fa-arrow-left"></i>
+            Back to Advice
+
+        </a>
+
+    </div>
+
+
+    <div class="advice-form-grid">
+
+        <!-- FORM -->
+        <div class="advice-form-card">
+
+            <div class="advice-card-header">
+
+                <div class="advice-card-icon">
+                    <i class="fa-solid fa-pen-to-square"></i>
+                </div>
+
+                <div>
+                    <h2>New Advice / Input</h2>
+                    <p>
+                        Provide clear and useful information for review.
+                    </p>
+                </div>
+
+            </div>
+
+
+            <div class="advice-card-body">
+
+                <div asp-validation-summary="ModelOnly"
+                     class="alert alert-danger"
+                     role="alert">
+                </div>
+
+
+                <form asp-action="CreateAdvice"
+                      method="post">
+
+                    @Html.AntiForgeryToken()
+
+
+                    <!-- TITLE -->
+                    <div class="advice-field">
+
+                        <label asp-for="Title">
+                            Subject
+                            <span>*</span>
+                        </label>
+
+                        <div class="advice-input-wrapper">
+
+                            <i class="fa-solid fa-heading"></i>
+
+                            <input asp-for="Title"
+                                   class="advice-input"
+                                   placeholder="e.g. Electricity payment issue for Residence A" />
+
+                        </div>
+
+                        <span asp-validation-for="Title"
+                              class="advice-error">
+                        </span>
+
+                    </div>
+
+
+                    <!-- ADVICE -->
+                    <div class="advice-field">
+
+                        <label asp-for="Advice">
+                            Advice / Input
+                            <span>*</span>
+                        </label>
+
+                        <textarea asp-for="Advice"
+                                  class="advice-textarea"
+                                  rows="9"
+                                  placeholder="Describe the issue, recommendation or customer input..."></textarea>
+
+                        <span asp-validation-for="Advice"
+                              class="advice-error">
+                        </span>
+
+                        <div class="advice-character-hint">
+                            <i class="fa-solid fa-circle-info"></i>
+                            Include enough detail for the Administrator to
+                            understand the issue and take appropriate action.
+                        </div>
+
+                    </div>
+
+
+                    <!-- ACTIONS -->
+                    <div class="advice-form-actions">
+
+                        <a asp-action="Advice"
+                           class="advice-cancel-btn">
+
+                            <i class="fa-solid fa-xmark"></i>
+                            Cancel
+
+                        </a>
+
+                        <button type="submit"
+                                class="advice-submit-btn">
+
+                            <i class="fa-solid fa-paper-plane"></i>
+                            Submit Advice
+
+                        </button>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+        </div>
+
+
+        <!-- INFORMATION -->
+        <aside>
+
+            <div class="advice-side-card">
+
+                <div class="advice-side-heading">
+
+                    <div class="advice-side-icon blue">
+                        <i class="fa-solid fa-lightbulb"></i>
+                    </div>
+
+                    <div>
+                        <h3>What to Include</h3>
+                        <span>Useful information for review</span>
+                    </div>
+
+                </div>
+
+
+                <ul class="advice-checklist">
+
+                    <li>
+                        <span>
+                            <i class="fa-solid fa-check"></i>
+                        </span>
+
+                        <div>
+                            <strong>Identify the issue</strong>
+                            <p>
+                                Clearly explain what happened or what needs
+                                attention.
+                            </p>
+                        </div>
+                    </li>
+
+                    <li>
+                        <span>
+                            <i class="fa-solid fa-check"></i>
+                        </span>
+
+                        <div>
+                            <strong>Provide context</strong>
+                            <p>
+                                Include relevant residence, customer or
+                                payment information.
+                            </p>
+                        </div>
+                    </li>
+
+                    <li>
+                        <span>
+                            <i class="fa-solid fa-check"></i>
+                        </span>
+
+                        <div>
+                            <strong>Suggest a solution</strong>
+                            <p>
+                                Where possible, explain what action you
+                                recommend.
+                            </p>
+                        </div>
+                    </li>
+
+                </ul>
+
+            </div>
+
+
+            <div class="advice-side-card advice-note-card">
+
+                <div class="advice-side-heading">
+
+                    <div class="advice-side-icon gold">
+                        <i class="fa-solid fa-building-columns"></i>
+                    </div>
+
+                    <div>
+                        <h3>UFS StayConnect</h3>
+                        <span>Operational communication</span>
+                    </div>
+
+                </div>
+
+                <p>
+                    Advice and inputs help communicate operational,
+                    customer and financial matters to the Administrator.
+                    Submitted items can be reviewed and responded to
+                    through the management system.
+                </p>
+
+            </div>
+
+        </aside>
+
+    </div>
+
+</div>
+
+
+@section Scripts {
+
+    <partial name="_ValidationScriptsPartial" />
+
+    </<style></style>
+
+}     

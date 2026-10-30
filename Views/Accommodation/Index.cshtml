@@ -1,0 +1,431 @@
+@model IEnumerable<UFSStayConnect.Models.Accommodation>
+
+@{
+    ViewData["Title"] = "Find Accommodation";
+
+    var currentLocation = Context.Request.Query["location"].ToString();
+    var currentType = Context.Request.Query["type"].ToString();
+    var currentServiceId = Context.Request.Query["serviceId"].ToString();
+
+    var services =
+        ViewBag.Services as IEnumerable<UFSStayConnect.Models.Service>
+        ?? Enumerable.Empty<UFSStayConnect.Models.Service>();
+}
+
+<div class="find-accommodation-page">
+
+    <!-- =====================================================
+         HERO
+         ===================================================== -->
+
+    <section class="accommodation-hero">
+
+        <div class="accommodation-hero-content">
+
+            <span class="accommodation-eyebrow">
+                UFS QWAQWA ACCOMMODATION
+            </span>
+
+            <h1>
+                Find a place<br />
+                <span>to call home.</span>
+            </h1>
+
+            <p>
+                Explore available accommodation, compare residences
+                and find a place that fits your student life.
+            </p>
+
+        </div>
+
+        <div class="accommodation-hero-decoration">
+            <i class="fa-solid fa-house-chimney"></i>
+        </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         SEARCH / FILTERS
+         ===================================================== -->
+
+    <section class="accommodation-search">
+
+        <div class="search-heading">
+
+            <div>
+                <span>FIND YOUR RESIDENCE</span>
+
+                <h2>
+                    Search accommodation
+                </h2>
+            </div>
+
+            @if (Model != null)
+            {
+                <div class="results-count">
+                    <strong>@Model.Count()</strong>
+                    residence@(Model.Count() == 1 ? "" : "s") available
+                </div>
+            }
+
+        </div>
+
+
+        <form method="get"
+              asp-controller="Accommodation"
+              asp-action="Index"
+              class="accommodation-filter-form">
+
+            <div class="filter-field">
+
+                <label for="location">
+                    Location
+                </label>
+
+                <div class="filter-input">
+
+                    <i class="fa-solid fa-location-dot"></i>
+
+                    <input type="text"
+                           id="location"
+                           name="location"
+                           value="@currentLocation"
+                           placeholder="Search by location" />
+
+                </div>
+
+            </div>
+
+
+            <div class="filter-field">
+
+                <label for="type">
+                    Accommodation type
+                </label>
+
+                <select id="type"
+                        name="type">
+
+                    <option value="">
+                        All types
+                    </option>
+
+                    <option value="Flat"
+                            selected="@(currentType == "Flat")">
+                        Flat
+                    </option>
+
+                    <option value="Townhouse"
+                            selected="@(currentType == "Townhouse")">
+                        Townhouse
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <div class="filter-field">
+
+                <label for="serviceId">
+                    Facilities &amp; services
+                </label>
+
+                <select id="serviceId"
+                        name="serviceId">
+
+                    <option value="">
+                        All services
+                    </option>
+
+                    @foreach (var service in services)
+                    {
+                        <option value="@service.ServiceID"
+                                selected="@(currentServiceId == service.ServiceID.ToString())">
+                            @service.ServiceName
+                        </option>
+                    }
+
+                </select>
+
+            </div>
+
+
+            <div class="filter-buttons">
+
+                <button type="submit"
+                        class="accommodation-search-btn">
+
+                    <i class="fa-solid fa-magnifying-glass"></i>
+
+                    Search
+
+                </button>
+
+                <a asp-controller="Accommodation"
+                   asp-action="Index"
+                   class="clear-filter-btn">
+
+                    Clear
+
+                </a>
+
+            </div>
+
+        </form>
+
+    </section>
+
+
+    <!-- =====================================================
+         ERROR MESSAGE
+         ===================================================== -->
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="accommodation-error">
+
+            <i class="fa-solid fa-circle-exclamation"></i>
+
+            <span>
+                @TempData["ErrorMessage"]
+            </span>
+
+        </div>
+    }
+
+
+    <!-- =====================================================
+         ACCOMMODATION RESULTS
+         ===================================================== -->
+
+    <section class="accommodation-results">
+
+        <div class="results-heading">
+
+            <div>
+
+                <span>AVAILABLE NOW</span>
+
+                <h2>
+                    Accommodation options
+                </h2>
+
+            </div>
+
+        </div>
+
+
+        @if (Model != null && Model.Any())
+        {
+            <div class="accommodation-grid">
+
+                @foreach (var accommodation in Model)
+                {
+                    <article class="accommodation-card">
+
+                        <!-- IMAGE -->
+
+                        <div class="accommodation-card-image">
+
+                            @if (!string.IsNullOrWhiteSpace(accommodation.ImagePath))
+                            {
+                                <img src="@accommodation.ImagePath"
+                                     alt="@accommodation.Name" />
+                            }
+                            else
+                            {
+                                <div class="accommodation-image-placeholder">
+
+                                    <i class="fa-solid fa-house"></i>
+
+                                    <span>
+                                        No image available
+                                    </span>
+
+                                </div>
+                            }
+
+
+                            <div class="availability-badge">
+
+                                <span></span>
+
+                                @accommodation.AvailableRooms
+                                room@(accommodation.AvailableRooms == 1 ? "" : "s")
+                                available
+
+                            </div>
+
+
+                            <div class="type-badge">
+                                @accommodation.Type
+                            </div>
+
+                        </div>
+
+
+                        <!-- CARD CONTENT -->
+
+                        <div class="accommodation-card-body">
+
+                            <div class="accommodation-card-title">
+
+                                <h3>
+                                    @accommodation.Name
+                                </h3>
+
+                                <div class="accommodation-location">
+
+                                    <i class="fa-solid fa-location-dot"></i>
+
+                                    @accommodation.Location
+
+                                </div>
+
+                            </div>
+
+
+                            <p class="accommodation-description">
+
+                                @if (!string.IsNullOrWhiteSpace(accommodation.Description))
+                                {
+                                    if (accommodation.Description.Length > 120)
+                                    {
+                                        @accommodation.Description.Substring(0, 120)
+                                        <text>...</text>
+                                    }
+                                    else
+                                    {
+                                        @accommodation.Description
+                                    }
+                                }
+                                else
+                                {
+                                    <text>
+                                        Student accommodation near
+                                        UFS QwaQwa Campus.
+                                    </text>
+                                }
+
+                            </p>
+
+
+                            <!-- FEATURES -->
+
+                            <div class="accommodation-features">
+
+                                <div>
+
+                                    <i class="fa-solid fa-bed"></i>
+
+                                    <span>
+                                        <strong>
+                                            @accommodation.Bedrooms
+                                        </strong>
+                                        bedroom@(accommodation.Bedrooms == 1 ? "" : "s")
+                                    </span>
+
+                                </div>
+
+
+                                <div>
+
+                                    <i class="fa-solid fa-bath"></i>
+
+                                    <span>
+                                        <strong>
+                                            @accommodation.Bathrooms
+                                        </strong>
+                                        bathroom@(accommodation.Bathrooms == 1 ? "" : "s")
+                                    </span>
+
+                                </div>
+                       
+                            </div>
+
+
+                            <!-- FOOTER -->
+
+                            <div class="accommodation-card-footer">
+
+                                <div class="accommodation-price">
+
+                                    <span>
+                                        From
+                                    </span>
+
+                                    <strong>
+                                        R @accommodation.MonthlyRent.ToString("N2")
+                                    </strong>
+
+                                    <small>
+                                        / month
+                                    </small>
+
+                                </div>
+
+
+                                <a asp-controller="Accommodation"
+                                   asp-action="Details"
+                                   asp-route-id="@accommodation.AccommodationID"
+                                   class="view-accommodation-btn">
+
+                                    View residence
+
+                                    <i class="fa-solid fa-arrow-right"></i>
+
+                                </a>
+
+                            </div>
+
+                        </div>
+
+                    </article>
+                }
+
+            </div>
+        }
+        else
+        {
+            <!-- =================================================
+                 NO RESULTS
+                 ================================================= -->
+
+            <div class="accommodation-empty">
+
+                <div class="empty-accommodation-icon">
+
+                    <i class="fa-solid fa-house-circle-xmark"></i>
+
+                </div>
+
+                <span>
+                    NO MATCHES FOUND
+                </span>
+
+                <h3>
+                    We couldn't find accommodation matching your search.
+                </h3>
+
+                <p>
+                    Try changing your location, accommodation type
+                    or service filter.
+                </p>
+
+                <a asp-controller="Accommodation"
+                   asp-action="Index"
+                   class="accommodation-search-btn">
+
+                    <i class="fa-solid fa-rotate-left"></i>
+
+                    View all accommodation
+
+                </a>
+
+            </div>
+        }
+
+    </section>
+
+</div>

@@ -1,0 +1,17 @@
+Admin........
+
+Email: admin@ufs.ac.za
+password: Admin@123
+
+
+Financial Officer........
+
+Email: officer1@ufs.ac.za
+password: Zingelwayo399@
+
+One Student........
+
+Email: student@ufs4life.ac.za
+password: Test123
+
+

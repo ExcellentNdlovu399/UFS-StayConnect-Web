@@ -1,0 +1,389 @@
+
+@model IEnumerable<UFSStayConnect.Models.CustomerCharge>
+@using UFSStayConnect.Models
+@using System.Globalization
+
+@{
+    ViewData["Title"] = "Customer Charges";
+
+    var customers = ViewBag.Customers as List<ApplicationUser> ?? new List<ApplicationUser>();
+    var applications = ViewBag.Applications as List<UFSStayConnect.Models.Application> ?? new List<UFSStayConnect.Models.Application>();
+    var types = ViewBag.PaymentTypes as List<PaymentType> ?? new List<PaymentType>();
+
+    // Use South African number formatting for all displayed amounts.
+    var zarCulture = CultureInfo.GetCultureInfo("en-ZA");
+}
+
+<div class="container-fluid py-4">
+
+    <!-- Page heading -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2">
+        <div>
+            <span class="text-uppercase small fw-bold text-primary">Finance workspace</span>
+            <h1 class="h3 mb-1">Customer charges</h1>
+            <p class="text-muted mb-0">
+                Assign an individual charge at any time. Customers see it on web and Android.
+            </p>
+        </div>
+    </div>
+
+    <!-- Feedback messages -->
+    @if (TempData["SuccessMessage"] is string ok)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="fa-solid fa-circle-check me-2"></i>
+            @ok
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    @if (TempData["ErrorMessage"] is string err)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="fa-solid fa-triangle-exclamation me-2"></i>
+            @err
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <!-- Assign a charge -->
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-header bg-white py-3">
+            <h2 class="h5 mb-0">
+                <i class="fa-solid fa-file-invoice-dollar text-primary me-2"></i>
+                Assign a charge
+            </h2>
+        </div>
+
+        <div class="card-body">
+            <form asp-action="Create" method="post" class="row g-3">
+                @Html.AntiForgeryToken()
+
+                <div class="col-12 col-md-6">
+                    <label for="chargeCustomer" class="form-label">Customer</label>
+                    <select name="userId"
+                            id="chargeCustomer"
+                            class="form-select"
+                            required>
+                        <option value="">Choose customer</option>
+
+                        @foreach (var u in customers)
+                        {
+                            <option value="@u.Id">
+                                @u.FirstName @u.Surname — @u.Email
+                            </option>
+                        }
+                    </select>
+                </div>
+
+                <div class="col-12 col-md-6">
+                    <label for="chargeApplication" class="form-label">
+                        Approved accommodation
+                    </label>
+
+                    <select name="applicationId"
+                            id="chargeApplication"
+                            class="form-select"
+                            required>
+                        <option value="">Choose customer first</option>
+
+                        @foreach (var a in applications)
+                        {
+                            <option value="@a.ApplicationID"
+                                    data-user="@a.UserID">
+                                @a.Accommodation?.Name —
+                                @a.User?.FirstName @a.User?.Surname
+                                (Application #@a.ApplicationID)
+                            </option>
+                        }
+                    </select>
+                </div>
+
+                <div class="col-12 col-md-4">
+                    <label for="paymentTypeId" class="form-label">Charge category</label>
+                    <select name="paymentTypeId"
+                            id="paymentTypeId"
+                            class="form-select"
+                            required>
+                        <option value="">Select category</option>
+
+                        @foreach (var t in types)
+                        {
+                            <option value="@t.PaymentTypeID">@t.Name</option>
+                        }
+                    </select>
+                </div>
+
+                <div class="col-12 col-md-4">
+                    <label for="chargeTitle" class="form-label">Charge title</label>
+                    <input name="title"
+                           id="chargeTitle"
+                           class="form-control"
+                           maxlength="120"
+                           placeholder="e.g. October electricity"
+                           required />
+                </div>
+
+                <div class="col-12 col-md-4">
+                    <label for="chargeAmount" class="form-label">Amount (ZAR)</label>
+                    <div class="input-group">
+                        <span class="input-group-text">R</span>
+                        <input name="amount"
+                               id="chargeAmount"
+                               class="form-control"
+                               type="number"
+                               min="0.01"
+                               step="0.01"
+                               placeholder="0.00"
+                               required />
+                    </div>
+                </div>
+
+                <div class="col-12 col-md-6">
+                    <label for="dueDate" class="form-label">Due date</label>
+                    <input name="dueDate"
+                           id="dueDate"
+                           class="form-control"
+                           type="date"
+                           required />
+                </div>
+
+                <div class="col-12 col-md-6">
+                    <label for="description" class="form-label">
+                        Description (shown to customer)
+                    </label>
+                    <input name="description"
+                           id="description"
+                           class="form-control"
+                           maxlength="600"
+                           placeholder="Billing period, usage or reason" />
+                </div>
+
+                <div class="col-12">
+                    <label for="adminNote" class="form-label">Internal note (optional)</label>
+                    <input name="adminNote"
+                           id="adminNote"
+                           class="form-control"
+                           maxlength="500"
+                           placeholder="Notes for administrators or finance staff" />
+                </div>
+
+                <div class="col-12">
+                    <button class="btn btn-primary px-4" type="submit">
+                        <i class="fa-solid fa-plus me-2"></i>
+                        Assign charge
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Assigned charges -->
+    <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white py-3">
+            <h2 class="h5 mb-0">
+                <i class="fa-solid fa-list-check text-primary me-2"></i>
+                Assigned charges
+            </h2>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Customer</th>
+                        <th>Charge</th>
+                        <th>Accommodation</th>
+                        <th class="text-nowrap">Amount</th>
+                        <th class="text-nowrap">Paid</th>
+                        <th class="text-nowrap">Awaiting review</th>
+                        <th>Due</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @if (Model != null && Model.Any())
+                    {
+                        @foreach (var c in Model)
+                        {
+                            var paid = c.Payments?
+                                .Where(p => p.PaymentStatus == "Paid")
+                                .Sum(p => p.Amount) ?? 0m;
+
+                            var pending = c.Payments?
+                                .Where(p => p.PaymentStatus == "Pending")
+                                .Sum(p => p.Amount) ?? 0m;
+
+                            var isPaid = paid >= c.Amount;
+                            var isOverdue = c.DueDate.Date < DateTime.Today;
+                            var status = isPaid
+                                ? "Paid"
+                                : pending > 0
+                                    ? "Pending verification"
+                                    : !c.IsActive
+                                        ? "Cancelled"
+                                        : isOverdue
+                                            ? "Overdue"
+                                            : "Unpaid";
+
+                            var statusClass = isPaid
+                                ? "bg-success"
+                                : pending > 0
+                                    ? "bg-warning text-dark"
+                                    : !c.IsActive
+                                        ? "bg-secondary"
+                                        : isOverdue
+                                            ? "bg-danger"
+                                            : "bg-secondary";
+
+                            <tr class="@(c.IsActive ? "" : "table-secondary")">
+                                <td>
+                                    <div class="fw-semibold">
+                                        @c.User?.FirstName @c.User?.Surname
+                                    </div>
+                                    <small class="text-muted">
+                                        @c.User?.Email
+                                    </small>
+                                </td>
+
+                                <td>
+                                    <div class="fw-semibold">@c.Title</div>
+                                    <small class="text-muted">
+                                        @c.PaymentType?.Name
+                                    </small>
+
+                                    @if (!string.IsNullOrWhiteSpace(c.Description))
+                                    {
+                                        <div class="small text-muted mt-1">
+                                            @c.Description
+                                        </div>
+                                    }
+                                </td>
+
+                                <td>
+                                    @(c.Accommodation?.Name ?? "N/A")
+                                </td>
+
+                               
+                                <td class="text-nowrap fw-semibold">
+                                    R @(c.Amount.ToString("N2", zarCulture))
+                                </td>
+
+                                <td class="text-nowrap text-success">
+                                    R @(paid.ToString("N2", zarCulture))
+                                </td>
+
+                                <td class="text-nowrap text-warning-emphasis">
+                                    R @(pending.ToString("N2", zarCulture))
+                                </td>
+
+                                <td class="text-nowrap">
+                                    @c.DueDate.ToString("dd MMM yyyy", zarCulture)
+                                </td>
+
+                                <td>
+                                    <span class="badge @statusClass">
+                                        @status
+                                    </span>
+                                </td>
+
+                                <td>
+                                    @if (c.IsActive && paid == 0)
+                                    {
+                                        <form asp-action="Cancel"
+                                              method="post"
+                                              onsubmit="return confirm('Cancel this charge?');">
+                                            @Html.AntiForgeryToken()
+
+                                            <input type="hidden"
+                                                   name="id"
+                                                   value="@c.CustomerChargeID" />
+
+                                            <button type="submit"
+                                                    class="btn btn-sm btn-outline-danger">
+                                                <i class="fa-solid fa-ban me-1"></i>
+                                                Cancel
+                                            </button>
+                                        </form>
+                                    }
+                                    else if (!c.IsActive)
+                                    {
+                                        <span class="text-muted small">Cancelled</span>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="9" class="text-center text-muted py-5">
+                                <i class="fa-solid fa-file-invoice-dollar fa-2x mb-3 d-block"></i>
+                                No customer charges assigned yet.
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        (() => {
+            const customer = document.getElementById('chargeCustomer');
+            const application = document.getElementById('chargeApplication');
+
+            if (!customer || !application) {
+                return;
+            }
+
+            function filterApplications() {
+                const selectedUserId = customer.value;
+                let firstMatchingOption = null;
+
+                for (const option of application.options) {
+                    if (!option.value) {
+                        option.hidden = false;
+                        option.disabled = false;
+                        continue;
+                    }
+
+                    const matchesCustomer =
+                        !selectedUserId || option.dataset.user === selectedUserId;
+
+                    option.hidden = !matchesCustomer;
+                    option.disabled = !matchesCustomer;
+
+                    if (matchesCustomer && firstMatchingOption === null) {
+                        firstMatchingOption = option;
+                    }
+                }
+
+                const selectedOption =
+                    application.options[application.selectedIndex];
+
+                if (selectedOption && selectedOption.value &&
+                    selectedOption.dataset.user !== selectedUserId &&
+                    selectedUserId) {
+                    application.value = '';
+                }
+
+                const placeholder = application.options[0];
+
+                if (!selectedUserId) {
+                    application.value = '';
+                    placeholder.textContent = 'Choose customer first';
+                } else {
+                    placeholder.textContent = 'Choose approved accommodation';
+                }
+            }
+
+            customer.addEventListener('change', filterApplications);
+            filterApplications();
+        })();
+    </script>
+}

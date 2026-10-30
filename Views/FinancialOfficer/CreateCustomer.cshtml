@@ -1,0 +1,965 @@
+@model UFSStayConnect.ViewModels.CustomerAccountViewModel
+
+@{
+    ViewData["Title"] = "Add Customer";
+
+    if (User.IsInRole("FinancialOfficer"))
+    {
+        Layout = "~/Views/FinancialOfficer/_FinancialOfficerLayout.cshtml";
+    }
+    else if (User.IsInRole("Admin"))
+    {
+        Layout = "~/Views/Admin/_AdminLayout.cshtml";
+    }
+}
+
+<div class="customer-form-page">
+
+    <!-- HEADER -->
+    <div class="customer-form-header">
+
+        <div>
+            <div class="customer-eyebrow">
+                <i class="fa-solid fa-users"></i>
+                Customer Management
+            </div>
+
+            <h1>Add Customer</h1>
+
+            <p>
+                Create a new Student or Staff customer account
+                for UFS StayConnect.
+            </p>
+        </div>
+
+        <a asp-controller="@(User.IsInRole("FinancialOfficer") ? "FinancialOfficer" : "Admin")"
+           asp-action="@(User.IsInRole("FinancialOfficer") ? "Customers" : "Users")"
+           class="customer-back-btn">
+
+            <i class="fa-solid fa-arrow-left"></i>
+            Back to Customers
+
+        </a>
+
+    </div>
+
+
+    <!-- VALIDATION -->
+    <div asp-validation-summary="ModelOnly"
+         class="customer-validation"
+         role="alert"></div>
+
+
+    <form asp-action="CreateCustomer"
+          method="post"
+          id="createCustomerForm">
+
+        @Html.AntiForgeryToken()
+
+
+        <div class="customer-form-layout">
+
+
+            <!-- MAIN FORM -->
+            <div class="customer-form-main">
+
+
+                <!-- PERSONAL INFORMATION -->
+                <section class="customer-section-card">
+
+                    <div class="customer-section-heading">
+
+                        <div class="customer-section-icon blue">
+
+                            <i class="fa-solid fa-user"></i>
+
+                        </div>
+
+                        <div>
+
+                            <h2>Personal Information</h2>
+
+                            <p>
+                                Enter the customer's basic personal details.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="customer-form-grid">
+
+
+                        <!-- FIRST NAME -->
+                        <div class="customer-field">
+
+                            <label asp-for="FirstName">
+                                First Name
+                                <span>*</span>
+                            </label>
+
+                            <div class="customer-input-icon">
+
+                                <i class="fa-solid fa-user"></i>
+
+                                <input asp-for="FirstName"
+                                       autocomplete="given-name"
+                                       placeholder="e.g. Excellent" />
+
+                            </div>
+
+                            <span asp-validation-for="FirstName"
+                                  class="customer-field-error"></span>
+
+                        </div>
+
+
+                        <!-- SURNAME -->
+                        <div class="customer-field">
+
+                            <label asp-for="Surname">
+                                Surname
+                                <span>*</span>
+                            </label>
+
+                            <div class="customer-input-icon">
+
+                                <i class="fa-solid fa-user-tag"></i>
+
+                                <input asp-for="Surname"
+                                       autocomplete="family-name"
+                                       placeholder="e.g. Ndlovu" />
+
+                            </div>
+
+                            <span asp-validation-for="Surname"
+                                  class="customer-field-error"></span>
+
+                        </div>
+
+
+                        <!-- EMAIL -->
+                        <div class="customer-field full">
+
+                            <label asp-for="Email">
+                                UFS Email Address
+                                <span>*</span>
+                            </label>
+
+                            <div class="customer-input-icon">
+
+                                <i class="fa-solid fa-envelope"></i>
+
+                                <input asp-for="Email"
+                                       type="email"
+                                       autocomplete="email"
+                                       placeholder="name@ufs.ac.za" />
+
+                            </div>
+
+                            <span class="customer-field-hint">
+                                Use the customer's approved UFS email address.
+                            </span>
+
+                            <span asp-validation-for="Email"
+                                  class="customer-field-error"></span>
+
+                        </div>
+
+
+                        <!-- USER TYPE -->
+                        <div class="customer-field">
+
+                            <label asp-for="UserType">
+                                Customer Type
+                                <span>*</span>
+                            </label>
+
+                            <div class="customer-input-icon">
+
+                                <i class="fa-solid fa-id-badge"></i>
+
+                                <select asp-for="UserType"
+                                        id="userType">
+
+                                    <option value="Student">
+                                        Student
+                                    </option>
+
+                                    <option value="Staff">
+                                        Staff
+                                    </option>
+
+                                </select>
+
+                            </div>
+
+                            <span class="customer-field-hint">
+                                Determines whether a student or employee number is required.
+                            </span>
+
+                        </div>
+
+
+                        <!-- ACCOUNT STATUS -->
+                        <div class="customer-field">
+
+                            <label asp-for="AccountStatus">
+                                Account Status
+                                <span>*</span>
+                            </label>
+
+                            <div class="customer-input-icon">
+
+                                <i class="fa-solid fa-circle-check"></i>
+
+                                <select asp-for="AccountStatus">
+
+                                    <option value="Active">
+                                        Active
+                                    </option>
+
+                                    <option value="Inactive">
+                                        Inactive
+                                    </option>
+
+                                </select>
+
+                            </div>
+
+                            <span class="customer-field-hint">
+                                Inactive customers cannot sign in.
+                            </span>
+
+                        </div>
+
+
+                    </div>
+
+                </section>
+
+
+                <!-- IDENTIFICATION -->
+                <section class="customer-section-card">
+
+                    <div class="customer-section-heading">
+
+                        <div class="customer-section-icon gold">
+
+                            <i class="fa-solid fa-id-card"></i>
+
+                        </div>
+
+                        <div>
+
+                            <h2>Identification & Contact</h2>
+
+                            <p>
+                                Enter the customer's university identification
+                                and contact information.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="customer-form-grid">
+
+
+                        <!-- STUDENT NUMBER -->
+                        <div class="customer-field"
+                             id="studentNumberGroup">
+
+                            <label asp-for="StudentNumber">
+                                Student Number
+                                <span>*</span>
+                            </label>
+
+                            <div class="customer-input-icon">
+
+                                <i class="fa-solid fa-graduation-cap"></i>
+
+                                <input asp-for="StudentNumber"
+                                       id="StudentNumber"
+                                       placeholder="e.g. 2021001234" />
+
+                            </div>
+
+                            <span asp-validation-for="StudentNumber"
+                                  class="customer-field-error"></span>
+
+                        </div>
+
+
+                        <!-- EMPLOYEE NUMBER -->
+                        <div class="customer-field d-none"
+                             id="employeeNumberGroup">
+
+                            <label asp-for="EmployeeNumber">
+                                Employee Number
+                                <span>*</span>
+                            </label>
+
+                            <div class="customer-input-icon">
+
+                                <i class="fa-solid fa-briefcase"></i>
+
+                                <input asp-for="EmployeeNumber"
+                                       id="EmployeeNumber"
+                                       placeholder="e.g. EMP001234" />
+
+                            </div>
+
+                            <span asp-validation-for="EmployeeNumber"
+                                  class="customer-field-error"></span>
+
+                        </div>
+
+
+                        <!-- PHONE -->
+                        <div class="customer-field">
+
+                            <label asp-for="PhoneNumber">
+                                Phone Number
+                            </label>
+
+                            <div class="customer-input-icon">
+
+                                <i class="fa-solid fa-phone"></i>
+
+                                <input asp-for="PhoneNumber"
+                                       type="tel"
+                                       autocomplete="tel"
+                                       placeholder="e.g. 078 123 4567" />
+
+                            </div>
+
+                            <span asp-validation-for="PhoneNumber"
+                                  class="customer-field-error"></span>
+
+                        </div>
+
+                    </div>
+
+                </section>
+
+
+                <!-- SECURITY -->
+                <section class="customer-section-card">
+
+                    <div class="customer-section-heading">
+
+                        <div class="customer-section-icon green">
+
+                            <i class="fa-solid fa-shield-halved"></i>
+
+                        </div>
+
+                        <div>
+
+                            <h2>Account Security</h2>
+
+                            <p>
+                                Set the customer's initial login password.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="customer-form-grid">
+
+
+                        <!-- PASSWORD -->
+                        <div class="customer-field">
+
+                            <label asp-for="Password">
+                                Temporary Password
+                                <span>*</span>
+                            </label>
+
+                            <div class="customer-password-input">
+
+                                <i class="fa-solid fa-lock"></i>
+
+                                <input asp-for="Password"
+                                       id="customerPassword"
+                                       autocomplete="new-password"
+                                       placeholder="Enter secure password" />
+
+                                <button type="button"
+                                        class="password-toggle"
+                                        data-target="customerPassword"
+                                        aria-label="Show password">
+
+                                    <i class="fa-solid fa-eye"></i>
+
+                                </button>
+
+                            </div>
+
+                            <span class="customer-field-hint">
+                                Minimum 12 characters with uppercase, lowercase and a number.
+                            </span>
+
+                            <span asp-validation-for="Password"
+                                  class="customer-field-error"></span>
+
+                        </div>
+
+
+                        <!-- CONFIRM -->
+                        <div class="customer-field">
+
+                            <label asp-for="ConfirmPassword">
+                                Confirm Password
+                                <span>*</span>
+                            </label>
+
+                            <div class="customer-password-input">
+
+                                <i class="fa-solid fa-lock"></i>
+
+                                <input asp-for="ConfirmPassword"
+                                       id="confirmCustomerPassword"
+                                       autocomplete="new-password"
+                                       placeholder="Repeat password" />
+
+                                <button type="button"
+                                        class="password-toggle"
+                                        data-target="confirmCustomerPassword"
+                                        aria-label="Show password">
+
+                                    <i class="fa-solid fa-eye"></i>
+
+                                </button>
+
+                            </div>
+
+                            <span asp-validation-for="ConfirmPassword"
+                                  class="customer-field-error"></span>
+
+                        </div>
+
+
+                    </div>
+
+
+                    <!-- PASSWORD NOTICE -->
+                    <div class="security-notice">
+
+                        <div class="security-notice-icon">
+
+                            <i class="fa-solid fa-key"></i>
+
+                        </div>
+
+                        <div>
+
+                            <strong>Initial login credentials</strong>
+
+                            <p>
+                                Give the customer their temporary password
+                                securely. They should change their password
+                                after signing in if password assistance is used.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                </section>
+
+
+                <!-- ACTIONS -->
+                <div class="customer-form-actions">
+
+                    <a asp-controller="@(User.IsInRole("FinancialOfficer") ? "FinancialOfficer" : "Admin")"
+                       asp-action="@(User.IsInRole("FinancialOfficer") ? "Customers" : "Users")"
+                       class="customer-cancel-btn">
+
+                        <i class="fa-solid fa-xmark"></i>
+                        Cancel
+
+                    </a>
+
+
+                    <button type="submit"
+                            class="customer-save-btn">
+
+                        <i class="fa-solid fa-user-plus"></i>
+
+                        Create Customer
+
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <!-- SIDEBAR -->
+            <aside class="customer-form-sidebar">
+
+
+                <!-- ACCOUNT PREVIEW -->
+                <div class="customer-side-card">
+
+                    <div class="customer-side-header">
+
+                        <span>
+
+                            <i class="fa-solid fa-eye"></i>
+
+                            Account Preview
+
+                        </span>
+
+                    </div>
+
+
+                    <div class="customer-preview">
+
+                        <div class="customer-avatar"
+                             id="customerAvatar">
+
+                            <span id="avatarInitials">
+                                U
+                            </span>
+
+                        </div>
+
+
+                        <h3 id="previewName">
+                            New Customer
+                        </h3>
+
+
+                        <span class="customer-preview-type"
+                              id="previewType">
+
+                            Student
+
+                        </span>
+
+
+                        <div class="customer-preview-email"
+                             id="previewEmail">
+
+                            <i class="fa-solid fa-envelope"></i>
+
+                            Email not specified
+
+                        </div>
+
+
+                        <div class="customer-preview-status">
+
+                            <span class="status-dot"></span>
+
+                            <span id="previewStatus">
+                                Active Account
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="customer-preview-details">
+
+                        <div>
+
+                            <i class="fa-solid fa-id-card"></i>
+
+                            <span id="previewNumber">
+                                Number not specified
+                            </span>
+
+                        </div>
+
+                        <div>
+
+                            <i class="fa-solid fa-phone"></i>
+
+                            <span id="previewPhone">
+                                Phone not specified
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- CHECKLIST -->
+                <div class="customer-side-card">
+
+                    <div class="customer-side-header">
+
+                        <span>
+
+                            <i class="fa-solid fa-list-check"></i>
+
+                            Before Creating
+
+                        </span>
+
+                    </div>
+
+
+                    <ul class="customer-checklist">
+
+                        <li>
+                            <i class="fa-solid fa-check"></i>
+                            Confirm the customer's full name.
+                        </li>
+
+                        <li>
+                            <i class="fa-solid fa-check"></i>
+                            Use an approved UFS email address.
+                        </li>
+
+                        <li>
+                            <i class="fa-solid fa-check"></i>
+                            Enter the correct Student or Employee number.
+                        </li>
+
+                        <li>
+                            <i class="fa-solid fa-check"></i>
+                            Set a secure temporary password.
+                        </li>
+
+                        <li>
+                            <i class="fa-solid fa-check"></i>
+                            Confirm the correct account status.
+                        </li>
+
+                    </ul>
+
+                </div>
+
+
+                <!-- ROLE INFORMATION -->
+                <div class="customer-side-card role-information">
+
+                    <div class="customer-side-header">
+
+                        <span>
+
+                            <i class="fa-solid fa-circle-info"></i>
+
+                            Customer Access
+
+                        </span>
+
+                    </div>
+
+
+                    <p>
+                        Customers are created with the
+                        <strong>Customer</strong> system role.
+                        They cannot access administration features.
+                    </p>
+
+                </div>
+
+            </aside>
+
+        </div>
+
+    </form>
+
+</div>
+
+
+@section Scripts {
+
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+
+        document.addEventListener("DOMContentLoaded", function () {
+
+            const userType =
+                document.getElementById("userType");
+
+            const studentGroup =
+                document.getElementById("studentNumberGroup");
+
+            const employeeGroup =
+                document.getElementById("employeeNumberGroup");
+
+            const studentNumber =
+                document.getElementById("StudentNumber");
+
+            const employeeNumber =
+                document.getElementById("EmployeeNumber");
+
+            const firstName =
+                document.getElementById("FirstName");
+
+            const surname =
+                document.getElementById("Surname");
+
+            const email =
+                document.getElementById("Email");
+
+            const phone =
+                document.getElementById("PhoneNumber");
+
+            const accountStatus =
+                document.getElementById("AccountStatus");
+
+
+            function toggleNumberFields() {
+
+                const isStudent =
+                    userType?.value === "Student";
+
+
+                studentGroup?.classList.toggle(
+                    "d-none",
+                    !isStudent
+                );
+
+                employeeGroup?.classList.toggle(
+                    "d-none",
+                    isStudent
+                );
+
+
+                if (isStudent) {
+
+                    if (employeeNumber) {
+                        employeeNumber.value = "";
+                    }
+
+                } else {
+
+                    if (studentNumber) {
+                        studentNumber.value = "";
+                    }
+
+                }
+
+
+                updatePreview();
+
+            }
+
+
+            function updatePreview() {
+
+                const first =
+                    firstName?.value.trim() || "";
+
+                const last =
+                    surname?.value.trim() || "";
+
+                const fullName =
+                    `${first} ${last}`.trim()
+                    || "New Customer";
+
+
+                const initials =
+                    (
+                        (first.charAt(0) || "") +
+                        (last.charAt(0) || "")
+                    ).toUpperCase()
+                    || "U";
+
+
+                const previewName =
+                    document.getElementById("previewName");
+
+                const avatarInitials =
+                    document.getElementById("avatarInitials");
+
+                const previewEmail =
+                    document.getElementById("previewEmail");
+
+                const previewPhone =
+                    document.getElementById("previewPhone");
+
+                const previewNumber =
+                    document.getElementById("previewNumber");
+
+                const previewType =
+                    document.getElementById("previewType");
+
+                const previewStatus =
+                    document.getElementById("previewStatus");
+
+
+                if (previewName) {
+                    previewName.textContent =
+                        fullName;
+                }
+
+
+                if (avatarInitials) {
+                    avatarInitials.textContent =
+                        initials;
+                }
+
+
+                if (previewEmail) {
+
+                    previewEmail.innerHTML =
+                        '<i class="fa-solid fa-envelope"></i> ' +
+                        (
+                            email?.value.trim()
+                            || "Email not specified"
+                        );
+
+                }
+
+
+                if (previewPhone) {
+
+                    previewPhone.textContent =
+                        phone?.value.trim()
+                        || "Phone not specified";
+
+                }
+
+
+                if (previewType) {
+
+                    previewType.textContent =
+                        userType?.value
+                        || "Student";
+
+                }
+
+
+                if (previewNumber) {
+
+                    const number =
+                        userType?.value === "Student"
+                            ? studentNumber?.value.trim()
+                            : employeeNumber?.value.trim();
+
+                    previewNumber.textContent =
+                        number || "Number not specified";
+
+                }
+
+
+                if (previewStatus) {
+
+                    previewStatus.textContent =
+                        accountStatus?.value === "Inactive"
+                            ? "Inactive Account"
+                            : "Active Account";
+
+                }
+
+            }
+
+
+            userType?.addEventListener(
+                "change",
+                toggleNumberFields
+            );
+
+
+            [
+                firstName,
+                surname,
+                email,
+                phone,
+                studentNumber,
+                employeeNumber,
+                accountStatus
+            ].forEach(function (element) {
+
+                element?.addEventListener(
+                    "input",
+                    updatePreview
+                );
+
+                element?.addEventListener(
+                    "change",
+                    updatePreview
+                );
+
+            });
+
+
+            document.querySelectorAll(
+                ".password-toggle"
+            ).forEach(function (button) {
+
+                button.addEventListener(
+                    "click",
+                    function () {
+
+                        const targetId =
+                            this.dataset.target;
+
+                        const input =
+                            document.getElementById(targetId);
+
+                        const icon =
+                            this.querySelector("i");
+
+                        if (!input) {
+                            return;
+                        }
+
+
+                        if (input.type === "password") {
+
+                            input.type = "text";
+
+                            icon.classList.remove(
+                                "fa-eye"
+                            );
+
+                            icon.classList.add(
+                                "fa-eye-slash"
+                            );
+
+                            this.setAttribute(
+                                "aria-label",
+                                "Hide password"
+                            );
+
+                        } else {
+
+                            input.type = "password";
+
+                            icon.classList.remove(
+                                "fa-eye-slash"
+                            );
+
+                            icon.classList.add(
+                                "fa-eye"
+                            );
+
+                            this.setAttribute(
+                                "aria-label",
+                                "Show password"
+                            );
+
+                        }
+
+                    }
+                );
+
+            });
+
+
+            toggleNumberFields();
+            updatePreview();
+
+        });
+
+    </script>
+}

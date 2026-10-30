@@ -1,0 +1,834 @@
+@model IEnumerable<UFSStayConnect.ViewModels.CustomerPaymentViewModel>
+
+@{
+    ViewData["Title"] = "Payments";
+    var items = Model?.ToList() ?? new List<UFSStayConnect.ViewModels.CustomerPaymentViewModel>();
+
+    decimal totalCharges = ViewBag.TotalCharges is decimal tc ? tc : 0m;
+    decimal paidAmount = ViewBag.PaidAmount is decimal pa ? pa : 0m;
+    decimal outstanding = ViewBag.Outstanding is decimal os ? os : 0m;
+    decimal overdue = ViewBag.Overdue is decimal od ? od : 0m;
+
+    var payableItems = items.Where(x => x.CanPay).ToList();
+    var paidItems = items.Where(x => string.Equals(x.Status, "Paid", StringComparison.OrdinalIgnoreCase)).ToList();
+    var overdueItems = items.Where(x => x.IsOverdue).ToList();
+}
+
+<div class="customer-payment-page">
+
+    <!-- =========================================================
+         PAGE HEADER
+         ========================================================= -->
+
+    <div class="payment-page-header">
+
+        <div>
+            <div class="payment-eyebrow">
+                <i class="fas fa-wallet"></i>
+                FINANCIAL ACCOUNT
+            </div>
+
+            <h1>Payments</h1>
+
+            <p>
+                View accommodation charges and one-time charges assigned by the administrator, submit payments, and track verification status.
+            </p>
+        </div>
+
+        <a asp-action="History" class="payment-history-button">
+            <i class="fas fa-clock-rotate-left"></i>
+            <span>Transaction History</span>
+        </a>
+
+    </div>
+
+
+    <!-- =========================================================
+         SUCCESS MESSAGE
+         ========================================================= -->
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="payment-alert payment-alert-success">
+            <div class="payment-alert-icon">
+                <i class="fas fa-circle-check"></i>
+            </div>
+
+            <div>
+                <strong>Payment submitted</strong>
+                <p>@TempData["SuccessMessage"]</p>
+            </div>
+
+            <button type="button"
+                    class="payment-alert-close"
+                    onclick="this.parentElement.remove()">
+                <i class="fas fa-xmark"></i>
+            </button>
+        </div>
+    }
+
+
+    @if (ViewBag.ErrorMessage != null || TempData["ErrorMessage"] != null)
+    {
+        <div class="payment-alert payment-alert-info">
+            <div class="payment-alert-icon">
+                <i class="fas fa-circle-exclamation"></i>
+            </div>
+            <div>
+                <strong>Payment could not continue</strong>
+                <p>@(TempData["ErrorMessage"] ?? ViewBag.ErrorMessage)</p>
+            </div>
+        </div>
+    }
+
+    @if (ViewBag.Message != null)
+    {
+        <div class="payment-alert payment-alert-info">
+            <div class="payment-alert-icon">
+                <i class="fas fa-circle-info"></i>
+            </div>
+
+            <div>
+                <strong>Payment information</strong>
+                <p>@ViewBag.Message</p>
+            </div>
+        </div>
+    }
+
+
+    <!-- =========================================================
+         ACCOUNT SUMMARY
+         ========================================================= -->
+
+    <div class="payment-summary-grid">
+
+        <div class="payment-summary-card summary-total">
+
+            <div class="summary-icon">
+                <i class="fas fa-file-invoice-dollar"></i>
+            </div>
+
+            <div class="summary-content">
+                <span>Active Charges</span>
+                <strong>R @totalCharges.ToString("N2")</strong>
+                <small>Accommodation and administrator-assigned charges</small>
+            </div>
+
+        </div>
+
+
+        <div class="payment-summary-card summary-paid">
+
+            <div class="summary-icon">
+                <i class="fas fa-circle-check"></i>
+            </div>
+
+            <div class="summary-content">
+                <span>Paid</span>
+                <strong>R @paidAmount.ToString("N2")</strong>
+                <small>Verified payments</small>
+            </div>
+
+        </div>
+
+
+        <div class="payment-summary-card summary-outstanding">
+
+            <div class="summary-icon">
+                <i class="fas fa-wallet"></i>
+            </div>
+
+            <div class="summary-content">
+                <span>Outstanding</span>
+                <strong>R @outstanding.ToString("N2")</strong>
+                <small>Amount still requiring payment</small>
+            </div>
+
+        </div>
+
+
+        <div class="payment-summary-card summary-overdue">
+
+            <div class="summary-icon">
+                <i class="fas fa-triangle-exclamation"></i>
+            </div>
+
+            <div class="summary-content">
+                <span>Overdue</span>
+                <strong>R @overdue.ToString("N2")</strong>
+                <small>Charges past their due date</small>
+            </div>
+
+        </div>
+
+    </div>
+
+
+    @if (items.Any())
+    {
+        <!-- =====================================================
+             CURRENT ACCOMMODATION
+             ====================================================== -->
+
+        <div class="payment-account-card">
+
+            <div class="payment-account-left">
+
+                <div class="payment-account-icon">
+                    <i class="fas fa-house"></i>
+                </div>
+
+                <div>
+                    <span class="payment-account-label">
+                        APPROVED ACCOMMODATIONS
+                    </span>
+
+                    <h2>All Payment Charges</h2>
+
+                    <p>
+                        <i class="fas fa-house"></i>
+                        Accommodation charges and individual charges assigned to your account
+                    </p>
+                </div>
+
+            </div>
+
+            <div class="payment-account-status">
+
+                @if (outstanding <= 0)
+                {
+                    <span class="account-status paid">
+                        <i class="fas fa-circle-check"></i>
+                        Account Up to Date
+                    </span>
+                }
+                else if (overdue > 0)
+                {
+                    <span class="account-status overdue">
+                        <i class="fas fa-triangle-exclamation"></i>
+                        Payment Required
+                    </span>
+                }
+                else
+                {
+                    <span class="account-status due">
+                        <i class="fas fa-clock"></i>
+                        Payment Due
+                    </span>
+                }
+
+            </div>
+
+        </div>
+
+
+        <!-- =====================================================
+             PAYMENT ACTION AREA
+             ====================================================== -->
+
+        <form asp-action="Checkout"
+              method="get"
+              id="chargeForm">
+
+            <div class="payment-charges-card">
+
+                <div class="payment-charges-header">
+
+                    <div>
+                        <span class="section-eyebrow">
+                            ALL PAYMENT CHARGES
+                        </span>
+
+                        <h2>Current Charges</h2>
+
+                        <p>
+                            Accommodation charges and any one-time charges assigned by the administrator appear together here. Select the items you would like to pay.
+                        </p>
+                    </div>
+
+                    @if (payableItems.Any())
+                    {
+                        <div class="payment-action-buttons">
+
+                            <button type="submit"
+                                    class="payment-primary-button"
+                                    id="paySelected">
+
+                                <i class="fas fa-credit-card"></i>
+                                Pay Selected
+                            </button>
+
+                            <button type="button"
+                                    class="payment-secondary-button"
+                                    onclick="payAllCharges()">
+
+                                <i class="fas fa-layer-group"></i>
+                                Pay All
+                            </button>
+
+                        </div>
+                    }
+
+                </div>
+
+
+                <!-- =================================================
+                     CHARGES TABLE
+                     ================================================== -->
+
+                <div class="payment-table-container">
+
+                    <table class="customer-payment-table">
+
+                        <thead>
+                            <tr>
+
+                                <th class="select-column">
+                                    <span class="visually-hidden">
+                                        Select
+                                    </span>
+                                </th>
+
+                                <th>Accommodation</th>
+
+                                <th>Charge</th>
+
+                                <th>Frequency</th>
+
+                                <th>Amount</th>
+
+                                <th>Due Date</th>
+
+                                <th>Status</th>
+
+                                <th>Reference</th>
+
+                            </tr>
+                        </thead>
+
+
+                        <tbody>
+
+                            @foreach (var charge in items)
+                            {
+                                var isPaid = string.Equals(
+                                charge.Status,
+                                "Paid",
+                                StringComparison.OrdinalIgnoreCase);
+
+                                var isRejected = string.Equals(
+                                charge.Status,
+                                "Rejected",
+                                StringComparison.OrdinalIgnoreCase);
+
+                                var isPending = string.Equals(charge.Status, "Pending", StringComparison.OrdinalIgnoreCase);
+                                var checkboxName = charge.IsAssignedCustomerCharge ? "customerChargeIds" : "ids";
+                                int? checkboxValue = charge.IsAssignedCustomerCharge
+                                    ? charge.CustomerChargeID
+                                    : charge.AccommodationChargeID;
+                                var blockedIconClass = isPending ? "fas fa-hourglass-half" : "fas fa-circle-exclamation";
+                                var statusClass =
+                                isPaid
+                                ? "paid"
+                                : isRejected
+                                ? "rejected"
+                                : isPending
+                                ? "pending"
+                                : charge.IsOverdue
+                                ? "overdue"
+                                : "unpaid";
+
+                                <tr>
+
+                                    <!-- SELECT -->
+
+                                    <td class="select-column">
+
+                                        @if (charge.CanPay)
+                                        {
+                                            <label class="payment-checkbox">
+                                                <input type="checkbox"
+                                                       class="charge-check"
+                                                       name="@checkboxName"
+                                                       value="@checkboxValue" />
+
+                                                <span></span>
+                                            </label>
+                                        }
+                                        else if (isPaid)
+                                        {
+                                            <div class="payment-completed-icon">
+                                                <i class="fas fa-check"></i>
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            <div class="payment-completed-icon payment-not-payable-icon">
+                                                <i class="@blockedIconClass"></i>
+                                            </div>
+                                        }
+
+                                    </td>
+
+
+                                    <!-- ACCOMMODATION -->
+
+                                    <td>
+                                        <strong>@charge.AccommodationName</strong>
+                                        <small class="d-block text-muted">
+                                            Room @charge.RoomNumber
+                                        </small>
+                                    </td>
+
+                                    <!-- CHARGE -->
+
+                                    <td>
+
+                                        <div class="charge-name">
+
+                                            <div class="charge-icon">
+
+                                                @if (charge.PaymentTypeName?.Contains(
+                                                                                        "rent",
+                                                                                        StringComparison.OrdinalIgnoreCase) == true)
+                                                {
+                                                    <i class="fas fa-house"></i>
+                                                }
+                                                else if (charge.PaymentTypeName?.Contains(
+                                                "water",
+                                                StringComparison.OrdinalIgnoreCase) == true)
+                                                {
+                                                    <i class="fas fa-droplet"></i>
+                                                }
+                                                else if (charge.PaymentTypeName?.Contains(
+                                                "electric",
+                                                StringComparison.OrdinalIgnoreCase) == true)
+                                                {
+                                                    <i class="fas fa-bolt"></i>
+                                                }
+                                                else if (charge.PaymentTypeName?.Contains(
+                                                "parking",
+                                                StringComparison.OrdinalIgnoreCase) == true)
+                                                {
+                                                    <i class="fas fa-car"></i>
+                                                }
+                                                else if (charge.PaymentTypeName?.Contains(
+                                                "wifi",
+                                                StringComparison.OrdinalIgnoreCase) == true)
+                                                {
+                                                    <i class="fas fa-wifi"></i>
+                                                }
+                                                else if (charge.PaymentTypeName?.Contains(
+                                                "refuse",
+                                                StringComparison.OrdinalIgnoreCase) == true)
+                                                {
+                                                    <i class="fas fa-trash-can"></i>
+                                                }
+                                                else
+                                                {
+                                                    <i class="fas fa-file-invoice-dollar"></i>
+                                                }
+
+                                            </div>
+
+                                            <div>
+                                                <strong>
+                                                    @(charge.IsAssignedCustomerCharge && !string.IsNullOrWhiteSpace(charge.ChargeTitle)
+                                                        ? charge.ChargeTitle
+                                                        : charge.PaymentTypeName)
+                                                </strong>
+                                                @if (charge.IsAssignedCustomerCharge)
+                                                {
+                                                    <small>Administrator-assigned · @charge.PaymentTypeName</small>
+                                                }
+
+                                                @if (!string.IsNullOrWhiteSpace(charge.Description))
+                                                {
+                                                    <small>
+                                                        @charge.Description
+                                                    </small>
+                                                }
+                                            </div>
+
+                                        </div>
+
+                                    </td>
+
+
+                                    <!-- FREQUENCY -->
+
+                                    <td>
+                                        <span class="frequency-text">
+                                            @charge.Frequency
+                                        </span>
+                                    </td>
+
+
+                                    <!-- AMOUNT -->
+
+                                    <td>
+
+                                        <strong class="charge-amount">
+                                            R @charge.Amount.ToString("N2")
+                                        </strong>
+
+                                    </td>
+
+
+                                    <!-- DUE DATE -->
+
+                                    <td>
+
+                                        <div class="due-date
+                                            @(charge.IsOverdue ? "due-overdue" : "")">
+
+                                            <i class="far fa-calendar"></i>
+
+                                            @charge.DueDate.ToString("dd MMM yyyy")
+
+                                        </div>
+
+                                        @if (charge.IsOverdue)
+                                        {
+                                            <small class="overdue-label">
+                                                Overdue
+                                            </small>
+                                        }
+
+                                    </td>
+
+
+                                    <!-- STATUS -->
+
+                                    <td>
+
+                                        <span class="payment-status @statusClass">
+
+                                            @if (isPaid)
+                                            {
+                                                <i class="fas fa-circle-check"></i>
+                                            }
+                                            else if (isRejected)
+                                            {
+                                                <i class="fas fa-circle-xmark"></i>
+                                            }
+                                            else if (isPending)
+                                            {
+                                                <i class="fas fa-hourglass-half"></i>
+                                            }
+                                            else if (charge.IsOverdue)
+                                            {
+                                                <i class="fas fa-triangle-exclamation"></i>
+                                            }
+                                            else
+                                            {
+                                                <i class="fas fa-clock"></i>
+                                            }
+
+                                            @charge.Status
+
+                                        </span>
+
+                                    </td>
+
+
+                                    <!-- REFERENCE -->
+
+                                    <td>
+
+                                        @if (!string.IsNullOrWhiteSpace(charge.LastReference))
+                                        {
+                                            <span class="payment-reference">
+                                                @charge.LastReference
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="no-reference">
+                                                —
+                                            </span>
+                                        }
+
+                                    </td>
+
+                                </tr>
+                            }
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+
+                <!-- =================================================
+                     TABLE FOOTER
+                     ================================================== -->
+
+                <div class="payment-charges-footer">
+
+                    <div class="selection-information">
+
+                        <div class="selection-icon">
+                            <i class="fas fa-circle-info"></i>
+                        </div>
+
+                        <div>
+                            <strong>Need to make a payment?</strong>
+
+                            <span>
+                                Select one or more unpaid charges above.
+                                Overdue charges can still be paid.
+                            </span>
+                        </div>
+
+                    </div>
+
+
+                    @if (payableItems.Any())
+                    {
+                        <button type="button"
+                                class="select-all-button"
+                                onclick="selectAllUnpaid()">
+
+                            <i class="fas fa-check-double"></i>
+                            Select All Unpaid
+
+                        </button>
+                    }
+
+                </div>
+
+            </div>
+
+        </form>
+
+
+        <!-- =====================================================
+             PAYMENT INFORMATION
+             ====================================================== -->
+
+        <div class="payment-information-grid">
+
+            <div class="payment-information-card">
+
+                <div class="information-icon">
+                    <i class="fas fa-shield-halved"></i>
+                </div>
+
+                <div>
+                    <h3>Secure payments</h3>
+
+                    <p>
+                        Your payment is recorded securely and remains
+                        pending until it has been verified by UFS
+                        StayConnect staff.
+                    </p>
+                </div>
+
+            </div>
+
+
+            <div class="payment-information-card">
+
+                <div class="information-icon">
+                    <i class="fas fa-receipt"></i>
+                </div>
+
+                <div>
+                    <h3>Keep your references</h3>
+
+                    <p>
+                        Each payment receives a unique reference.
+                        Paid transactions can be viewed from your
+                        transaction history.
+                    </p>
+                </div>
+
+            </div>
+
+
+            <div class="payment-information-card">
+
+                <div class="information-icon">
+                    <i class="fas fa-clock-rotate-left"></i>
+                </div>
+
+                <div>
+                    <h3>View transaction history</h3>
+
+                    <p>
+                        Review previous payments, their status,
+                        payment method and available receipts.
+                    </p>
+
+                    <a asp-action="History">
+                        View transaction history
+                        <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+
+            </div>
+
+        </div>
+
+    }
+    else
+    {
+        <!-- =====================================================
+             NO APPROVED ACCOMMODATION
+             ====================================================== -->
+
+        <div class="payment-empty-state">
+
+            <div class="payment-empty-icon">
+                <i class="fas fa-house-circle-check"></i>
+            </div>
+
+            <h2>No payment account yet</h2>
+
+            <p>
+                @if (ViewBag.Message != null)
+                {
+                    @ViewBag.Message
+                }
+                else
+                {
+                    <text>
+                        Once you have an approved accommodation,
+                        your accommodation charges will appear here.
+                    </text>
+                }
+            </p>
+
+            <a asp-controller="Accommodation"
+               asp-action="Index"
+               class="payment-empty-button">
+
+                <i class="fas fa-house"></i>
+                Find Accommodation
+
+            </a>
+
+        </div>
+    }
+
+</div>
+
+
+@section Scripts {
+
+    <script>
+
+        function selectAllUnpaid() {
+
+            const checkboxes =
+                document.querySelectorAll(".charge-check");
+
+            checkboxes.forEach(function (checkbox) {
+                checkbox.checked = true;
+            });
+
+            updateSelectionCount();
+        }
+
+
+        function payAllCharges() {
+
+            const checkboxes =
+                document.querySelectorAll(".charge-check");
+
+            if (!checkboxes.length) {
+                return;
+            }
+
+            checkboxes.forEach(function (checkbox) {
+                checkbox.checked = true;
+            });
+
+            const form =
+                document.getElementById("chargeForm");
+
+            if (form) {
+                form.requestSubmit();
+            }
+        }
+
+
+        function updateSelectionCount() {
+
+            const selected =
+                document.querySelectorAll(".charge-check:checked");
+
+            const button =
+                document.getElementById("paySelected");
+
+            if (!button) {
+                return;
+            }
+
+            if (selected.length > 0) {
+
+                button.innerHTML =
+                    '<i class="fas fa-credit-card"></i> Pay Selected (' +
+                    selected.length +
+                    ')';
+
+            } else {
+
+                button.innerHTML =
+                    '<i class="fas fa-credit-card"></i> Pay Selected';
+
+            }
+        }
+
+
+        document.addEventListener("DOMContentLoaded", function () {
+
+            const form =
+                document.getElementById("chargeForm");
+
+            if (!form) {
+                return;
+            }
+
+
+            document
+                .querySelectorAll(".charge-check")
+                .forEach(function (checkbox) {
+
+                    checkbox.addEventListener(
+                        "change",
+                        updateSelectionCount
+                    );
+
+                });
+
+
+            form.addEventListener("submit", function (event) {
+
+                const selected =
+                    document.querySelectorAll(
+                        ".charge-check:checked"
+                    );
+
+                if (!selected.length) {
+
+                    event.preventDefault();
+
+                    alert(
+                        "Please select at least one unpaid charge before continuing."
+                    );
+
+                }
+
+            });
+
+        });
+
+    </script>
+}
+
+
+<style>
+
+</style>

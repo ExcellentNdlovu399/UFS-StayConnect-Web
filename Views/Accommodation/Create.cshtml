@@ -1,0 +1,1006 @@
+@model UFSStayConnect.ViewModels.AccommodationViewModel
+
+@{
+    ViewData["Title"] = "Add Accommodation";
+    Layout = "~/Views/Admin/_AdminLayout.cshtml";
+}
+
+<div class="accommodation-form-page">
+
+    <!-- PAGE HEADER -->
+    <div class="accommodation-form-header">
+        <div>
+            <div class="page-eyebrow">
+                <i class="fa-solid fa-building"></i>
+                Accommodation Management
+            </div>
+
+            <h1>Add New Residence</h1>
+
+            <p>
+                Create a new accommodation listing and configure its
+                rooms, pricing and availability.
+            </p>
+        </div>
+
+        <a asp-controller="Accommodation"
+           asp-action="Manage"
+           class="form-back-btn">
+            <i class="fa-solid fa-arrow-left"></i>
+            Back to Accommodation
+        </a>
+    </div>
+
+
+    <!-- VALIDATION -->
+    <div asp-validation-summary="ModelOnly"
+         class="form-validation-summary"
+         role="alert"></div>
+
+
+    <form asp-controller="Accommodation"
+          asp-action="Create"
+          method="post"
+          enctype="multipart/form-data"
+          id="accommodationForm">
+
+        @Html.AntiForgeryToken()
+
+
+        <div class="accommodation-form-layout">
+
+            <!-- LEFT COLUMN -->
+            <div class="accommodation-form-main">
+
+                <!-- BASIC INFORMATION -->
+                <section class="form-section-card">
+
+                    <div class="form-section-heading">
+
+                        <div class="section-icon blue">
+                            <i class="fa-solid fa-building"></i>
+                        </div>
+
+                        <div>
+                            <h2>Residence Information</h2>
+                            <p>Enter the basic details of the accommodation.</p>
+                        </div>
+
+                    </div>
+
+
+                    <div class="form-grid">
+
+                        <!-- NAME -->
+                        <div class="form-field full">
+
+                            <label asp-for="Name">
+                                Accommodation Name
+                                <span>*</span>
+                            </label>
+
+                            <div class="input-with-icon">
+
+                                <i class="fa-solid fa-house"></i>
+
+                                <input asp-for="Name"
+                                       placeholder="e.g. QwaQwa Student Residence 1"
+                                       autocomplete="off" />
+
+                            </div>
+
+                            <span asp-validation-for="Name"
+                                  class="field-error"></span>
+
+                        </div>
+
+
+                        <!-- LOCATION -->
+                        <div class="form-field">
+
+                            <label asp-for="Location">
+                                Location
+                                <span>*</span>
+                            </label>
+
+                            <div class="input-with-icon">
+
+                                <i class="fa-solid fa-location-dot"></i>
+
+                                <input asp-for="Location"
+                                       placeholder="e.g. Phuthaditjhaba" />
+
+                            </div>
+
+                            <span asp-validation-for="Location"
+                                  class="field-error"></span>
+
+                        </div>
+
+
+                        <!-- TYPE -->
+                        <div class="form-field">
+
+                            <label asp-for="Type">
+                                Accommodation Type
+                                <span>*</span>
+                            </label>
+
+                            <div class="input-with-icon">
+
+                                <i class="fa-solid fa-city"></i>
+
+                                <select asp-for="Type">
+
+                                    <option value="">
+                                        Select accommodation type
+                                    </option>
+
+                                    <option value="Flat">
+                                        Flat
+                                    </option>
+
+                                    <option value="Townhouse">
+                                        Townhouse
+                                    </option>
+
+                                </select>
+
+                            </div>
+
+                            <span asp-validation-for="Type"
+                                  class="field-error"></span>
+
+                        </div>
+
+
+                        <!-- DESCRIPTION -->
+                        <div class="form-field full">
+
+                            <label asp-for="Description">
+                                Description
+                                <span>*</span>
+                            </label>
+
+                            <textarea asp-for="Description"
+                                      rows="5"
+                                      maxlength="1000"
+                                      placeholder="Describe the residence, facilities, location, security, nearby amenities and any other useful information..."></textarea>
+
+                            <div class="field-bottom-row">
+
+                                <small>
+                                    <i class="fa-solid fa-circle-info"></i>
+                                    Provide between 10 and 1000 characters.
+                                </small>
+
+                                <small id="descriptionCounter">
+                                    0 / 1000
+                                </small>
+
+                            </div>
+
+                            <span asp-validation-for="Description"
+                                  class="field-error"></span>
+
+                        </div>
+
+                    </div>
+
+                </section>
+
+
+                <!-- PROPERTY DETAILS -->
+                <section class="form-section-card">
+
+                    <div class="form-section-heading">
+
+                        <div class="section-icon gold">
+                            <i class="fa-solid fa-chart-simple"></i>
+                        </div>
+
+                        <div>
+                            <h2>Property Details</h2>
+                            <p>Configure the residence capacity and pricing.</p>
+                        </div>
+
+                    </div>
+
+
+                    <div class="form-grid">
+
+                        <!-- MONTHLY RENT -->
+                        <div class="form-field">
+
+                            <label asp-for="MonthlyRent">
+                                Monthly Rent
+                                <span>*</span>
+                            </label>
+
+                            <div class="money-input">
+
+                                <span>R</span>
+
+                                <input asp-for="MonthlyRent"
+                                       type="number"
+                                       step="0.01"
+                                       min="0.01"
+                                       placeholder="3500.00" />
+
+                            </div>
+
+                            <span class="field-hint">
+                                Monthly rental amount charged to the customer.
+                            </span>
+
+                            <span asp-validation-for="MonthlyRent"
+                                  class="field-error"></span>
+
+                        </div>
+
+
+                        <!-- TOTAL ROOMS -->
+                        <div class="form-field">
+
+                            <label asp-for="TotalRooms">
+                                Total Rooms
+                                <span>*</span>
+                            </label>
+
+                            <div class="input-with-icon">
+
+                                <i class="fa-solid fa-door-open"></i>
+
+                                <input asp-for="TotalRooms"
+                                       type="number"
+                                       min="1"
+                                       max="100"
+                                       placeholder="e.g. 20" />
+
+                            </div>
+
+                            <span class="field-hint">
+                                Number of rooms in this residence.
+                            </span>
+
+                            <span asp-validation-for="TotalRooms"
+                                  class="field-error"></span>
+
+                        </div>
+
+
+                        <!-- BEDROOMS -->
+                        <div class="form-field">
+
+                            <label asp-for="Bedrooms">
+                                Bedrooms
+                                <span>*</span>
+                            </label>
+
+                            <div class="input-with-icon">
+
+                                <i class="fa-solid fa-bed"></i>
+
+                                <input asp-for="Bedrooms"
+                                       type="number"
+                                       min="1"
+                                       max="500"
+                                       placeholder="e.g. 2" />
+
+                            </div>
+
+                            <span class="field-hint">
+                                Number of bedrooms.
+                            </span>
+
+                            <span asp-validation-for="Bedrooms"
+                                  class="field-error"></span>
+
+                        </div>
+
+
+                        <!-- BATHROOMS -->
+                        <div class="form-field">
+
+                            <label asp-for="Bathrooms">
+                                Bathrooms
+                                <span>*</span>
+                            </label>
+
+                            <div class="input-with-icon">
+
+                                <i class="fa-solid fa-shower"></i>
+
+                                <input asp-for="Bathrooms"
+                                       type="number"
+                                       min="1"
+                                       max="200"
+                                       placeholder="e.g. 1" />
+
+                            </div>
+
+                            <span class="field-hint">
+                                Number of bathrooms.
+                            </span>
+
+                            <span asp-validation-for="Bathrooms"
+                                  class="field-error"></span>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- CAPACITY PREVIEW -->
+                    <div class="capacity-preview">
+
+                        <div class="capacity-icon">
+                            <i class="fa-solid fa-bed"></i>
+                        </div>
+
+                        <div>
+                            <strong>Room Capacity</strong>
+
+                            <p>
+                                All rooms will initially be marked as available.
+                                Individual rooms can be managed after the residence
+                                has been created.
+                            </p>
+                        </div>
+
+                    </div>
+
+                </section>
+
+
+                <!-- IMAGE -->
+                <section class="form-section-card">
+
+                    <div class="form-section-heading">
+
+                        <div class="section-icon green">
+                            <i class="fa-solid fa-image"></i>
+                        </div>
+
+                        <div>
+                            <h2>Residence Image</h2>
+                            <p>Add a photo that customers will see when browsing accommodation.</p>
+                        </div>
+
+                    </div>
+
+
+                    <div class="image-upload-area"
+                         id="imageUploadArea">
+
+                        <div class="upload-placeholder"
+                             id="uploadPlaceholder">
+
+                            <div class="upload-icon">
+                                <i class="fa-solid fa-cloud-arrow-up"></i>
+                            </div>
+
+                            <h3>Upload Residence Image</h3>
+
+                            <p>
+                                Drag and drop an image here or select one
+                                from your computer.
+                            </p>
+
+                            <label for="ImageFile"
+                                   class="choose-image-btn">
+                                <i class="fa-solid fa-folder-open"></i>
+                                Choose Image
+                            </label>
+
+                            <span class="upload-note">
+                                JPG, JPEG, PNG or WEBP · Maximum 5 MB
+                            </span>
+
+                        </div>
+
+
+                        <div class="image-preview-wrapper"
+                             id="imagePreviewContainer"
+                             style="display:none;">
+
+                            <img id="imagePreview"
+                                 src="#"
+                                 alt="Accommodation image preview" />
+
+                            <div class="preview-overlay">
+
+                                <label for="ImageFile"
+                                       class="change-image-btn">
+                                    <i class="fa-solid fa-camera"></i>
+                                    Change Image
+                                </label>
+
+                            </div>
+
+                        </div>
+
+
+                        <input asp-for="ImageFile"
+                               type="file"
+                               accept=".jpg,.jpeg,.png,.webp"
+                               id="ImageFile"
+                               class="hidden-file-input" />
+
+                    </div>
+
+                    <span asp-validation-for="ImageFile"
+                          class="field-error"></span>
+
+                </section>
+
+            </div>
+
+
+            <!-- RIGHT COLUMN -->
+            <aside class="accommodation-form-sidebar">
+
+                <!-- PREVIEW CARD -->
+                <div class="form-side-card preview-card">
+
+                    <div class="side-card-header">
+                        <span>
+                            <i class="fa-solid fa-eye"></i>
+                            Listing Preview
+                        </span>
+                    </div>
+
+
+                    <div class="mini-residence-preview">
+
+                        <div class="mini-image"
+                             id="miniImage">
+
+                            <div class="mini-image-placeholder">
+                                <i class="fa-solid fa-building"></i>
+                            </div>
+
+                        </div>
+
+
+                        <div class="mini-content">
+
+                            <span class="mini-type"
+                                  id="previewType">
+                                Accommodation
+                            </span>
+
+                            <h3 id="previewName">
+                                New Residence
+                            </h3>
+
+                            <p id="previewLocation">
+                                <i class="fa-solid fa-location-dot"></i>
+                                Location not specified
+                            </p>
+
+                            <div class="mini-price">
+                                <strong id="previewRent">R0.00</strong>
+                                <span>/ month</span>
+                            </div>
+
+                        </div>
+
+
+                        <div class="mini-stats">
+
+                            <div>
+                                <i class="fa-solid fa-door-open"></i>
+                                <strong id="previewRooms">0</strong>
+                                <span>Rooms</span>
+                            </div>
+
+                            <div>
+                                <i class="fa-solid fa-bed"></i>
+                                <strong id="previewBedrooms">0</strong>
+                                <span>Bedrooms</span>
+                            </div>
+
+                            <div>
+                                <i class="fa-solid fa-shower"></i>
+                                <strong id="previewBathrooms">0</strong>
+                                <span>Bathrooms</span>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- AVAILABILITY -->
+                <div class="form-side-card">
+
+                    <div class="side-card-header">
+
+                        <span>
+                            <i class="fa-solid fa-circle-check"></i>
+                            Availability
+                        </span>
+
+                    </div>
+
+
+                    <div class="availability-control">
+
+                        <div class="availability-icon">
+                            <i class="fa-solid fa-house-circle-check"></i>
+                        </div>
+
+                        <div class="availability-text">
+
+                            <strong>Residence is available</strong>
+
+                            <span>
+                                Customers can view and apply when rooms
+                                are available.
+                            </span>
+
+                        </div>
+
+                        <label class="modern-switch">
+
+                            <input asp-for="Available"
+                                   type="checkbox"
+                                   id="Available" />
+
+                            <span class="switch-slider"></span>
+
+                        </label>
+
+                    </div>
+
+                </div>
+
+
+                <!-- IMPORTANT INFORMATION -->
+                <div class="form-side-card information-card">
+
+                    <div class="side-card-header">
+
+                        <span>
+                            <i class="fa-solid fa-circle-info"></i>
+                            Before You Save
+                        </span>
+
+                    </div>
+
+
+                    <ul>
+
+                        <li>
+                            <i class="fa-solid fa-check"></i>
+                            Check the residence name and location.
+                        </li>
+
+                        <li>
+                            <i class="fa-solid fa-check"></i>
+                            Confirm the monthly rental amount.
+                        </li>
+
+                        <li>
+                            <i class="fa-solid fa-check"></i>
+                            Enter the correct total room capacity.
+                        </li>
+
+                        <li>
+                            <i class="fa-solid fa-check"></i>
+                            Use a clear residence image.
+                        </li>
+
+                        <li>
+                            <i class="fa-solid fa-check"></i>
+                            You can manage individual rooms after creation.
+                        </li>
+
+                    </ul>
+
+                </div>
+
+
+                <!-- ACTIONS -->
+                <div class="form-side-actions">
+
+                    <a asp-controller="Accommodation"
+                       asp-action="Manage"
+                       class="cancel-form-btn">
+
+                        <i class="fa-solid fa-xmark"></i>
+                        Cancel
+
+                    </a>
+
+
+                    <button type="submit"
+                            class="save-form-btn">
+
+                        <i class="fa-solid fa-plus"></i>
+                        Create Residence
+
+                    </button>
+
+                </div>
+
+            </aside>
+
+        </div>
+
+    </form>
+
+</div>
+
+
+@section Scripts {
+
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+
+        document.addEventListener("DOMContentLoaded", function () {
+
+            const imageInput =
+                document.getElementById("ImageFile");
+
+            const previewContainer =
+                document.getElementById("imagePreviewContainer");
+
+            const preview =
+                document.getElementById("imagePreview");
+
+            const uploadPlaceholder =
+                document.getElementById("uploadPlaceholder");
+
+            const uploadArea =
+                document.getElementById("imageUploadArea");
+
+
+            const nameInput =
+                document.getElementById("Name");
+
+            const locationInput =
+                document.getElementById("Location");
+
+            const typeInput =
+                document.getElementById("Type");
+
+            const rentInput =
+                document.getElementById("MonthlyRent");
+
+            const roomsInput =
+                document.getElementById("TotalRooms");
+
+            const bedroomsInput =
+                document.getElementById("Bedrooms");
+
+            const bathroomsInput =
+                document.getElementById("Bathrooms");
+
+            const descriptionInput =
+                document.getElementById("Description");
+
+
+            const previewName =
+                document.getElementById("previewName");
+
+            const previewLocation =
+                document.getElementById("previewLocation");
+
+            const previewType =
+                document.getElementById("previewType");
+
+            const previewRent =
+                document.getElementById("previewRent");
+
+            const previewRooms =
+                document.getElementById("previewRooms");
+
+            const previewBedrooms =
+                document.getElementById("previewBedrooms");
+
+            const previewBathrooms =
+                document.getElementById("previewBathrooms");
+
+            const miniImage =
+                document.getElementById("miniImage");
+
+            const descriptionCounter =
+                document.getElementById("descriptionCounter");
+
+
+            function updatePreview() {
+
+                if (nameInput) {
+
+                    previewName.textContent =
+                        nameInput.value.trim() || "New Residence";
+
+                }
+
+
+                if (locationInput) {
+
+                    const location =
+                        locationInput.value.trim();
+
+                    previewLocation.innerHTML =
+                        '<i class="fa-solid fa-location-dot"></i> ' +
+                        (location || "Location not specified");
+
+                }
+
+
+                if (typeInput) {
+
+                    previewType.textContent =
+                        typeInput.value || "Accommodation";
+
+                }
+
+
+                if (rentInput) {
+
+                    const rent =
+                        parseFloat(rentInput.value);
+
+                    previewRent.textContent =
+                        "R" +
+                        (isNaN(rent)
+                            ? "0.00"
+                            : rent.toLocaleString(
+                                "en-ZA",
+                                {
+                                    minimumFractionDigits: 2,
+                                    maximumFractionDigits: 2
+                                }
+                              ));
+                }
+
+
+                if (roomsInput) {
+
+                    previewRooms.textContent =
+                        roomsInput.value || "0";
+
+                }
+
+
+                if (bedroomsInput) {
+
+                    previewBedrooms.textContent =
+                        bedroomsInput.value || "0";
+
+                }
+
+
+                if (bathroomsInput) {
+
+                    previewBathrooms.textContent =
+                        bathroomsInput.value || "0";
+
+                }
+
+
+                if (descriptionInput &&
+                    descriptionCounter) {
+
+                    descriptionCounter.textContent =
+                        descriptionInput.value.length +
+                        " / 1000";
+
+                }
+
+            }
+
+
+            [
+                nameInput,
+                locationInput,
+                typeInput,
+                rentInput,
+                roomsInput,
+                bedroomsInput,
+                bathroomsInput,
+                descriptionInput
+            ].forEach(function (input) {
+
+                if (input) {
+
+                    input.addEventListener(
+                        "input",
+                        updatePreview
+                    );
+
+                    input.addEventListener(
+                        "change",
+                        updatePreview
+                    );
+
+                }
+
+            });
+
+
+            if (imageInput) {
+
+                imageInput.addEventListener(
+                    "change",
+                    function () {
+
+                        const file =
+                            this.files[0];
+
+                        if (!file) {
+
+                            previewContainer.style.display =
+                                "none";
+
+                            uploadPlaceholder.style.display =
+                                "flex";
+
+                            preview.src = "#";
+
+                            return;
+                        }
+
+
+                        const allowedTypes = [
+                            "image/jpeg",
+                            "image/png",
+                            "image/webp"
+                        ];
+
+
+                        if (!allowedTypes.includes(file.type)) {
+
+                            alert(
+                                "Please select a JPG, JPEG, PNG or WEBP image."
+                            );
+
+                            this.value = "";
+
+                            previewContainer.style.display =
+                                "none";
+
+                            uploadPlaceholder.style.display =
+                                "flex";
+
+                            return;
+
+                        }
+
+
+                        if (file.size > 5 * 1024 * 1024) {
+
+                            alert(
+                                "The selected image is larger than 5 MB."
+                            );
+
+                            this.value = "";
+
+                            previewContainer.style.display =
+                                "none";
+
+                            uploadPlaceholder.style.display =
+                                "flex";
+
+                            return;
+
+                        }
+
+
+                        const reader =
+                            new FileReader();
+
+
+                        reader.onload =
+                            function (event) {
+
+                                preview.src =
+                                    event.target.result;
+
+                                previewContainer.style.display =
+                                    "block";
+
+                                uploadPlaceholder.style.display =
+                                    "none";
+
+
+                                miniImage.style.backgroundImage =
+                                    "url('" +
+                                    event.target.result +
+                                    "')";
+
+                                miniImage
+                                    .classList
+                                    .add("has-image");
+
+                            };
+
+
+                        reader.readAsDataURL(file);
+
+                    }
+                );
+
+            }
+
+
+            if (uploadArea) {
+
+                [
+                    "dragenter",
+                    "dragover"
+                ].forEach(function (eventName) {
+
+                    uploadArea.addEventListener(
+                        eventName,
+                        function (event) {
+
+                            event.preventDefault();
+
+                            uploadArea.classList.add(
+                                "dragging"
+                            );
+
+                        }
+                    );
+
+                });
+
+
+                [
+                    "dragleave",
+                    "drop"
+                ].forEach(function (eventName) {
+
+                    uploadArea.addEventListener(
+                        eventName,
+                        function (event) {
+
+                            event.preventDefault();
+
+                            uploadArea.classList.remove(
+                                "dragging"
+                            );
+
+                        }
+                    );
+
+                });
+
+
+                uploadArea.addEventListener(
+                    "drop",
+                    function (event) {
+
+                        const files =
+                            event.dataTransfer.files;
+
+                        if (!files.length) {
+                            return;
+                        }
+
+                        imageInput.files = files;
+
+                        imageInput.dispatchEvent(
+                            new Event("change")
+                        );
+
+                    }
+                );
+
+            }
+
+
+            updatePreview();
+
+        });
+
+    </script>
+}

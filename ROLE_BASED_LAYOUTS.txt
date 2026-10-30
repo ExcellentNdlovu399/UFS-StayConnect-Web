@@ -1,0 +1,23 @@
+UFS StayConnect - Role-Based Layout Structure
+
+Public / anonymous:
+    Views/Shared/_Layout.cshtml
+    Used by Home, Login, Register and anonymous public pages.
+
+Customer:
+    Views/Shared/_CustomerLayout.cshtml
+
+Admin:
+    Views/Admin/_AdminLayout.cshtml
+
+Financial Officer:
+    Views/FinancialOfficer/_FinancialOfficerLayout.cshtml
+
+Global selection:
+    Views/_ViewStart.cshtml
+
+Important:
+- Home/Index.cshtml explicitly keeps the public landing layout.
+- HomeController already redirects authenticated users to their role dashboard.
+- Authenticated views without a hard-coded Layout now inherit the correct role layout.
+- The public landing navbar/footer are not placed inside customer/admin/financial-officer layouts.

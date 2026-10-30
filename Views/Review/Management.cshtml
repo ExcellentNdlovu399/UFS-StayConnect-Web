@@ -1,0 +1,265 @@
+@model IEnumerable<UFSStayConnect.Models.Review>
+
+@{
+    ViewData["Title"] = "Reviews";
+    var reviews = Model.ToList();
+
+    var totalReviews = reviews.Count;
+    var averageRating = reviews.Any()
+        ? reviews.Average(x => x.Rating)
+        : 0;
+
+    var fiveStar = reviews.Count(x => x.Rating == 5);
+    var fourStar = reviews.Count(x => x.Rating == 4);
+}
+
+<div class="reviews-page">
+
+    <!-- HEADER -->
+    <div class="reviews-header">
+
+        <div>
+            <div class="reviews-eyebrow">
+                <i class="fa-solid fa-star"></i>
+                Customer Feedback
+            </div>
+
+            <h1>Reviews</h1>
+
+            <p>
+                Review customer feedback about UFS accommodation.
+            </p>
+        </div>
+
+    </div>
+
+
+    <!-- SUMMARY -->
+    <div class="reviews-summary">
+
+        <div class="review-summary-card">
+
+            <div class="review-summary-icon blue">
+                <i class="fa-solid fa-comments"></i>
+            </div>
+
+            <div>
+                <span>Total Reviews</span>
+                <strong>@totalReviews</strong>
+            </div>
+
+        </div>
+
+
+        <div class="review-summary-card">
+
+            <div class="review-summary-icon gold">
+                <i class="fa-solid fa-star"></i>
+            </div>
+
+            <div>
+                <span>Average Rating</span>
+                <strong>@averageRating.ToString("0.0") / 5</strong>
+            </div>
+
+        </div>
+
+
+        <div class="review-summary-card">
+
+            <div class="review-summary-icon green">
+                <i class="fa-solid fa-star"></i>
+            </div>
+
+            <div>
+                <span>5-Star Reviews</span>
+                <strong>@fiveStar</strong>
+            </div>
+
+        </div>
+
+
+        <div class="review-summary-card">
+
+            <div class="review-summary-icon purple">
+                <i class="fa-solid fa-thumbs-up"></i>
+            </div>
+
+            <div>
+                <span>4-Star Reviews</span>
+                <strong>@fourStar</strong>
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- REVIEWS -->
+    <div class="reviews-card">
+
+        <div class="reviews-card-header">
+
+            <div>
+                <h2>Customer Feedback</h2>
+                <p>
+                    Feedback submitted by customers about their accommodation.
+                </p>
+            </div>
+
+        </div>
+
+
+        @if (reviews.Any())
+        {
+            <div class="reviews-table-wrapper">
+
+                <table class="reviews-table">
+
+                    <thead>
+                        <tr>
+                            <th>Customer</th>
+                            <th>Accommodation</th>
+                            <th>Rating</th>
+                            <th>Review</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        @foreach (var r in reviews)
+                        {
+                            <tr>
+
+                                <td>
+
+                                    <div class="review-customer">
+
+                                        <div class="review-avatar">
+
+                                            @{
+                                                var first =
+                                                r.User?.FirstName?.FirstOrDefault()
+                                                ?? 'U';
+
+                                                var last =
+                                                r.User?.Surname?.FirstOrDefault()
+                                                ?? 'U';
+                                            }
+
+                                        @($"{first}{last}".ToUpper())
+
+                                    </div>
+
+                                    <div>
+
+                                        <strong>
+                                            @(r.User == null
+                                                                                    ? "Unknown Customer"
+                                                                                    : $"{r.User.FirstName} {r.User.Surname}")
+                                                                                                                         </strong>
+
+                                        <span>
+                                            Customer
+                                        </span>
+
+                                    </div>
+
+                                </div>
+
+                            </td>
+
+
+                            <td>
+
+                                <div class="review-accommodation">
+
+                                    <i class="fa-solid fa-building"></i>
+
+                                    <span>
+                                        @(r.Accommodation?.Name ?? "Unknown")
+                                    </span>
+
+                                </div>
+
+                            </td>
+
+
+                            <td>
+
+                                <div class="review-rating">
+
+                                    <span class="review-stars">
+                                        @(new string('★', r.Rating))
+                                    </span>
+
+                                    <span class="review-rating-number">
+                                        @r.Rating/5
+                                    </span>
+
+                                </div>
+
+                            </td>
+
+
+                            <td>
+
+                                <div class="review-comment">
+
+                                    @(string.IsNullOrWhiteSpace(r.Comment)
+                                                                    ? "No comment provided."
+                                                                    : r.Comment)
+
+                            </div>
+
+                                </td>
+
+
+                                <td>
+
+                                    <div class="review-date">
+
+                                        <i class="fa-regular fa-calendar"></i>
+
+                                        @r.DateCreated.ToLocalTime().ToString("dd MMM yyyy")
+
+                                    </div>
+
+                                </td>
+
+                            </tr>
+                                        }
+
+                    </tbody>
+
+                </table>
+
+            </div>
+        }
+        else
+        {
+            <div class="reviews-empty">
+
+                <div class="reviews-empty-icon">
+                    <i class="fa-regular fa-star"></i>
+                </div>
+
+                <h3>No Reviews Yet</h3>
+
+                <p>
+                    Customer accommodation reviews will appear here
+                    once they have been submitted.
+                </p>
+
+            </div>
+        }
+
+    </div>
+
+</div>
+
+
+<style>
+
+    </style>

@@ -1,0 +1,786 @@
+@model UFSStayConnect.Models.Payment
+
+@{
+    ViewData["Title"] = "Payment Receipt";
+}
+
+<div class="customer-receipt-page">
+
+    <!-- Page Header -->
+    <div class="receipt-page-header">
+        <div>
+            <div class="receipt-eyebrow">
+                <i class="fas fa-file-invoice-dollar"></i>
+                PAYMENT CONFIRMATION
+            </div>
+
+            <h1>Payment Receipt</h1>
+
+            <p>
+                Your payment transaction details and official UFS StayConnect receipt.
+            </p>
+        </div>
+
+        <a asp-action="History" class="receipt-back-link">
+            <i class="fas fa-arrow-left"></i>
+            Transaction History
+        </a>
+    </div>
+
+
+    <!-- Receipt -->
+    <div class="receipt-wrapper">
+
+        <div class="receipt-card">
+
+            <!-- Receipt Top -->
+            <div class="receipt-top">
+
+                <div class="receipt-brand">
+
+                    <div class="receipt-logo">
+                        <img src="~/images/ufs-emblem.png" alt="University of the Free State" />
+                    </div>
+
+                    <div>
+                        <div class="receipt-brand-name">
+                            UFS StayConnect
+                        </div>
+
+                        <div class="receipt-brand-subtitle">
+                            Student Accommodation Portal
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="receipt-document">
+                    <span>OFFICIAL RECEIPT</span>
+                    <strong>#@Model.PaymentID</strong>
+                </div>
+
+            </div>
+
+
+            <!-- Payment Status -->
+            <div class="receipt-status">
+
+                <div class="receipt-success-icon">
+                    <i class="fas fa-check"></i>
+                </div>
+
+                <div>
+                    <h2>Payment Submitted</h2>
+
+                    <p>
+                        Your payment has been recorded successfully.
+                    </p>
+                </div>
+
+                <div class="receipt-status-badge">
+                    @Model.PaymentStatus
+                </div>
+
+            </div>
+
+
+            <!-- Amount -->
+            <div class="receipt-amount-section">
+
+                <span>Total Amount</span>
+
+                <strong>
+                    R @Model.Amount.ToString("N2")
+                </strong>
+
+            </div>
+
+
+            <!-- Transaction Details -->
+            <div class="receipt-section">
+
+                <div class="receipt-section-title">
+                    <i class="fas fa-receipt"></i>
+                    Transaction Details
+                </div>
+
+                <div class="receipt-details-grid">
+
+                    <div class="receipt-detail">
+                        <span>Payment Type</span>
+
+                        <strong>
+                            @(Model.PaymentType?.Name ?? "Unknown")
+                        </strong>
+                    </div>
+
+
+                    <div class="receipt-detail">
+                        <span>Payment Method</span>
+
+                        <strong>
+                            @if (Model.PaymentMethod == "Card")
+                            {
+                                <i class="fas fa-credit-card"></i>
+                            }
+                            else
+                            {
+                                <i class="fas fa-building-columns"></i>
+                            }
+
+                            @Model.PaymentMethod
+                        </strong>
+                    </div>
+
+
+                    <div class="receipt-detail">
+                        <span>Reference Number</span>
+
+                        <strong class="receipt-reference">
+                            @Model.ReferenceNumber
+                        </strong>
+                    </div>
+
+
+                    <div class="receipt-detail">
+                        <span>Payment Date</span>
+
+                        <strong>
+                            @Model.PaymentDate.ToLocalTime().ToString("dd MMMM yyyy, HH:mm")
+                        </strong>
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- Verification Notice -->
+            <div class="receipt-notice">
+
+                <div class="receipt-notice-icon">
+                    <i class="fas fa-shield-halved"></i>
+                </div>
+
+                <div>
+                    <strong>Payment verification</strong>
+
+                    <p>
+                        Payments submitted through UFS StayConnect are subject
+                        to verification by the authorised financial staff.
+                        Keep this receipt and reference number for your records.
+                    </p>
+                </div>
+
+            </div>
+
+
+            <!-- Receipt Footer -->
+            <div class="receipt-footer">
+
+                <div>
+                    <strong>UFS StayConnect</strong>
+
+                    <span>
+                        University of the Free State
+                    </span>
+                </div>
+
+                <div class="receipt-footer-reference">
+                    Reference:
+                    <strong>@Model.ReferenceNumber</strong>
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- Actions -->
+        <div class="receipt-actions">
+
+            <a asp-action="History" class="receipt-secondary-btn">
+                <i class="fas fa-arrow-left"></i>
+                Back to History
+            </a>
+
+            <button type="button"
+                    class="receipt-print-btn"
+                    onclick="window.print()">
+
+                <i class="fas fa-print"></i>
+                Print Receipt
+
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<style>
+
+    /* =========================================================
+           UFS STAYCONNECT - CUSTOMER PAYMENT RECEIPT
+           ========================================================= */
+
+    .customer-receipt-page {
+        max-width: 1180px;
+        margin: 0 auto;
+        padding: 34px 30px 60px;
+    }
+
+
+    /* =========================
+           PAGE HEADER
+           ========================= */
+
+    .receipt-page-header {
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-between;
+        gap: 30px;
+        margin-bottom: 28px;
+    }
+
+    .receipt-eyebrow {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: #b8860b;
+        font-size: 0.76rem;
+        font-weight: 800;
+        letter-spacing: 1.5px;
+        margin-bottom: 8px;
+    }
+
+    .receipt-page-header h1 {
+        margin: 0;
+        color: #123b73;
+        font-size: 2rem;
+        font-weight: 800;
+    }
+
+    .receipt-page-header p {
+        margin: 7px 0 0;
+        color: #6b7280;
+        font-size: 0.94rem;
+    }
+
+    .receipt-back-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 9px;
+        padding: 11px 17px;
+        border: 1px solid #dfe5ec;
+        border-radius: 9px;
+        background: #ffffff;
+        color: #123b73;
+        text-decoration: none;
+        font-size: 0.88rem;
+        font-weight: 700;
+        transition: all 0.2s ease;
+    }
+
+        .receipt-back-link:hover {
+            background: #f5f7fa;
+            color: #123b73;
+            transform: translateY(-1px);
+        }
+
+
+    /* =========================
+           RECEIPT WRAPPER
+           ========================= */
+
+    .receipt-wrapper {
+        max-width: 900px;
+        margin: 0 auto;
+    }
+
+
+    /* =========================
+           RECEIPT CARD
+           ========================= */
+
+    .receipt-card {
+        background: #ffffff;
+        border: 1px solid #e2e7ee;
+        border-radius: 16px;
+        box-shadow: 0 12px 35px rgba(8, 20, 38, 0.08);
+        overflow: hidden;
+    }
+
+
+    /* =========================
+           RECEIPT TOP
+           ========================= */
+
+    .receipt-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 27px 32px;
+        background: #123b73;
+        color: #ffffff;
+        border-bottom: 4px solid #f4c430;
+    }
+
+    .receipt-brand {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+    }
+
+    .receipt-logo {
+        width: 54px;
+        height: 54px;
+        background: #ffffff;
+        border: 2px solid #f4c430;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        flex-shrink: 0;
+    }
+
+        .receipt-logo img {
+            width: 42px;
+            height: 42px;
+            object-fit: contain;
+        }
+
+    .receipt-brand-name {
+        font-size: 1.18rem;
+        font-weight: 800;
+        letter-spacing: 0.2px;
+    }
+
+    .receipt-brand-subtitle {
+        margin-top: 3px;
+        color: rgba(255,255,255,0.72);
+        font-size: 0.79rem;
+    }
+
+    .receipt-document {
+        text-align: right;
+    }
+
+        .receipt-document span {
+            display: block;
+            color: #f4c430;
+            font-size: 0.7rem;
+            font-weight: 800;
+            letter-spacing: 1.4px;
+        }
+
+        .receipt-document strong {
+            display: block;
+            margin-top: 4px;
+            font-size: 1rem;
+            color: #ffffff;
+        }
+
+
+    /* =========================
+           STATUS
+           ========================= */
+
+    .receipt-status {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        padding: 25px 32px;
+        border-bottom: 1px solid #edf0f4;
+    }
+
+    .receipt-success-icon {
+        width: 46px;
+        height: 46px;
+        flex-shrink: 0;
+        border-radius: 50%;
+        background: #e9f7ef;
+        color: #16834b;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.05rem;
+    }
+
+    .receipt-status h2 {
+        margin: 0;
+        color: #1f2937;
+        font-size: 1.1rem;
+        font-weight: 800;
+    }
+
+    .receipt-status p {
+        margin: 4px 0 0;
+        color: #6b7280;
+        font-size: 0.84rem;
+    }
+
+    .receipt-status-badge {
+        margin-left: auto;
+        padding: 7px 13px;
+        border-radius: 999px;
+        background: #e9f7ef;
+        color: #16834b;
+        font-size: 0.75rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+
+    /* =========================
+           AMOUNT
+           ========================= */
+
+    .receipt-amount-section {
+        text-align: center;
+        padding: 30px 25px;
+        background: #f8fafc;
+        border-bottom: 1px solid #e6ebf1;
+    }
+
+        .receipt-amount-section span {
+            display: block;
+            color: #6b7280;
+            font-size: 0.78rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .receipt-amount-section strong {
+            display: block;
+            margin-top: 5px;
+            color: #123b73;
+            font-size: 2.25rem;
+            font-weight: 850;
+        }
+
+
+    /* =========================
+           DETAILS
+           ========================= */
+
+    .receipt-section {
+        padding: 29px 32px;
+    }
+
+    .receipt-section-title {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        margin-bottom: 20px;
+        color: #123b73;
+        font-size: 0.92rem;
+        font-weight: 800;
+    }
+
+        .receipt-section-title i {
+            color: #b8860b;
+        }
+
+    .receipt-details-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1px;
+        background: #e5e9ef;
+        border: 1px solid #e5e9ef;
+        border-radius: 10px;
+        overflow: hidden;
+    }
+
+    .receipt-detail {
+        min-height: 85px;
+        padding: 17px 19px;
+        background: #ffffff;
+    }
+
+        .receipt-detail span {
+            display: block;
+            margin-bottom: 7px;
+            color: #7a8491;
+            font-size: 0.73rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.7px;
+        }
+
+        .receipt-detail strong {
+            color: #263445;
+            font-size: 0.9rem;
+            font-weight: 750;
+        }
+
+            .receipt-detail strong i {
+                margin-right: 6px;
+                color: #123b73;
+            }
+
+    .receipt-reference {
+        font-family: "Courier New", monospace;
+        letter-spacing: 0.3px;
+        word-break: break-all;
+    }
+
+
+    /* =========================
+           NOTICE
+           ========================= */
+
+    .receipt-notice {
+        display: flex;
+        align-items: flex-start;
+        gap: 13px;
+        margin: 0 32px 28px;
+        padding: 17px 18px;
+        border: 1px solid #dce7f4;
+        border-radius: 10px;
+        background: #f5f9fe;
+    }
+
+    .receipt-notice-icon {
+        width: 34px;
+        height: 34px;
+        flex-shrink: 0;
+        border-radius: 8px;
+        background: #e3edf9;
+        color: #123b73;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .receipt-notice strong {
+        display: block;
+        color: #123b73;
+        font-size: 0.83rem;
+        margin-bottom: 3px;
+    }
+
+    .receipt-notice p {
+        margin: 0;
+        color: #667085;
+        font-size: 0.77rem;
+        line-height: 1.55;
+    }
+
+
+    /* =========================
+           RECEIPT FOOTER
+           ========================= */
+
+    .receipt-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 20px;
+        padding: 20px 32px;
+        background: #fafbfc;
+        border-top: 1px solid #e8ebef;
+    }
+
+        .receipt-footer strong {
+            display: block;
+            color: #123b73;
+            font-size: 0.82rem;
+        }
+
+        .receipt-footer span {
+            display: block;
+            margin-top: 3px;
+            color: #8a94a2;
+            font-size: 0.72rem;
+        }
+
+    .receipt-footer-reference {
+        color: #8a94a2;
+        font-size: 0.72rem;
+        text-align: right;
+    }
+
+        .receipt-footer-reference strong {
+            display: inline;
+            color: #4b5563;
+            font-family: "Courier New", monospace;
+        }
+
+
+    /* =========================
+           ACTIONS
+           ========================= */
+
+    .receipt-actions {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 20px;
+    }
+
+    .receipt-secondary-btn,
+    .receipt-print-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 9px;
+        min-height: 44px;
+        padding: 0 18px;
+        border-radius: 9px;
+        font-size: 0.86rem;
+        font-weight: 750;
+        text-decoration: none;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .receipt-secondary-btn {
+        border: 1px solid #dfe5ec;
+        background: #ffffff;
+        color: #123b73;
+    }
+
+        .receipt-secondary-btn:hover {
+            background: #f5f7fa;
+            color: #123b73;
+        }
+
+    .receipt-print-btn {
+        border: 1px solid #123b73;
+        background: #123b73;
+        color: #ffffff;
+    }
+
+        .receipt-print-btn:hover {
+            background: #0d2d58;
+            border-color: #0d2d58;
+            transform: translateY(-1px);
+        }
+
+
+    /* =========================
+           RESPONSIVE
+           ========================= */
+
+    @@media (max-width: 768px) {
+
+        .customer-receipt-page {
+            padding: 25px 16px 45px;
+        }
+
+        .receipt-page-header {
+            align-items: flex-start;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+            .receipt-page-header h1 {
+                font-size: 1.65rem;
+            }
+
+        .receipt-top {
+            padding: 22px;
+        }
+
+        .receipt-status {
+            padding: 22px;
+        }
+
+        .receipt-section {
+            padding: 24px 20px;
+        }
+
+        .receipt-notice {
+            margin-left: 20px;
+            margin-right: 20px;
+        }
+
+        .receipt-footer {
+            padding: 18px 20px;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .receipt-footer-reference {
+            text-align: left;
+        }
+
+        .receipt-details-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .receipt-actions {
+            flex-direction: column-reverse;
+            align-items: stretch;
+            gap: 10px;
+        }
+
+        .receipt-secondary-btn,
+        .receipt-print-btn {
+            width: 100%;
+        }
+    }
+
+
+    /* =========================
+           PRINT
+           ========================= */
+
+    @@media print {
+
+        body {
+            background: #ffffff !important;
+        }
+
+        .customer-sidebar,
+        .customer-topbar,
+        .receipt-page-header,
+        .receipt-actions {
+            display: none !important;
+        }
+
+        .customer-main {
+            margin: 0 !important;
+            width: 100% !important;
+            padding: 0 !important;
+        }
+
+        .customer-receipt-page {
+            max-width: none !important;
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+
+        .receipt-wrapper {
+            max-width: none !important;
+            margin: 0 !important;
+        }
+
+        .receipt-card {
+            border: 0 !important;
+            border-radius: 0 !important;
+            box-shadow: none !important;
+        }
+
+        .receipt-top {
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+
+        .receipt-amount-section {
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+
+        .receipt-notice {
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+    }
+</style>

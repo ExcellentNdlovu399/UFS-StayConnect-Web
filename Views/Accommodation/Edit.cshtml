@@ -1,0 +1,1302 @@
+@model UFSStayConnect.ViewModels.AccommodationViewModel
+
+@{
+    ViewData["Title"] = "Edit Accommodation";
+    Layout = "~/Views/Admin/_AdminLayout.cshtml";
+
+    int occupiedRooms = Math.Max(
+        0,
+        Model.TotalRooms - Model.AvailableRooms
+    );
+
+    double occupancyPercentage = Model.TotalRooms > 0
+        ? Math.Round(
+            (double)occupiedRooms / Model.TotalRooms * 100,
+            1
+        )
+        : 0;
+}
+
+<div class="accommodation-form-page">
+
+    <!-- HEADER -->
+    <div class="accommodation-form-header">
+
+        <div>
+
+            <div class="page-eyebrow">
+                <i class="fa-solid fa-pen-to-square"></i>
+                Accommodation Management
+            </div>
+
+            <h1>Edit Residence</h1>
+
+            <p>
+                Update residence information, pricing, availability
+                and accommodation imagery.
+            </p>
+
+        </div>
+
+
+        <a asp-controller="Accommodation"
+           asp-action="Manage"
+           class="form-back-btn">
+
+            <i class="fa-solid fa-arrow-left"></i>
+
+            Back to Accommodation
+
+        </a>
+
+    </div>
+
+
+    <!-- ROOM STATUS BANNER -->
+    <div class="edit-occupancy-banner">
+
+        <div class="occupancy-banner-icon">
+
+            <i class="fa-solid fa-building-circle-check"></i>
+
+        </div>
+
+
+        <div class="occupancy-banner-content">
+
+            <strong>
+                @Model.Name
+            </strong>
+
+            <span>
+                @occupiedRooms of @Model.TotalRooms rooms are currently occupied.
+            </span>
+
+        </div>
+
+
+        <div class="occupancy-banner-stats">
+
+            <div>
+                <strong>@Model.TotalRooms</strong>
+                <span>Total</span>
+            </div>
+
+            <div>
+                <strong class="available-number">
+                    @Model.AvailableRooms
+                </strong>
+                <span>Available</span>
+            </div>
+
+            <div>
+                <strong class="occupied-number">
+                    @occupiedRooms
+                </strong>
+                <span>Occupied</span>
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- VALIDATION -->
+    <div asp-validation-summary="ModelOnly"
+         class="form-validation-summary"
+         role="alert"></div>
+
+
+    <form asp-controller="Accommodation"
+          asp-action="Edit"
+          method="post"
+          enctype="multipart/form-data"
+          id="editAccommodationForm">
+
+        @Html.AntiForgeryToken()
+
+
+        <input type="hidden"
+               asp-for="AccommodationID" />
+
+        <input type="hidden"
+               asp-for="ExistingImagePath" />
+
+
+        <div class="accommodation-form-layout">
+
+            <!-- MAIN -->
+            <div class="accommodation-form-main">
+
+
+                <!-- RESIDENCE INFORMATION -->
+                <section class="form-section-card">
+
+                    <div class="form-section-heading">
+
+                        <div class="section-icon blue">
+
+                            <i class="fa-solid fa-building"></i>
+
+                        </div>
+
+                        <div>
+
+                            <h2>Residence Information</h2>
+
+                            <p>
+                                Update the basic information for this residence.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="form-grid">
+
+                        <!-- NAME -->
+                        <div class="form-field full">
+
+                            <label asp-for="Name">
+                                Accommodation Name
+                                <span>*</span>
+                            </label>
+
+                            <div class="input-with-icon">
+
+                                <i class="fa-solid fa-house"></i>
+
+                                <input asp-for="Name"
+                                       placeholder="e.g. QwaQwa Student Residence 1"
+                                       autocomplete="off" />
+
+                            </div>
+
+                            <span asp-validation-for="Name"
+                                  class="field-error"></span>
+
+                        </div>
+
+
+                        <!-- LOCATION -->
+                        <div class="form-field">
+
+                            <label asp-for="Location">
+                                Location
+                                <span>*</span>
+                            </label>
+
+                            <div class="input-with-icon">
+
+                                <i class="fa-solid fa-location-dot"></i>
+
+                                <input asp-for="Location"
+                                       placeholder="e.g. Phuthaditjhaba" />
+
+                            </div>
+
+                            <span asp-validation-for="Location"
+                                  class="field-error"></span>
+
+                        </div>
+
+
+                        <!-- TYPE -->
+                        <div class="form-field">
+
+                            <label asp-for="Type">
+                                Accommodation Type
+                                <span>*</span>
+                            </label>
+
+                            <div class="input-with-icon">
+
+                                <i class="fa-solid fa-city"></i>
+
+                                <select asp-for="Type">
+
+                                    <option value="">
+                                        Select accommodation type
+                                    </option>
+
+                                    <option value="Flat">
+                                        Flat
+                                    </option>
+
+                                    <option value="Townhouse">
+                                        Townhouse
+                                    </option>
+
+                                </select>
+
+                            </div>
+
+                            <span asp-validation-for="Type"
+                                  class="field-error"></span>
+
+                        </div>
+
+
+                        <!-- DESCRIPTION -->
+                        <div class="form-field full">
+
+                            <label asp-for="Description">
+                                Description
+                                <span>*</span>
+                            </label>
+
+                            <textarea asp-for="Description"
+                                      rows="5"
+                                      maxlength="1000"
+                                      placeholder="Describe the residence, facilities, security, location and other useful information..."></textarea>
+
+                            <div class="field-bottom-row">
+
+                                <small>
+                                    <i class="fa-solid fa-circle-info"></i>
+                                    Keep the description between 10 and 1000 characters.
+                                </small>
+
+                                <small id="editDescriptionCounter">
+                                    @((Model.Description ?? "").Length) / 1000
+                                </small>
+
+                            </div>
+
+                            <span asp-validation-for="Description"
+                                  class="field-error"></span>
+
+                        </div>
+
+                    </div>
+
+                </section>
+
+
+                <!-- PROPERTY DETAILS -->
+                <section class="form-section-card">
+
+                    <div class="form-section-heading">
+
+                        <div class="section-icon gold">
+
+                            <i class="fa-solid fa-chart-simple"></i>
+
+                        </div>
+
+                        <div>
+
+                            <h2>Property Details</h2>
+
+                            <p>
+                                Update pricing, capacity and room information.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="form-grid">
+
+                        <!-- RENT -->
+                        <div class="form-field">
+
+                            <label asp-for="MonthlyRent">
+                                Monthly Rent
+                                <span>*</span>
+                            </label>
+
+                            <div class="money-input">
+
+                                <span>R</span>
+
+                                <input asp-for="MonthlyRent"
+                                       type="number"
+                                       step="0.01"
+                                       min="0.01"
+                                       placeholder="3500.00" />
+
+                            </div>
+
+                            <span class="field-hint">
+                                Monthly rental amount charged to the customer.
+                            </span>
+
+                            <span asp-validation-for="MonthlyRent"
+                                  class="field-error"></span>
+
+                        </div>
+
+
+                        <!-- TOTAL ROOMS -->
+                        <div class="form-field">
+
+                            <label asp-for="TotalRooms">
+                                Total Rooms
+                                <span>*</span>
+                            </label>
+
+                            <div class="input-with-icon">
+
+                                <i class="fa-solid fa-door-open"></i>
+
+                                <input asp-for="TotalRooms"
+                                       id="TotalRooms"
+                                       type="number"
+                                       min="@Math.Max(1, occupiedRooms)"
+                                       max="100"
+                                       placeholder="e.g. 20" />
+
+                            </div>
+
+                            <div class="room-restriction-note">
+
+                                <i class="fa-solid fa-lock"></i>
+
+                                <span>
+                                    <strong>@occupiedRooms rooms occupied.</strong>
+                                    Total rooms cannot be less than
+                                    @occupiedRooms.
+                                </span>
+
+                            </div>
+
+                            <span asp-validation-for="TotalRooms"
+                                  class="field-error"></span>
+
+                        </div>
+
+
+                        <!-- BEDROOMS -->
+                        <div class="form-field">
+
+                            <label asp-for="Bedrooms">
+                                Bedrooms
+                                <span>*</span>
+                            </label>
+
+                            <div class="input-with-icon">
+
+                                <i class="fa-solid fa-bed"></i>
+
+                                <input asp-for="Bedrooms"
+                                       type="number"
+                                       min="1"
+                                       max="500"
+                                       placeholder="e.g. 2" />
+
+                            </div>
+
+                            <span class="field-hint">
+                                Number of bedrooms.
+                            </span>
+
+                            <span asp-validation-for="Bedrooms"
+                                  class="field-error"></span>
+
+                        </div>
+
+
+                        <!-- BATHROOMS -->
+                        <div class="form-field">
+
+                            <label asp-for="Bathrooms">
+                                Bathrooms
+                                <span>*</span>
+                            </label>
+
+                            <div class="input-with-icon">
+
+                                <i class="fa-solid fa-shower"></i>
+
+                                <input asp-for="Bathrooms"
+                                       type="number"
+                                       min="1"
+                                       max="200"
+                                       placeholder="e.g. 1" />
+
+                            </div>
+
+                            <span class="field-hint">
+                                Number of bathrooms.
+                            </span>
+
+                            <span asp-validation-for="Bathrooms"
+                                  class="field-error"></span>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- OCCUPANCY BAR -->
+                    <div class="occupancy-editor">
+
+                        <div class="occupancy-editor-header">
+
+                            <div>
+
+                                <strong>Current Room Occupancy</strong>
+
+                                <span>
+                                    @occupiedRooms occupied
+                                    ·
+                                    @Model.AvailableRooms available
+                                </span>
+
+                            </div>
+
+                            <strong class="occupancy-percentage">
+                                @occupancyPercentage%
+                            </strong>
+
+                        </div>
+
+
+                        <div class="occupancy-progress">
+
+                            <div class="occupancy-progress-fill"
+                                 style="width:@occupancyPercentage%;">
+                            </div>
+
+                        </div>
+
+
+                        <div class="occupancy-legend">
+
+                            <span>
+                                <i class="fa-solid fa-circle occupied-dot"></i>
+                                Occupied: @occupiedRooms
+                            </span>
+
+                            <span>
+                                <i class="fa-solid fa-circle available-dot"></i>
+                                Available: @Model.AvailableRooms
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                </section>
+
+
+                <!-- IMAGE -->
+                <section class="form-section-card">
+
+                    <div class="form-section-heading">
+
+                        <div class="section-icon green">
+
+                            <i class="fa-solid fa-image"></i>
+
+                        </div>
+
+                        <div>
+
+                            <h2>Residence Image</h2>
+
+                            <p>
+                                Keep the existing image or upload a replacement.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    @if (!string.IsNullOrWhiteSpace(Model.ExistingImagePath))
+                    {
+                        <div class="current-image-block">
+
+                            <div class="current-image-header">
+
+                                <div>
+
+                                    <strong>Current Residence Image</strong>
+
+                                    <span>
+                                        This image is currently displayed to customers.
+                                    </span>
+
+                                </div>
+
+                                <span class="current-image-badge">
+
+                                    <i class="fa-solid fa-check"></i>
+                                    Current
+
+                                </span>
+
+                            </div>
+
+
+                            <div class="current-image-container">
+
+                                <img src="@Model.ExistingImagePath"
+                                     alt="@Model.Name" />
+
+                            </div>
+
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="no-current-image">
+
+                            <i class="fa-solid fa-image"></i>
+
+                            <div>
+
+                                <strong>No residence image uploaded</strong>
+
+                                <span>
+                                    Upload an image below to improve the listing.
+                                </span>
+
+                            </div>
+
+                        </div>
+                    }
+
+
+                    <!-- UPLOAD -->
+                    <div class="replace-image-area"
+                         id="editImageUploadArea">
+
+                        <div class="replace-image-content">
+
+                            <div class="replace-image-icon">
+
+                                <i class="fa-solid fa-cloud-arrow-up"></i>
+
+                            </div>
+
+                            <div>
+
+                                <strong>Replace Residence Image</strong>
+
+                                <p>
+                                    Leave this empty to keep the current image.
+                                </p>
+
+                                <label for="ImageFile"
+                                       class="choose-image-btn">
+
+                                    <i class="fa-solid fa-folder-open"></i>
+
+                                    Choose New Image
+
+                                </label>
+
+                                <span class="upload-note">
+                                    JPG, JPEG, PNG or WEBP · Maximum 5 MB
+                                </span>
+
+                            </div>
+
+                        </div>
+
+                        <input asp-for="ImageFile"
+                               type="file"
+                               accept=".jpg,.jpeg,.png,.webp"
+                               id="ImageFile"
+                               class="hidden-file-input" />
+
+                    </div>
+
+
+                    <span asp-validation-for="ImageFile"
+                          class="field-error"></span>
+
+
+                    <!-- NEW PREVIEW -->
+                    <div id="imagePreviewContainer"
+                         class="new-image-preview"
+                         style="display:none;">
+
+                        <div class="new-preview-header">
+
+                            <strong>
+                                <i class="fa-solid fa-eye"></i>
+                                New Image Preview
+                            </strong>
+
+                            <span>
+                                This will replace the current image.
+                            </span>
+
+                        </div>
+
+                        <div class="new-preview-image">
+
+                            <img id="imagePreview"
+                                 src="#"
+                                 alt="New accommodation image preview" />
+
+                        </div>
+
+                    </div>
+
+                </section>
+
+            </div>
+
+
+            <!-- SIDEBAR -->
+            <aside class="accommodation-form-sidebar">
+
+
+                <!-- RESIDENCE STATUS -->
+                <div class="form-side-card">
+
+                    <div class="side-card-header">
+
+                        <span>
+                            <i class="fa-solid fa-circle-check"></i>
+                            Residence Status
+                        </span>
+
+                    </div>
+
+
+                    <div class="edit-status-panel">
+
+                        <div class="edit-status-icon">
+
+                            <i class="fa-solid fa-house-circle-check"></i>
+
+                        </div>
+
+
+                        <div class="edit-status-text">
+
+                            <strong id="availabilityStatusText">
+
+                                @(Model.Available
+                                                                ? "Residence is available"
+                                                                : "Residence is unavailable")
+
+                            </strong>
+
+                            <span>
+                                Customers can apply when enabled
+                                and rooms are available.
+                            </span>
+
+                        </div>
+
+
+                        <label class="modern-switch">
+
+                            <input asp-for="Available"
+                                   type="checkbox"
+                                   id="Available" />
+
+                            <span class="switch-slider"></span>
+
+                        </label>
+
+                    </div>
+
+
+                    @if (Model.AvailableRooms == 0)
+                    {
+                        <div class="zero-room-warning">
+
+                            <i class="fa-solid fa-triangle-exclamation"></i>
+
+                            <span>
+                                There are currently no available rooms.
+                            </span>
+
+                        </div>
+                    }
+
+                </div>
+
+
+                <!-- LIVE PREVIEW -->
+                <div class="form-side-card preview-card">
+
+                    <div class="side-card-header">
+
+                        <span>
+
+                            <i class="fa-solid fa-eye"></i>
+
+                            Listing Preview
+
+                        </span>
+
+                    </div>
+
+
+                    <div class="mini-residence-preview">
+
+                        <div class="mini-image"
+                             id="miniImage">
+
+                            @if (!string.IsNullOrWhiteSpace(Model.ExistingImagePath))
+                            {
+                                <img src="@Model.ExistingImagePath"
+                                     id="miniImageElement"
+                                     alt="@Model.Name" />
+                            }
+                            else
+                            {
+                                <div class="mini-image-placeholder">
+
+                                    <i class="fa-solid fa-building"></i>
+
+                                </div>
+                            }
+
+                        </div>
+
+
+                        <div class="mini-content">
+
+                            <span class="mini-type"
+                                  id="previewType">
+
+                                @(string.IsNullOrWhiteSpace(Model.Type)
+                                                                ? "Accommodation"
+                                                                : Model.Type)
+
+                            </span>
+
+
+                            <h3 id="previewName">
+                                @Model.Name
+                            </h3>
+
+
+                            <p id="previewLocation">
+
+                                <i class="fa-solid fa-location-dot"></i>
+
+                                @(string.IsNullOrWhiteSpace(Model.Location)
+                                                                ? "Location not specified"
+                                                                : Model.Location)
+
+                            </p>
+
+
+                            <div class="mini-price">
+
+                                <strong id="previewRent">
+                                    @Model.MonthlyRent.ToString("C2", new System.Globalization.CultureInfo("en-ZA"))
+                                </strong>
+
+                                <span>/ month</span>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="mini-stats">
+
+                            <div>
+
+                                <i class="fa-solid fa-door-open"></i>
+
+                                <strong id="previewRooms">
+                                    @Model.TotalRooms
+                                </strong>
+
+                                <span>Rooms</span>
+
+                            </div>
+
+
+                            <div>
+
+                                <i class="fa-solid fa-bed"></i>
+
+                                <strong id="previewBedrooms">
+                                    @Model.Bedrooms
+                                </strong>
+
+                                <span>Bedrooms</span>
+
+                            </div>
+
+
+                            <div>
+
+                                <i class="fa-solid fa-shower"></i>
+
+                                <strong id="previewBathrooms">
+                                    @Model.Bathrooms
+                                </strong>
+
+                                <span>Bathrooms</span>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- EDIT INFORMATION -->
+                <div class="form-side-card information-card">
+
+                    <div class="side-card-header">
+
+                        <span>
+
+                            <i class="fa-solid fa-shield-halved"></i>
+
+                            Editing Safely
+
+                        </span>
+
+                    </div>
+
+
+                    <ul>
+
+                        <li>
+
+                            <i class="fa-solid fa-lock"></i>
+
+                            Occupied rooms cannot be removed from the residence capacity.
+
+                        </li>
+
+                        <li>
+
+                            <i class="fa-solid fa-image"></i>
+
+                            Leave the image field empty to keep the current image.
+
+                        </li>
+
+                        <li>
+
+                            <i class="fa-solid fa-door-open"></i>
+
+                            Individual rooms can be managed separately.
+
+                        </li>
+
+                        <li>
+
+                            <i class="fa-solid fa-users"></i>
+
+                            Existing customer allocations are preserved.
+
+                        </li>
+
+                    </ul>
+
+                </div>
+
+
+                <!-- ACTIONS -->
+                <div class="form-side-actions">
+
+                    <a asp-controller="Accommodation"
+                       asp-action="Manage"
+                       class="cancel-form-btn">
+
+                        <i class="fa-solid fa-xmark"></i>
+
+                        Cancel
+
+                    </a>
+
+
+                    <button type="submit"
+                            class="save-form-btn">
+
+                        <i class="fa-solid fa-floppy-disk"></i>
+
+                        Save Changes
+
+                    </button>
+
+                </div>
+
+            </aside>
+
+        </div>
+
+    </form>
+
+</div>
+
+
+@section Scripts {
+
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+
+        document.addEventListener("DOMContentLoaded", function () {
+
+            const imageInput =
+                document.getElementById("ImageFile");
+
+            const previewContainer =
+                document.getElementById("imagePreviewContainer");
+
+            const preview =
+                document.getElementById("imagePreview");
+
+            const nameInput =
+                document.getElementById("Name");
+
+            const locationInput =
+                document.getElementById("Location");
+
+            const typeInput =
+                document.getElementById("Type");
+
+            const rentInput =
+                document.getElementById("MonthlyRent");
+
+            const roomsInput =
+                document.getElementById("TotalRooms");
+
+            const bedroomsInput =
+                document.getElementById("Bedrooms");
+
+            const bathroomsInput =
+                document.getElementById("Bathrooms");
+
+            const descriptionInput =
+                document.getElementById("Description");
+
+            const availableInput =
+                document.getElementById("Available");
+
+            const previewName =
+                document.getElementById("previewName");
+
+            const previewLocation =
+                document.getElementById("previewLocation");
+
+            const previewType =
+                document.getElementById("previewType");
+
+            const previewRent =
+                document.getElementById("previewRent");
+
+            const previewRooms =
+                document.getElementById("previewRooms");
+
+            const previewBedrooms =
+                document.getElementById("previewBedrooms");
+
+            const previewBathrooms =
+                document.getElementById("previewBathrooms");
+
+            const statusText =
+                document.getElementById("availabilityStatusText");
+
+            const descriptionCounter =
+                document.getElementById(
+                    "editDescriptionCounter"
+                );
+
+
+            function updatePreview() {
+
+                if (nameInput) {
+
+                    previewName.textContent =
+                        nameInput.value.trim()
+                        || "Residence";
+
+                }
+
+
+                if (locationInput) {
+
+                    const location =
+                        locationInput.value.trim();
+
+                    previewLocation.innerHTML =
+                        '<i class="fa-solid fa-location-dot"></i> ' +
+                        (location || "Location not specified");
+
+                }
+
+
+                if (typeInput) {
+
+                    previewType.textContent =
+                        typeInput.value
+                        || "Accommodation";
+
+                }
+
+
+                if (rentInput) {
+
+                    const rent =
+                        parseFloat(rentInput.value);
+
+                    previewRent.textContent =
+                        "R" +
+                        (
+                            isNaN(rent)
+                                ? "0.00"
+                                : rent.toLocaleString(
+                                    "en-ZA",
+                                    {
+                                        minimumFractionDigits: 2,
+                                        maximumFractionDigits: 2
+                                    }
+                                )
+                        );
+
+                }
+
+
+                if (roomsInput) {
+
+                    previewRooms.textContent =
+                        roomsInput.value || "0";
+
+                }
+
+
+                if (bedroomsInput) {
+
+                    previewBedrooms.textContent =
+                        bedroomsInput.value || "0";
+
+                }
+
+
+                if (bathroomsInput) {
+
+                    previewBathrooms.textContent =
+                        bathroomsInput.value || "0";
+
+                }
+
+
+                if (descriptionInput &&
+                    descriptionCounter) {
+
+                    descriptionCounter.textContent =
+                        descriptionInput.value.length +
+                        " / 1000";
+
+                }
+
+            }
+
+
+            [
+                nameInput,
+                locationInput,
+                typeInput,
+                rentInput,
+                roomsInput,
+                bedroomsInput,
+                bathroomsInput,
+                descriptionInput
+            ].forEach(function (input) {
+
+                if (input) {
+
+                    input.addEventListener(
+                        "input",
+                        updatePreview
+                    );
+
+                    input.addEventListener(
+                        "change",
+                        updatePreview
+                    );
+
+                }
+
+            });
+
+
+            /* AVAILABILITY STATUS */
+
+            if (availableInput) {
+
+                availableInput.addEventListener(
+                    "change",
+                    function () {
+
+                        if (!statusText) {
+                            return;
+                        }
+
+                        statusText.textContent =
+                            this.checked
+                                ? "Residence is available"
+                                : "Residence is unavailable";
+
+                    }
+                );
+
+            }
+
+
+            /* IMAGE PREVIEW */
+
+            if (imageInput) {
+
+                imageInput.addEventListener(
+                    "change",
+                    function () {
+
+                        const file =
+                            this.files[0];
+
+                        if (!file) {
+
+                            previewContainer.style.display =
+                                "none";
+
+                            preview.src = "#";
+
+                            return;
+
+                        }
+
+
+                        const allowedTypes = [
+                            "image/jpeg",
+                            "image/png",
+                            "image/webp"
+                        ];
+
+
+                        if (!allowedTypes.includes(file.type)) {
+
+                            alert(
+                                "Please select a JPG, JPEG, PNG or WEBP image."
+                            );
+
+                            this.value = "";
+
+                            previewContainer.style.display =
+                                "none";
+
+                            return;
+
+                        }
+
+
+                        if (file.size > 5 * 1024 * 1024) {
+
+                            alert(
+                                "The selected image is larger than 5 MB."
+                            );
+
+                            this.value = "";
+
+                            previewContainer.style.display =
+                                "none";
+
+                            return;
+
+                        }
+
+
+                        const reader =
+                            new FileReader();
+
+
+                        reader.onload =
+                            function (event) {
+
+                                preview.src =
+                                    event.target.result;
+
+                                previewContainer.style.display =
+                                    "block";
+
+
+                                const miniImage =
+                                    document.getElementById(
+                                        "miniImage"
+                                    );
+
+                                if (miniImage) {
+
+                                    miniImage.style.backgroundImage =
+                                        "url('" +
+                                        event.target.result +
+                                        "')";
+
+                                    miniImage.classList.add(
+                                        "has-image"
+                                    );
+
+                                    const existing =
+                                        document.getElementById(
+                                            "miniImageElement"
+                                        );
+
+                                    if (existing) {
+                                        existing.style.display =
+                                            "none";
+                                    }
+
+                                }
+
+                            };
+
+
+                        reader.readAsDataURL(file);
+
+                    }
+                );
+
+            }
+
+
+            /*
+             * Prevent the administrator from entering
+             * fewer rooms than are currently occupied.
+             */
+
+            const occupiedRooms =
+                @occupiedRooms;
+
+            if (roomsInput) {
+
+                roomsInput.addEventListener(
+                    "change",
+                    function () {
+
+                        const value =
+                            parseInt(this.value || "0");
+
+                        if (value < occupiedRooms) {
+
+                            this.value =
+                                occupiedRooms;
+
+                        }
+
+                    }
+                );
+
+            }
+
+
+            updatePreview();
+
+        });
+
+    </script>
+}

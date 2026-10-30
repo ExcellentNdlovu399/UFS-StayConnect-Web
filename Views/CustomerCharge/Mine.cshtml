@@ -1,0 +1,18 @@
+@model IEnumerable<UFSStayConnect.Models.CustomerCharge>
+@{
+    ViewData["Title"]="My charges";
+}
+<div class="container py-4">
+ <div class="mb-4"><span class="text-uppercase small fw-bold text-primary">Billing</span><h1 class="h3">My assigned charges</h1><p class="text-muted">Charges assigned to your account by UFS StayConnect administration.</p></div>
+ @if(TempData["SuccessMessage"] is string ok){<div class="alert alert-success">@ok</div>}
+ @if(TempData["ErrorMessage"] is string err){<div class="alert alert-danger">@err</div>}
+ @{var all=Model.ToList(); var total=all.Sum(c=>Math.Max(0,c.Amount-c.Payments.Where(p=>p.PaymentStatus=="Paid").Sum(p=>p.Amount))); var due=all.Where(c=>c.DueDate.Date<DateTime.UtcNow.Date).Sum(c=>Math.Max(0,c.Amount-c.Payments.Where(p=>p.PaymentStatus=="Paid").Sum(p=>p.Amount))); }
+ <div class="row g-3 mb-4"><div class="col-12 col-md-6"><div class="rounded-4 p-4 text-white" style="background:#102b50"><div class="small opacity-75">Remaining balance</div><div class="display-6 fw-bold">R@total.ToString("N2")</div></div></div><div class="col-12 col-md-6"><div class="rounded-4 p-4 bg-light border"><div class="small text-muted">Overdue balance</div><div class="display-6 fw-bold text-danger">R@due.ToString("N2")</div></div></div></div>
+ @foreach(var c in all){var paid=c.Payments.Where(p=>p.PaymentStatus=="Paid").Sum(p=>p.Amount);var pending=c.Payments.Where(p=>p.PaymentStatus=="Pending").Sum(p=>p.Amount);var balance=Math.Max(0,c.Amount-paid-pending);var status=paid>=c.Amount?"Paid":pending>0?"Payment awaiting verification":c.DueDate.Date<DateTime.UtcNow.Date?"Overdue":"Unpaid";
+ <div class="card border-0 shadow-sm mb-3"><div class="card-body p-4"><div class="d-flex flex-wrap justify-content-between gap-3"><div><div class="small text-primary fw-bold">@c.PaymentType?.Name · @c.Accommodation?.Name</div><h2 class="h5 mt-1 mb-1">@c.Title</h2><p class="text-muted mb-2">@c.Description</p><small class="text-muted">Assigned @c.AssignedAt.ToLocalTime().ToString("dd MMM yyyy") · Due @c.DueDate.ToString("dd MMM yyyy")</small></div><div class="text-md-end"><div class="h4 mb-1">R@c.Amount.ToString("N2")</div><span class="badge @(paid>=c.Amount?"bg-success":pending>0?"bg-info text-dark":status=="Overdue"?"bg-danger":"bg-warning text-dark")">@status</span></div></div>
+ <hr/><div class="row g-2 small mb-3"><div class="col-6 col-md-4">Paid: <strong>R@paid.ToString("N2")</strong></div><div class="col-6 col-md-4">Awaiting verification: <strong>R@pending.ToString("N2")</strong></div><div class="col-12 col-md-4">Balance to submit: <strong>R@balance.ToString("N2")</strong></div></div>
+ @if(balance>0){<form asp-action="Pay" method="post" class="row g-2 align-items-end">@Html.AntiForgeryToken()<input type="hidden" name="id" value="@c.CustomerChargeID"/><div class="col-12 col-sm-3"><label class="form-label">Method</label><select class="form-select" name="paymentMethod"><option value="EFT">EFT / bank transfer</option><option value="Card">Card</option></select></div><div class="col-12 col-sm-6"><label class="form-label">Payment reference (for EFT)</label><input class="form-control" name="referenceNumber" maxlength="100" placeholder="Bank reference (optional)" /></div><div class="col-12 col-sm-3"><button class="btn btn-primary w-100" type="submit">Submit payment · R@balance.ToString("N2")</button></div><div class="col-12"><small class="text-muted">Submissions remain pending until a Financial Officer verifies them. Do not enter card numbers or CVV on this form.</small></div></form>}
+ </div></div>
+ }
+ @if(!all.Any()){<div class="alert alert-light border">No charges have been assigned to your account yet.</div>}
+</div>

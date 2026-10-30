@@ -1,0 +1,63 @@
+
+# Build outputs
+bin/
+obj/
+publish/
+artifacts/
+
+# Visual Studio
+.vs/
+*.user
+*.suo
+
+# Local configuration and secrets
+appsettings.Development.json
+appsettings.Production.json
+secrets.json
+
+# Environment files
+.env
+.env.*
+
+# Database files and backups
+*.mdf
+*.ldf
+*.bak
+*.bacpac
+
+# Logs
+*.log
+
+# Temporary files
+*.tmp
+*.temp
+
+# Published deployment packages
+app.zip
+publish/
+
+# Production configuration and secrets
+appsettings.Production.json
+
+# Publishing credentials
+Properties/PublishProfiles/*.pubxml
+
+# Local database files and backups
+*.mdf
+*.ldf
+*.bak
+*.bacpac
+
+
+# Private application configuration
+appsettings.json
+
+# Database scripts - review before publishing
+Database/
+
+# Duplicate view backup folder
+Properties/Views/
+
+# Deployment publishing profiles
+Properties/PublishProfiles/
+*.pubxml

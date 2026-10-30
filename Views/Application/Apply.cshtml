@@ -1,0 +1,2339 @@
+@model UFSStayConnect.ViewModels.ApplicationViewModel
+
+@{
+    ViewData["Title"] = "Accommodation Application";
+
+    var accommodation =
+        ViewBag.Accommodation as UFSStayConnect.Models.Accommodation;
+}
+
+<div class="stay-application-page">
+
+    <div class="container application-container">
+
+        <!-- =========================================================
+             PAGE HEADER
+             ========================================================= -->
+
+        <div class="application-top">
+
+            <a asp-controller="Accommodation"
+               asp-action="Index"
+               class="application-back">
+
+                <i class="fa-solid fa-arrow-left"></i>
+
+                Back to Accommodation
+
+            </a>
+
+            <div class="application-title">
+
+                <span>
+                    UFS STAYCONNECT
+                </span>
+
+                <h1>
+                    Accommodation Application
+                </h1>
+
+                <p>
+                    Complete the application below to request accommodation.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <!-- =========================================================
+             PROGRESS BAR
+             ========================================================= -->
+
+        <div class="application-progress-card">
+
+            <div class="progress-wrapper">
+
+                <div class="progress-step active"
+                     data-step-indicator="1">
+
+                    <div class="progress-number">
+                        1
+                    </div>
+
+                    <div class="progress-text">
+                        Personal
+                    </div>
+
+                </div>
+
+
+                <div class="progress-connector"></div>
+
+
+                <div class="progress-step"
+                     data-step-indicator="2">
+
+                    <div class="progress-number">
+                        2
+                    </div>
+
+                    <div class="progress-text">
+                        Accommodation
+                    </div>
+
+                </div>
+
+
+                <div class="progress-connector"></div>
+
+
+                <div class="progress-step"
+                     data-step-indicator="3">
+
+                    <div class="progress-number">
+                        3
+                    </div>
+
+                    <div class="progress-text">
+                        ID
+                    </div>
+
+                </div>
+
+
+                <div class="progress-connector"></div>
+
+
+                <div class="progress-step"
+                     data-step-indicator="4">
+
+                    <div class="progress-number">
+                        4
+                    </div>
+
+                    <div class="progress-text">
+                        @(string.Equals(Model.UserType, "Staff", StringComparison.OrdinalIgnoreCase) ? "Employment" : "Registration")
+                    </div>
+
+                </div>
+
+
+                <div class="progress-connector"></div>
+
+
+                <div class="progress-step"
+                     data-step-indicator="5">
+
+                    <div class="progress-number">
+                        5
+                    </div>
+
+                    <div class="progress-text">
+                        Review
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- =========================================================
+             VALIDATION
+             ========================================================= -->
+        @if (!ViewData.ModelState.IsValid)
+        {
+            <div class="application-error" role="alert">
+                <div class="error-icon">
+                    <i class="fa-solid fa-circle-exclamation"></i>
+                </div>
+
+                <div>
+                    <strong>Application could not be submitted</strong>
+
+                    <div asp-validation-summary="All"
+                         class="text-danger mt-2">
+                    </div>
+                </div>
+            </div>
+        }
+
+
+        <!-- =========================================================
+             MAIN FORM
+             ========================================================= -->
+
+        <form asp-controller="Application"
+              asp-action="Apply"
+              method="post"
+              enctype="multipart/form-data"
+              id="stayApplicationForm">
+
+            @Html.AntiForgeryToken()
+
+            <input type="hidden" asp-for="AccommodationID" />
+
+            <!-- Keep your existing five application steps here. -->
+
+            <!-- =====================================================
+                 STEP 1
+                 ===================================================== -->
+
+            <section class="application-step-panel active"
+                     data-step="1">
+
+                <div class="application-card">
+
+                    <div class="card-heading">
+
+                        <div class="heading-icon">
+
+                            <i class="fa-solid fa-user"></i>
+
+                        </div>
+
+                        <div>
+
+                            <div class="step-label">
+                                STEP 1 OF 5
+                            </div>
+
+                            <h2>
+                                Personal Information
+                            </h2>
+
+                            <p>
+                                Confirm the information associated with your account.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="heading-divider"></div>
+
+
+                    <div class="personal-grid">
+
+                        <div class="information-field">
+
+                            <label>
+                                Full Name
+                            </label>
+
+                            <div class="readonly-field">
+                                @Model.FullName
+                            </div>
+
+                        </div>
+
+
+                        <div class="information-field">
+
+                            <label>
+                                Student / Staff Number
+                            </label>
+
+                            <div class="readonly-field">
+                                @Model.StudentOrStaffNumber
+                            </div>
+
+                        </div>
+
+
+                        <div class="information-field">
+
+                            <label>
+                                Email Address
+                            </label>
+
+                            <div class="readonly-field">
+                                @Model.Email
+                            </div>
+
+                        </div>
+
+
+                        <div class="information-field">
+
+                            <label>
+                                Phone Number
+                            </label>
+
+                            <div class="readonly-field">
+                                @Model.PhoneNumber
+                            </div>
+
+                        </div>
+
+
+                        <div class="information-field">
+
+                            <label>
+                                User Type
+                            </label>
+
+                            <div class="readonly-field">
+                                @Model.UserType
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="notice-box">
+
+                        <i class="fa-solid fa-circle-info"></i>
+
+                        <div>
+
+                            <strong>
+                                Your information is automatically populated
+                            </strong>
+
+                            <p>
+                                This information comes directly from your
+                                StayConnect account and cannot be edited here.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="application-actions end">
+
+                        <button type="button"
+                                class="next-button"
+                                onclick="showStep(2)">
+
+                            Continue
+
+                            <i class="fa-solid fa-arrow-right"></i>
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- =====================================================
+                 STEP 2
+                 ===================================================== -->
+
+            <section class="application-step-panel"
+                     data-step="2">
+
+                <div class="application-card">
+
+                    <div class="card-heading">
+
+                        <div class="heading-icon accommodation-icon">
+
+                            <i class="fa-solid fa-building"></i>
+
+                        </div>
+
+                        <div>
+
+                            <div class="step-label">
+                                STEP 2 OF 5
+                            </div>
+
+                            <h2>
+                                Accommodation Details
+                            </h2>
+
+                            <p>
+                                Review the accommodation you selected.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="heading-divider"></div>
+
+
+                    @if (accommodation != null)
+                    {
+                        <div class="accommodation-card">
+
+                            <div class="accommodation-main">
+
+                                <div class="accommodation-building">
+
+                                    <i class="fa-solid fa-building"></i>
+
+                                </div>
+
+                                <div>
+
+                                    <span class="selected-caption">
+                                        SELECTED ACCOMMODATION
+                                    </span>
+
+                                    <h3>
+                                        @accommodation.Name
+                                    </h3>
+
+                                    <p>
+
+                                        <i class="fa-solid fa-location-dot"></i>
+
+                                        @accommodation.Location
+
+                                    </p>
+
+                                </div>
+
+                            </div>
+
+
+                            <div class="accommodation-details">
+
+                                <div>
+
+                                    <span>
+                                        Accommodation Type
+                                    </span>
+
+                                    <strong>
+                                        @accommodation.Type
+                                    </strong>
+
+                                </div>
+
+
+                                <div>
+
+                                    <span>
+                                        Bedrooms
+                                    </span>
+
+                                    <strong>
+                                        @accommodation.Bedrooms
+                                    </strong>
+
+                                </div>
+
+
+                                <div>
+
+                                    <span>
+                                        Bathrooms
+                                    </span>
+
+                                    <strong>
+                                        @accommodation.Bathrooms
+                                    </strong>
+
+                                </div>
+
+
+                                <div>
+
+                                    <span>
+                                        Monthly Rent
+                                    </span>
+
+                                    <strong class="rent-value">
+                                        R @(accommodation.MonthlyRent.ToString("N2"))
+                                    </strong>
+
+                                </div>
+
+                            </div>
+
+                            
+                            <div class="card border-0 shadow-sm mt-4 p-4">
+                                <h5 class="fw-bold mb-2">
+                                    <i class="fa-solid fa-car text-primary me-2"></i>
+                                    Parking Registration
+                                </h5>
+
+                                <p class="text-muted small mb-3">
+                                    Tell us how many cars you intend to register for this accommodation.
+                                    Select 0 if you do not need parking.
+                                </p>
+
+                                <div class="row align-items-end g-3">
+                                    <div class="col-md-6">
+                                        <label asp-for="NumberOfVehicles"
+                                               class="form-label fw-semibold"></label>
+
+                                        <select asp-for="NumberOfVehicles"
+                                                class="form-select"
+                                                id="NumberOfVehicles">
+                                            @for (var i = 0; i <= 10; i++)
+                                            {
+                                                <option value="@i">
+                                                    @(i == 0 ? "0 cars — No parking required" :
+                                                      i == 1 ? "1 car" : $"{i} cars")
+                                                </option>
+                                            }
+                                        </select>
+
+                                        <span asp-validation-for="NumberOfVehicles"
+                                              class="text-danger small"></span>
+                                    </div>
+
+                                </div>
+                            </div>
+
+
+                        </div>
+
+
+                        <div class="card border-0 shadow-sm mt-4 p-4">
+                            <h5 class="fw-bold mb-3"><i class="fa-solid fa-bolt text-primary me-2"></i>Services & Facilities</h5>
+                            <div class="row g-2">
+                                @foreach (var service in accommodation.AccommodationServices.Where(x => x.Service != null))
+                                {
+                                    <div class="col-md-6"><div class="p-2 rounded bg-light"><i class="fa-solid fa-circle-check text-success me-2"></i>@service.Service!.ServiceName</div></div>
+                                }
+                            </div>
+                            @if (!accommodation.AccommodationServices.Any())
+                            {
+                                <div class="text-muted small">No additional services have been configured for this residence.</div>
+                            }
+                        </div>
+
+                        <div class="alert alert-info border-0 mt-3 mb-0">
+                            <i class="fa-solid fa-circle-info me-2"></i>
+                            <strong>Additional services are pay-as-you-go.</strong>
+                            Only monthly rent is shown as a fixed amount on this application.
+                            Other service charges are calculated later from actual recorded usage and the rates configured for this accommodation.
+                        </div>
+
+                        <div class="rooms-available">
+
+                            <div>
+
+                                <i class="fa-solid fa-circle-check"></i>
+
+                            </div>
+
+                            <div>
+
+                                <strong>
+                                    @accommodation.AvailableRooms
+                                    rooms currently available
+                                </strong>
+
+                                <p>
+                                    Submitting an application does not reserve
+                                    a room. A room is allocated only after
+                                    administrator approval.
+                                </p>
+
+                            </div>
+
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="application-error">
+
+                            <i class="fa-solid fa-triangle-exclamation"></i>
+
+                            Accommodation information could not be loaded.
+
+                        </div>
+                    }
+
+
+                    <div class="application-actions">
+
+                        <button type="button"
+                                class="back-button"
+                                onclick="showStep(1)">
+
+                            <i class="fa-solid fa-arrow-left"></i>
+
+                            Back
+
+                        </button>
+
+
+                        <button type="button"
+                                class="next-button"
+                                onclick="showStep(3)">
+
+                            Continue
+
+                            <i class="fa-solid fa-arrow-right"></i>
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- =====================================================
+                 STEP 3
+                 ===================================================== -->
+
+            <section class="application-step-panel"
+                     data-step="3">
+
+                <div class="application-card document-card">
+
+                    <div class="card-heading">
+
+                        <div class="heading-icon document-red">
+
+                            <i class="fa-solid fa-id-card"></i>
+
+                        </div>
+
+                        <div>
+
+                            <div class="step-label">
+                                STEP 3 OF 5
+                            </div>
+
+                            <h2>
+                                Certified Copy of ID
+                            </h2>
+
+                            <p>
+                                Upload a certified copy of your identification document.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="heading-divider"></div>
+
+
+                    <div class="document-requirement">
+
+                        <div class="requirement-icon">
+
+                            <i class="fa-solid fa-file-pdf"></i>
+
+                        </div>
+
+                        <div>
+
+                            <strong>
+                                Certified Copy of ID
+                            </strong>
+
+                            <span>
+                                PDF format only · Maximum file size: 5 MB
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="upload-area">
+
+                        <i class="fa-solid fa-cloud-arrow-up"></i>
+
+                        <h3>
+                            Upload your certified ID
+                        </h3>
+
+                        <p>
+                            Select the PDF document from your computer.
+                        </p>
+
+
+                        <label class="file-button">
+
+                            <i class="fa-solid fa-folder-open"></i>
+
+                            Choose PDF
+
+                            <input asp-for="IDDocument"
+                                   type="file"
+                                   accept=".pdf,application/pdf"
+                                   onchange="handleFile(this, 'idFileName')" />
+
+                        </label>
+
+
+                        <div id="idFileName"
+                             class="selected-file">
+                        </div>
+
+                    </div>
+
+
+                    <span asp-validation-for="IDDocument"
+                          class="validation-message">
+                    </span>
+
+
+                    <div class="application-actions">
+
+                        <button type="button"
+                                class="back-button"
+                                onclick="showStep(2)">
+
+                            <i class="fa-solid fa-arrow-left"></i>
+
+                            Back
+
+                        </button>
+
+
+                        <button type="button"
+                                class="next-button"
+                                onclick="checkFile('IDDocument', 4)">
+
+                            Continue
+
+                            <i class="fa-solid fa-arrow-right"></i>
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- =====================================================
+                 STEP 4
+                 ===================================================== -->
+
+            <section class="application-step-panel"
+                     data-step="4">
+
+                <div class="application-card document-card">
+
+                    <div class="card-heading">
+
+                        <div class="heading-icon document-red">
+
+                            @if (string.Equals(Model.UserType, "Staff", StringComparison.OrdinalIgnoreCase))
+                            {
+                                <i class="fa-solid fa-briefcase"></i>
+                            }
+                            else
+                            {
+                                <i class="fa-solid fa-graduation-cap"></i>
+                            }
+
+                        </div>
+
+                        <div>
+
+                            <div class="step-label">
+                                STEP 4 OF 5
+                            </div>
+
+                            @if (string.Equals(Model.UserType, "Staff", StringComparison.OrdinalIgnoreCase))
+                            {
+                                <h2>Proof of Employment</h2>
+                                <p>Upload proof that you are currently employed.</p>
+                            }
+                            else
+                            {
+                                <h2>Proof of Registration</h2>
+                                <p>Upload your current UFS proof of registration.</p>
+                            }
+
+                        </div>
+
+                    </div>
+
+                    <div class="heading-divider"></div>
+
+                    <div class="document-requirement">
+
+                        <div class="requirement-icon">
+                            <i class="fa-solid fa-file-pdf"></i>
+                        </div>
+
+                        <div>
+                            @if (string.Equals(Model.UserType, "Staff", StringComparison.OrdinalIgnoreCase))
+                            {
+                                <strong>Proof of Employment</strong>
+                                <span>PDF format only · Maximum file size: 5 MB</span>
+                            }
+                            else
+                            {
+                                <strong>Proof of Registration</strong>
+                                <span>PDF format only · Maximum file size: 5 MB</span>
+                            }
+                        </div>
+
+                    </div>
+
+                    <div class="upload-area">
+
+                        <i class="fa-solid fa-cloud-arrow-up"></i>
+
+                        @if (string.Equals(Model.UserType, "Staff", StringComparison.OrdinalIgnoreCase))
+                        {
+                            <h3>Upload proof of employment</h3>
+                            <p>Select your current employment confirmation PDF.</p>
+
+                            <label class="file-button">
+                                <i class="fa-solid fa-folder-open"></i>
+                                Choose PDF
+                                <input asp-for="EmploymentDocument"
+                                       type="file"
+                                       accept=".pdf,application/pdf"
+                                       onchange="handleFile(this, 'employmentFileName')" />
+                            </label>
+
+                            <div id="employmentFileName" class="selected-file"></div>
+                        }
+                        else
+                        {
+                            <h3>Upload proof of registration</h3>
+                            <p>Select your current UFS registration PDF.</p>
+
+                            <label class="file-button">
+                                <i class="fa-solid fa-folder-open"></i>
+                                Choose PDF
+                                <input asp-for="RegistrationDocument"
+                                       type="file"
+                                       accept=".pdf,application/pdf"
+                                       onchange="handleFile(this, 'registrationFileName')" />
+                            </label>
+
+                            <div id="registrationFileName" class="selected-file"></div>
+                        }
+
+                    </div>
+
+                    @if (string.Equals(Model.UserType, "Staff", StringComparison.OrdinalIgnoreCase))
+                    {
+                        <span asp-validation-for="EmploymentDocument" class="validation-message"></span>
+                    }
+                    else
+                    {
+                        <span asp-validation-for="RegistrationDocument" class="validation-message"></span>
+                    }
+
+                    <div class="notice-box">
+                        <i class="fa-solid fa-lock"></i>
+                        <div>
+                            <strong>Your documents are securely submitted</strong>
+                            <p>
+                                Only documents relevant to your applicant type are required.
+                                Funding documentation is not required.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="application-actions">
+
+                        <button type="button"
+                                class="back-button"
+                                onclick="showStep(3)">
+                            <i class="fa-solid fa-arrow-left"></i>
+                            Back
+                        </button>
+
+                        <button type="button"
+                                class="next-button"
+                                onclick="checkApplicantDocument()">
+                            Review Application
+                            <i class="fa-solid fa-arrow-right"></i>
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- =====================================================
+                 STEP 5
+                 ===================================================== -->
+
+            <section class="application-step-panel"
+                     data-step="5">
+
+                <div class="application-card">
+
+                    <div class="card-heading">
+
+                        <div class="heading-icon success-green">
+                            <i class="fa-solid fa-clipboard-check"></i>
+                        </div>
+
+                        <div>
+                            <div class="step-label">STEP 5 OF 5</div>
+                            <h2>Review Application</h2>
+                            <p>Check your information and documents before submitting.</p>
+                        </div>
+
+                    </div>
+
+                    <div class="heading-divider"></div>
+
+                    <div class="review-section">
+                        <div class="review-header">
+                            <div>
+                                <i class="fa-solid fa-user"></i>
+                                <strong>Personal Information</strong>
+                            </div>
+                            <button type="button" onclick="showStep(1)">Edit</button>
+                        </div>
+
+                        <div class="review-grid">
+                            <div><span>Full Name</span><strong>@Model.FullName</strong></div>
+                            <div><span>Student / Staff Number</span><strong>@Model.StudentOrStaffNumber</strong></div>
+                            <div><span>Email</span><strong>@Model.Email</strong></div>
+                            <div><span>Phone Number</span><strong>@Model.PhoneNumber</strong></div>
+                        </div>
+                    </div>
+
+                    <div class="review-section">
+                        <div class="review-header">
+                            <div>
+                                <i class="fa-solid fa-building"></i>
+                                <strong>Accommodation</strong>
+                            </div>
+                            <button type="button" onclick="showStep(2)">Edit</button>
+                        </div>
+
+                        @if (accommodation != null)
+                        {
+                            <div class="review-accommodation">
+                                <strong>@accommodation.Name</strong>
+                                <span><i class="fa-solid fa-location-dot"></i> @accommodation.Location</span>
+                                <div>
+                                    @accommodation.Type · @accommodation.Bedrooms bedrooms · @accommodation.Bathrooms bathrooms · R @(accommodation.MonthlyRent.ToString("N2")) / month
+                                </div>
+                            </div>
+                        }
+                    </div>
+
+                    <div class="review-section">
+                        <div class="review-header">
+                            <div>
+                                <i class="fa-solid fa-folder-open"></i>
+                                <strong>Supporting Documents</strong>
+                            </div>
+                            <button type="button" onclick="showStep(3)">Edit</button>
+                        </div>
+
+                        <div class="review-document">
+                            <div>
+                                <i class="fa-solid fa-id-card"></i>
+                                <span>Certified Copy of ID</span>
+                            </div>
+                            <strong id="reviewId">Not selected</strong>
+                        </div>
+
+                        @if (string.Equals(Model.UserType, "Staff", StringComparison.OrdinalIgnoreCase))
+                        {
+                            <div class="review-document">
+                                <div>
+                                    <i class="fa-solid fa-briefcase"></i>
+                                    <span>Proof of Employment</span>
+                                </div>
+                                <strong id="reviewEmployment">Not selected</strong>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="review-document">
+                                <div>
+                                    <i class="fa-solid fa-graduation-cap"></i>
+                                    <span>Proof of Registration</span>
+                                </div>
+                                <strong id="reviewRegistration">Not selected</strong>
+                            </div>
+                        }
+                    </div>
+
+                    <div class="submission-box">
+                        <div class="submission-icon">
+                            <i class="fa-solid fa-circle-info"></i>
+                        </div>
+                        <div>
+                            <strong>What happens after submission?</strong>
+                            <p>
+                                Your application will be submitted with <strong>Pending</strong> status.
+                                An administrator will review your application and supporting documents before making a decision.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="application-actions">
+                        <button type="button" class="back-button" onclick="showStep(4)">
+                            <i class="fa-solid fa-arrow-left"></i>
+                            Back
+                        </button>
+
+                        <div class="alert alert-info border-0 mb-3">
+                            <div class="d-flex gap-3 align-items-start">
+                                <i class="fa-solid fa-shield-halved mt-1"></i>
+                                <div>
+                                    <strong>Application declaration</strong>
+                                    <p class="mb-0 small">
+                                        I confirm that the information and documents submitted are accurate and belong to me.
+                                        I understand that submitting an application does not reserve a room and that I may apply to multiple residences until one application is approved.
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="form-check mt-3">
+                                <input asp-for="DeclarationAccepted" class="form-check-input" />
+                                <label asp-for="DeclarationAccepted" class="form-check-label fw-semibold">
+                                    I accept this declaration and want to submit my application.
+                                </label>
+                                <div><span asp-validation-for="DeclarationAccepted" class="text-danger small"></span></div>
+                            </div>
+                        </div>
+
+                        <button type="submit"
+                                id="submitApplicationButton"
+                                class="submit-button">
+                            <i class="fa-solid fa-paper-plane me-2"></i>
+                            Submit Application
+                        </button>
+                    </div>
+
+                </div>
+
+            </section>
+
+        </form>
+
+    </div>
+
+</div>
+
+
+<style>
+
+    /* =========================================================
+               PAGE
+               ========================================================= */
+
+    .stay-application-page {
+        min-height: calc(100vh - 70px);
+        background: #f5f7fa;
+        padding: 35px 0 70px;
+    }
+
+
+    .application-container {
+        max-width: 1000px;
+    }
+
+
+    /* =========================================================
+               HEADER
+               ========================================================= */
+
+    .application-back {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        color: #64748b;
+        text-decoration: none;
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+
+        .application-back:hover {
+            color: #1769e0;
+        }
+
+
+    .application-title {
+        margin-top: 24px;
+        margin-bottom: 25px;
+    }
+
+
+        .application-title span {
+            color: #1769e0;
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: 1.5px;
+        }
+
+
+        .application-title h1 {
+            color: #13263f;
+            font-size: 31px;
+            font-weight: 700;
+            margin: 5px 0 7px;
+        }
+
+
+        .application-title p {
+            color: #718096;
+            font-size: 14px;
+            margin: 0;
+        }
+
+
+    /* =========================================================
+               PROGRESS
+               ========================================================= */
+
+    .application-progress-card {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 22px 25px;
+        margin-bottom: 22px;
+    }
+
+
+    .progress-wrapper {
+        display: flex;
+        align-items: flex-start;
+    }
+
+
+    .progress-step {
+        width: 82px;
+        min-width: 82px;
+        text-align: center;
+        color: #94a0ae;
+    }
+
+
+    .progress-number {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        margin: 0 auto 7px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #eef2f6;
+        border: 2px solid #eef2f6;
+        color: #778392;
+        font-size: 12px;
+        font-weight: 700;
+    }
+
+
+    .progress-text {
+        font-size: 10px;
+        font-weight: 700;
+        white-space: nowrap;
+    }
+
+
+    .progress-step.active {
+        color: #1769e0;
+    }
+
+
+        .progress-step.active .progress-number {
+            background: #1769e0;
+            border-color: #1769e0;
+            color: white;
+            box-shadow: 0 4px 12px rgba(23, 105, 224, .20);
+        }
+
+
+    .progress-step.completed {
+        color: #16804b;
+    }
+
+
+        .progress-step.completed .progress-number {
+            background: #eaf7f0;
+            border-color: #16804b;
+            color: #16804b;
+        }
+
+
+    .progress-connector {
+        flex: 1;
+        height: 2px;
+        background: #e6ebf1;
+        margin-top: 17px;
+    }
+
+
+        .progress-connector.completed {
+            background: #16804b;
+        }
+
+
+    /* =========================================================
+               ERROR
+               ========================================================= */
+
+    .application-error {
+        display: flex;
+        gap: 12px;
+        align-items: flex-start;
+        padding: 15px 17px;
+        margin-bottom: 20px;
+        border-radius: 9px;
+        background: #fff1f1;
+        border: 1px solid #f2cccc;
+        color: #9b2c2c;
+        font-size: 13px;
+    }
+
+
+    .error-icon {
+        font-size: 17px;
+    }
+
+
+    .application-error strong {
+        display: block;
+        margin-bottom: 4px;
+    }
+
+
+    .application-error ul {
+        margin: 0;
+        padding-left: 18px;
+    }
+
+
+    /* =========================================================
+               STEP PANELS
+               ========================================================= */
+
+    .application-step-panel {
+        display: none;
+    }
+
+
+        .application-step-panel.active {
+            display: block;
+        }
+
+
+    .application-card {
+        background: white;
+        border: 1px solid #e1e7ee;
+        border-radius: 13px;
+        padding: 34px;
+        box-shadow: 0 5px 20px rgba(20, 40, 65, .045);
+    }
+
+
+    /* =========================================================
+               CARD HEADING
+               ========================================================= */
+
+    .card-heading {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
+
+
+    .heading-icon {
+        width: 51px;
+        height: 51px;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 10px;
+        background: #edf4ff;
+        color: #1769e0;
+        font-size: 19px;
+    }
+
+
+        .heading-icon.accommodation-icon {
+            background: #eef5ff;
+            color: #1769e0;
+        }
+
+
+        .heading-icon.document-red {
+            background: #fff1f1;
+            color: #d34848;
+        }
+
+
+        .heading-icon.success-green {
+            background: #eaf8f0;
+            color: #16804b;
+        }
+
+
+    .step-label {
+        color: #1769e0;
+        font-size: 9px;
+        font-weight: 800;
+        letter-spacing: 1.2px;
+        margin-bottom: 4px;
+    }
+
+
+    .card-heading h2 {
+        color: #172b45;
+        font-size: 21px;
+        font-weight: 700;
+        margin: 0;
+    }
+
+
+    .card-heading p {
+        color: #7b8796;
+        font-size: 12px;
+        margin: 5px 0 0;
+    }
+
+
+    .heading-divider {
+        height: 1px;
+        background: #edf1f5;
+        margin: 30px 0;
+    }
+
+
+    /* =========================================================
+               PERSONAL INFORMATION
+               ========================================================= */
+
+    .personal-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 22px;
+    }
+
+
+    .information-field label {
+        display: block;
+        color: #475569;
+        font-size: 12px;
+        font-weight: 700;
+        margin-bottom: 7px;
+    }
+
+
+    .readonly-field {
+        min-height: 45px;
+        display: flex;
+        align-items: center;
+        padding: 10px 13px;
+        background: #f8fafc;
+        border: 1px solid #e1e7ee;
+        border-radius: 7px;
+        color: #334155;
+        font-size: 13px;
+    }
+
+
+    .notice-box {
+        display: flex;
+        gap: 12px;
+        margin-top: 25px;
+        padding: 15px;
+        background: #f3f7fc;
+        border: 1px solid #dce7f3;
+        border-radius: 8px;
+    }
+
+
+        .notice-box > i {
+            color: #1769e0;
+            margin-top: 2px;
+        }
+
+
+        .notice-box strong {
+            display: block;
+            color: #334155;
+            font-size: 12px;
+            margin-bottom: 4px;
+        }
+
+
+        .notice-box p {
+            color: #68788a;
+            font-size: 11px;
+            line-height: 1.6;
+            margin: 0;
+        }
+
+
+    /* =========================================================
+               ACCOMMODATION
+               ========================================================= */
+
+    .accommodation-card {
+        border: 1px solid #dce5ef;
+        border-radius: 10px;
+        background: #f9fbfd;
+        overflow: hidden;
+    }
+
+
+    .accommodation-main {
+        display: flex;
+        align-items: center;
+        gap: 17px;
+        padding: 23px;
+    }
+
+
+    .accommodation-building {
+        width: 58px;
+        height: 58px;
+        flex-shrink: 0;
+        border-radius: 9px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #eaf2ff;
+        color: #1769e0;
+        font-size: 23px;
+    }
+
+
+    .selected-caption {
+        display: block;
+        color: #1769e0;
+        font-size: 9px;
+        font-weight: 800;
+        letter-spacing: 1px;
+        margin-bottom: 3px;
+    }
+
+
+    .accommodation-main h3 {
+        color: #172b45;
+        font-size: 18px;
+        margin: 0 0 4px;
+    }
+
+
+    .accommodation-main p {
+        color: #7a8796;
+        font-size: 12px;
+        margin: 0;
+    }
+
+
+    .accommodation-details {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        border-top: 1px solid #e1e8ef;
+    }
+
+
+        .accommodation-details > div {
+            padding: 17px 20px;
+            border-right: 1px solid #e1e8ef;
+        }
+
+
+            .accommodation-details > div:last-child {
+                border-right: none;
+            }
+
+
+        .accommodation-details span {
+            display: block;
+            color: #8a96a4;
+            font-size: 9px;
+            margin-bottom: 4px;
+        }
+
+
+        .accommodation-details strong {
+            color: #334155;
+            font-size: 12px;
+        }
+
+
+        .accommodation-details .rent-value {
+            color: #1769e0;
+        }
+
+
+    .rooms-available {
+        display: flex;
+        gap: 11px;
+        margin-top: 17px;
+        padding: 14px 15px;
+        background: #edf9f2;
+        border: 1px solid #cee9d9;
+        border-radius: 8px;
+    }
+
+
+        .rooms-available > div:first-child {
+            color: #16804b;
+        }
+
+
+        .rooms-available strong {
+            display: block;
+            color: #256046;
+            font-size: 12px;
+        }
+
+
+        .rooms-available p {
+            color: #648071;
+            font-size: 11px;
+            margin: 3px 0 0;
+        }
+
+
+    /* =========================================================
+               DOCUMENTS
+               ========================================================= */
+
+    .document-requirement {
+        display: flex;
+        align-items: center;
+        gap: 13px;
+        padding: 14px;
+        background: #f8fafc;
+        border-radius: 8px;
+        margin-bottom: 25px;
+    }
+
+
+    .requirement-icon {
+        width: 43px;
+        height: 43px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #fff0f0;
+        color: #d34848;
+        border-radius: 8px;
+        font-size: 18px;
+    }
+
+
+    .document-requirement strong {
+        display: block;
+        color: #334155;
+        font-size: 12px;
+    }
+
+
+    .document-requirement span {
+        display: block;
+        color: #8995a3;
+        font-size: 10px;
+        margin-top: 3px;
+    }
+
+
+    .upload-area {
+        border: 2px dashed #d0dbe7;
+        border-radius: 10px;
+        padding: 48px 20px;
+        text-align: center;
+        background: #fcfdff;
+    }
+
+
+        .upload-area > i {
+            color: #1769e0;
+            font-size: 37px;
+            margin-bottom: 13px;
+        }
+
+
+        .upload-area h3 {
+            color: #334155;
+            font-size: 16px;
+            margin: 0 0 5px;
+        }
+
+
+        .upload-area p {
+            color: #8a96a4;
+            font-size: 11px;
+            margin: 0 0 19px;
+        }
+
+
+    .file-button {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 17px;
+        background: #1769e0;
+        color: white;
+        border-radius: 7px;
+        font-size: 11px;
+        font-weight: 700;
+        cursor: pointer;
+    }
+
+
+        .file-button:hover {
+            background: #0f55bd;
+        }
+
+
+        .file-button input {
+            display: none;
+        }
+
+
+    .selected-file {
+        min-height: 18px;
+        margin-top: 14px;
+        color: #16804b;
+        font-size: 11px;
+        font-weight: 700;
+    }
+
+
+    .validation-message {
+        display: block;
+        color: #c03939;
+        font-size: 11px;
+        margin-top: 8px;
+    }
+
+
+    /* =========================================================
+               REVIEW
+               ========================================================= */
+
+    .review-section {
+        padding: 23px 0;
+        border-bottom: 1px solid #edf1f5;
+    }
+
+
+        .review-section:first-child {
+            padding-top: 0;
+        }
+
+
+    .review-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 17px;
+    }
+
+
+        .review-header > div {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #334155;
+            font-size: 13px;
+        }
+
+
+        .review-header i {
+            color: #1769e0;
+        }
+
+
+        .review-header button {
+            border: none;
+            background: none;
+            color: #1769e0;
+            font-size: 11px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+
+    .review-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 18px;
+    }
+
+
+        .review-grid span {
+            display: block;
+            color: #8b96a3;
+            font-size: 9px;
+            margin-bottom: 4px;
+        }
+
+
+        .review-grid strong {
+            color: #334155;
+            font-size: 12px;
+        }
+
+
+    .review-accommodation {
+        padding: 15px;
+        background: #f8fafc;
+        border-radius: 8px;
+    }
+
+
+        .review-accommodation strong {
+            display: block;
+            color: #334155;
+            font-size: 13px;
+            margin-bottom: 4px;
+        }
+
+
+        .review-accommodation span {
+            display: block;
+            color: #64748b;
+            font-size: 11px;
+            margin-bottom: 5px;
+        }
+
+
+        .review-accommodation > div {
+            color: #7b8796;
+            font-size: 10px;
+        }
+
+
+    .review-document {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 15px;
+        padding: 12px 14px;
+        margin-bottom: 8px;
+        background: #f8fafc;
+        border-radius: 7px;
+    }
+
+
+        .review-document > div {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #475569;
+            font-size: 11px;
+        }
+
+
+        .review-document i {
+            color: #16804b;
+        }
+
+
+        .review-document strong {
+            max-width: 300px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            color: #64748b;
+            font-size: 10px;
+        }
+
+
+    .submission-box {
+        display: flex;
+        gap: 12px;
+        margin-top: 23px;
+        padding: 16px;
+        background: #fff9e8;
+        border: 1px solid #f0dfa9;
+        border-radius: 8px;
+    }
+
+
+    .submission-icon {
+        color: #b77900;
+    }
+
+
+    .submission-box strong {
+        color: #725817;
+        font-size: 12px;
+    }
+
+
+    .submission-box p {
+        color: #7d6b39;
+        font-size: 11px;
+        line-height: 1.6;
+        margin: 4px 0 0;
+    }
+
+
+    /* =========================================================
+               ACTIONS
+               ========================================================= */
+
+    .application-actions {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 15px;
+        margin-top: 30px;
+        padding-top: 24px;
+        border-top: 1px solid #edf1f5;
+    }
+
+
+        .application-actions.end {
+            justify-content: flex-end;
+        }
+
+
+    .back-button,
+    .next-button,
+    .submit-button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        min-height: 42px;
+        padding: 9px 19px;
+        border-radius: 7px;
+        font-size: 12px;
+        font-weight: 700;
+        cursor: pointer;
+    }
+
+
+    .back-button {
+        background: white;
+        border: 1px solid #d2dae3;
+        color: #5d6b7b;
+    }
+
+
+        .back-button:hover {
+            background: #f8fafc;
+        }
+
+
+    .next-button,
+    .submit-button {
+        background: #1769e0;
+        border: 1px solid #1769e0;
+        color: white;
+    }
+
+
+        .next-button:hover,
+        .submit-button:hover {
+            background: #0f55bd;
+            border-color: #0f55bd;
+        }
+
+
+    .submit-button {
+        padding-left: 25px;
+        padding-right: 25px;
+    }
+
+
+    /* =========================================================
+               RESPONSIVE
+               ========================================================= */
+
+    @@media (max-width: 850px) {
+
+        .progress-wrapper {
+            overflow-x: auto;
+        }
+
+
+        .progress-step {
+            min-width: 75px;
+        }
+
+
+        .progress-connector {
+            min-width: 18px;
+        }
+
+
+        .accommodation-details {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+
+            .accommodation-details > div:nth-child(2) {
+                border-right: none;
+            }
+    }
+
+
+    @@media (max-width: 650px) {
+
+        .stay-application-page {
+            padding-top: 20px;
+        }
+
+
+        .application-card {
+            padding: 22px;
+        }
+
+
+        .application-title h1 {
+            font-size: 25px;
+        }
+
+
+        .personal-grid {
+            grid-template-columns: 1fr;
+        }
+
+
+        .review-grid {
+            grid-template-columns: 1fr;
+        }
+
+
+        .accommodation-main {
+            align-items: flex-start;
+        }
+
+
+        .accommodation-details {
+            grid-template-columns: 1fr 1fr;
+        }
+
+
+        .application-actions {
+            flex-direction: column-reverse;
+        }
+
+
+            .application-actions.end {
+                flex-direction: row;
+            }
+
+
+        .back-button,
+        .next-button,
+        .submit-button {
+            width: 100%;
+        }
+
+
+        .application-actions.end .next-button {
+            width: auto;
+        }
+    }
+</style>
+
+
+@section Scripts {
+
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+
+        let currentStep = 1;
+
+
+        // =========================================================
+        // SHOW STEP
+        // =========================================================
+
+        function showStep(step) {
+
+            document
+                .querySelectorAll(".application-step-panel")
+                .forEach(panel => {
+
+                    panel.classList.remove("active");
+
+                });
+
+
+            const selectedPanel =
+                document.querySelector(
+                    `.application-step-panel[data-step="${step}"]`
+                );
+
+
+            if (selectedPanel) {
+
+                selectedPanel.classList.add("active");
+
+            }
+
+
+            // Update progress indicators
+
+            document
+                .querySelectorAll(".progress-step")
+                .forEach(indicator => {
+
+                    const number =
+                        parseInt(
+                            indicator.getAttribute(
+                                "data-step-indicator"
+                            )
+                        );
+
+
+                    indicator.classList.remove(
+                        "active",
+                        "completed"
+                    );
+
+
+                    if (number === step) {
+
+                        indicator.classList.add("active");
+
+                    }
+                    else if (number < step) {
+
+                        indicator.classList.add("completed");
+
+                    }
+
+                });
+
+
+            // Update connectors
+
+            document
+                .querySelectorAll(".progress-connector")
+                .forEach((connector, index) => {
+
+                    if (index < step - 1) {
+
+                        connector.classList.add("completed");
+
+                    }
+                    else {
+
+                        connector.classList.remove("completed");
+
+                    }
+
+                });
+
+
+            currentStep = step;
+
+
+            updateReview();
+
+
+            window.scrollTo({
+                top: 0,
+                behavior: "smooth"
+            });
+
+        }
+
+
+        // =========================================================
+        // CHECK FILE
+        // =========================================================
+
+        function checkFile(inputName, nextStep) {
+
+            const input =
+                document.querySelector(
+                    `[name="${inputName}"]`
+                );
+
+
+            if (!input ||
+                !input.files ||
+                input.files.length === 0) {
+
+                alert(
+                    "Please select the required PDF document before continuing."
+                );
+
+                return;
+
+            }
+
+
+            const file =
+                input.files[0];
+
+
+            const extension =
+                file.name
+                    .toLowerCase()
+                    .substring(
+                        file.name.lastIndexOf(".")
+                    );
+
+
+            if (extension !== ".pdf") {
+
+                alert(
+                    "Only PDF documents are allowed."
+                );
+
+                return;
+
+            }
+
+
+            if (file.size > 5 * 1024 * 1024) {
+
+                alert(
+                    "The selected PDF cannot be larger than 5 MB."
+                );
+
+                return;
+
+            }
+
+
+            showStep(nextStep);
+
+        }
+
+
+        // =========================================================
+        // HANDLE FILE
+        // =========================================================
+
+        function handleFile(input, displayId) {
+
+            const display =
+                document.getElementById(displayId);
+
+
+            if (!display) {
+                return;
+            }
+
+
+            if (!input.files ||
+                input.files.length === 0) {
+
+                display.innerHTML = "";
+
+                return;
+
+            }
+
+
+            const file =
+                input.files[0];
+
+
+            if (!file.name
+                .toLowerCase()
+                .endsWith(".pdf")) {
+
+                display.innerHTML =
+                    `<span style="color:#c03939;">
+                        <i class="fa-solid fa-circle-exclamation"></i>
+                        Please select a PDF file.
+                    </span>`;
+
+                return;
+
+            }
+
+
+            if (file.size > 5 * 1024 * 1024) {
+
+                display.innerHTML =
+                    `<span style="color:#c03939;">
+                        <i class="fa-solid fa-circle-exclamation"></i>
+                        File exceeds the 5 MB limit.
+                    </span>`;
+
+                return;
+
+            }
+
+
+            display.innerHTML =
+                `<i class="fa-solid fa-circle-check"></i>
+                 ${escapeHtml(file.name)}
+                 · ${formatFileSize(file.size)}`;
+
+
+            updateReview();
+
+        }
+
+
+        // =========================================================
+        // REVIEW
+        // =========================================================
+
+        function checkApplicantDocument() {
+
+            const isStaff =
+                '@Model.UserType'.toLowerCase() === 'staff';
+
+            const inputName =
+                isStaff ? 'EmploymentDocument' : 'RegistrationDocument';
+
+            const input =
+                document.querySelector(`[name="${inputName}"]`);
+
+            if (!input ||
+                !input.files ||
+                input.files.length === 0) {
+
+                alert(
+                    isStaff
+                        ? 'Please select your proof of employment before continuing.'
+                        : 'Please select your proof of registration before continuing.'
+                );
+
+                return;
+            }
+
+            const file = input.files[0];
+
+            if (!file.name.toLowerCase().endsWith('.pdf')) {
+
+                alert('Only PDF documents are allowed.');
+
+                return;
+            }
+
+            if (file.size > 5 * 1024 * 1024) {
+
+                alert('The selected PDF cannot be larger than 5 MB.');
+
+                return;
+            }
+
+            showStep(5);
+        }
+
+        
+        // =========================================================
+        // REVIEW
+        // =========================================================
+
+        function updateReview() {
+
+            const idInput = document.querySelector('[name="IDDocument"]');
+            const registrationInput = document.querySelector('[name="RegistrationDocument"]');
+            const employmentInput = document.querySelector('[name="EmploymentDocument"]');
+
+            const reviewId = document.getElementById('reviewId');
+            const reviewRegistration = document.getElementById('reviewRegistration');
+            const reviewEmployment = document.getElementById('reviewEmployment');
+
+            if (idInput && idInput.files && idInput.files.length > 0 && reviewId) {
+                reviewId.textContent = idInput.files[0].name;
+            }
+
+            if (registrationInput && registrationInput.files && registrationInput.files.length > 0 && reviewRegistration) {
+                reviewRegistration.textContent = registrationInput.files[0].name;
+            }
+
+            if (employmentInput && employmentInput.files && employmentInput.files.length > 0 && reviewEmployment) {
+                reviewEmployment.textContent = employmentInput.files[0].name;
+            }
+        }
+
+
+        // =========================================================
+        // FILE SIZE
+        // =========================================================
+
+        function formatFileSize(bytes) {
+
+            if (bytes < 1024) {
+
+                return bytes + " B";
+
+            }
+
+
+            if (bytes < 1024 * 1024) {
+
+                return (
+                    bytes / 1024
+                ).toFixed(1) + " KB";
+
+            }
+
+
+            return (
+                bytes / (1024 * 1024)
+            ).toFixed(1) + " MB";
+
+        }
+
+
+        // =========================================================
+        // ESCAPE HTML
+        // =========================================================
+
+        function escapeHtml(value) {
+
+            const element =
+                document.createElement("div");
+
+            element.textContent = value;
+
+            return element.innerHTML;
+
+        }
+
+
+        // =========================================================
+        // PREVENT DOUBLE SUBMISSION
+        // =========================================================
+
+        document
+            .getElementById("stayApplicationForm")
+            .addEventListener(
+                "submit",
+                function () {
+
+                    const button =
+                        this.querySelector(
+                            ".submit-button"
+                        );
+
+
+                    if (button) {
+
+                        button.disabled = true;
+
+                        button.innerHTML =
+                            `<i class="fa-solid fa-spinner fa-spin"></i>
+                             Submitting...`;
+
+                    }
+
+                }
+            );
+
+
+        // =========================================================
+        // INITIALISE
+        // =========================================================
+
+        showStep(1);
+
+
+    </script>
+
+}

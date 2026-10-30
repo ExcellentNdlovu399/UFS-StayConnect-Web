@@ -1,0 +1,687 @@
+@model IEnumerable<UFSStayConnect.Models.FinancialAdvice>
+
+@{
+    ViewData["Title"] = "Officer Advice & Inputs";
+    Layout = "~/Views/Admin/_AdminLayout.cshtml";
+
+    var items = Model?.ToList()
+        ?? new List<UFSStayConnect.Models.FinancialAdvice>();
+
+    var totalAdvice = items.Count;
+    var pendingAdvice = items.Count(a => a.Status != "Reviewed");
+    var reviewedAdvice = items.Count(a => a.Status == "Reviewed");
+}
+
+<div class="advice-page">
+
+    <!-- HEADER -->
+    <div class="page-header">
+
+        <div>
+
+            <div class="eyebrow">
+                <i class="fas fa-comments"></i>
+                STAFF COMMUNICATION
+            </div>
+
+            <h1>Officer Advice & Inputs</h1>
+
+            <p>
+                Review financial officer advice, issues and recommendations.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <!-- STATS -->
+    <div class="stats-grid">
+
+        <div class="stat-card">
+
+            <div class="stat-icon blue">
+                <i class="fas fa-comments"></i>
+            </div>
+
+            <div>
+                <span>Total Submissions</span>
+                <strong>@totalAdvice</strong>
+                <small>Officer inputs received</small>
+            </div>
+
+        </div>
+
+
+        <div class="stat-card">
+
+            <div class="stat-icon orange">
+                <i class="fas fa-clock"></i>
+            </div>
+
+            <div>
+                <span>Awaiting Review</span>
+                <strong>@pendingAdvice</strong>
+                <small>Require administrator attention</small>
+            </div>
+
+        </div>
+
+
+        <div class="stat-card">
+
+            <div class="stat-icon green">
+                <i class="fas fa-check-circle"></i>
+            </div>
+
+            <div>
+                <span>Reviewed</span>
+                <strong>@reviewedAdvice</strong>
+                <small>Completed reviews</small>
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ADVICE -->
+    <div class="advice-container">
+
+        @if (!items.Any())
+        {
+            <div class="management-card">
+
+                <div class="empty-state">
+
+                    <div class="empty-icon">
+                        <i class="fas fa-comments"></i>
+                    </div>
+
+                    <h3>No Advice or Inputs</h3>
+
+                    <p>
+                        No financial officer advice or inputs have been
+                        submitted.
+                    </p>
+
+                </div>
+
+            </div>
+        }
+        else
+        {
+            <div class="advice-grid">
+
+                @foreach (var advice in items)
+                {
+                    var officerName =
+                    advice.Officer == null
+                    ? "Unknown Officer"
+                    : $"{advice.Officer.FirstName} {advice.Officer.Surname}";
+
+                    var initials =
+                    advice.Officer == null
+                    ? "?"
+                    :
+                    $"{(string.IsNullOrWhiteSpace(advice.Officer.FirstName) ? "" : advice.Officer.FirstName.Substring(0, 1))}" +
+                    $"{(string.IsNullOrWhiteSpace(advice.Officer.Surname) ? "" : advice.Officer.Surname.Substring(0, 1))}";
+
+                    <div class="advice-card">
+
+                        <!-- CARD HEADER -->
+                        <div class="advice-header">
+
+                            <div class="officer-info">
+
+                                <div class="officer-avatar">
+                                    @initials.ToUpper()
+                                </div>
+
+                                <div>
+
+                                    <strong>
+                                        @officerName
+                                    </strong>
+
+                                    <span>
+                                        Financial Officer
+                                    </span>
+
+                                </div>
+
+                            </div>
+
+
+                            @if (advice.Status == "Reviewed")
+                            {
+                                <span class="review-status reviewed">
+                                    <span></span>
+                                    Reviewed
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="review-status pending">
+                                    <span></span>
+                                    Awaiting Review
+                                </span>
+                            }
+
+                        </div>
+
+
+                        <!-- TITLE -->
+                        <div class="advice-title">
+
+                            <h2>
+                                @advice.Title
+                            </h2>
+
+                            <span>
+                                <i class="fas fa-calendar-alt"></i>
+
+                                @advice.DateCreated.ToLocalTime().ToString("dd/MM/yyyy HH:mm")
+                            </span>
+
+                        </div>
+
+
+                        <!-- ADVICE -->
+                        <div class="advice-content">
+
+                            <div class="content-label">
+                                Officer Input
+                            </div>
+
+                            <p>
+                                @advice.Advice
+                            </p>
+
+                        </div>
+
+
+                        <!-- RESPONSE / REVIEW -->
+                        @if (advice.Status != "Reviewed")
+                        {
+                            <div class="review-section">
+
+                                <div class="content-label">
+                                    Administrator Response
+                                </div>
+
+                                <form asp-action="ReviewAdvice"
+                                      method="post">
+
+                                    @Html.AntiForgeryToken()
+
+                                    <input type="hidden"
+                                           name="id"
+                                           value="@advice.FinancialAdviceID" />
+
+                                    <textarea name="response"
+                                  class="response-input"
+                                  rows="4"
+                                  maxlength="1000"
+                                  placeholder="Optional response to the financial officer..."></textarea>
+
+                                    <button type="submit"
+                                            class="review-button">
+
+                                        <i class="fas fa-check"></i>
+
+                                        Mark as Reviewed
+
+                                    </button>
+
+                                </form>
+
+                            </div>
+                        }
+                        else if (!string.IsNullOrWhiteSpace(advice.AdminResponse))
+                        {
+                            <div class="response-section">
+
+                                <div class="response-heading">
+
+                                    <span>
+                                        <i class="fas fa-reply"></i>
+                                        Administrator Response
+                                    </span>
+
+                                </div>
+
+                                <p>
+                                    @advice.AdminResponse
+                                </p>
+
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="reviewed-note">
+
+                                <i class="fas fa-check-circle"></i>
+
+                                This submission has been reviewed.
+
+                            </div>
+                        }
+
+                    </div>
+                }
+
+            </div>
+        }
+
+    </div>
+
+</div>
+
+
+<style>
+
+    .advice-page {
+        padding: 30px 34px 50px;
+        background: #f6f8fb;
+        min-height: calc(100vh - 70px);
+    }
+
+    .page-header {
+        margin-bottom: 25px;
+    }
+
+    .eyebrow {
+        color: #2563eb;
+        font-size: 12px;
+        font-weight: 800;
+        letter-spacing: 1.4px;
+        margin-bottom: 7px;
+    }
+
+    .page-header h1 {
+        margin: 0;
+        color: #172033;
+        font-size: 31px;
+        font-weight: 800;
+    }
+
+    .page-header p {
+        color: #7b8494;
+        font-size: 14px;
+        margin: 7px 0 0;
+    }
+
+
+    /* STATS */
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(3,1fr);
+        gap: 18px;
+        margin-bottom: 24px;
+    }
+
+    .stat-card {
+        background: white;
+        border: 1px solid #e7ebf1;
+        border-radius: 14px;
+        padding: 20px;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        box-shadow: 0 5px 18px rgba(20,30,50,.04);
+    }
+
+    .stat-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+        .stat-icon.blue {
+            background: #eef4ff;
+            color: #2563eb;
+        }
+
+        .stat-icon.orange {
+            background: #fff4df;
+            color: #d97706;
+        }
+
+        .stat-icon.green {
+            background: #eaf9ef;
+            color: #16a34a;
+        }
+
+    .stat-card span {
+        display: block;
+        color: #7b8495;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    .stat-card strong {
+        display: block;
+        color: #172033;
+        font-size: 25px;
+        margin: 2px 0;
+    }
+
+    .stat-card small {
+        color: #9aa3b2;
+        font-size: 11px;
+    }
+
+
+    /* GRID */
+
+    .advice-grid {
+        display: grid;
+        grid-template-columns: repeat(2,1fr);
+        gap: 20px;
+    }
+
+
+    /* CARD */
+
+    .advice-card {
+        background: white;
+        border: 1px solid #e7ebf1;
+        border-radius: 16px;
+        padding: 22px;
+        box-shadow: 0 7px 25px rgba(20,30,50,.045);
+        transition: .2s ease;
+    }
+
+        .advice-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 11px 30px rgba(20,30,50,.07);
+        }
+
+
+    /* HEADER */
+
+    .advice-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 15px;
+        margin-bottom: 20px;
+    }
+
+    .officer-info {
+        display: flex;
+        align-items: center;
+        gap: 11px;
+    }
+
+    .officer-avatar {
+        width: 42px;
+        height: 42px;
+        border-radius: 50%;
+        background: #eef4ff;
+        color: #2563eb;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 11px;
+        font-weight: 800;
+    }
+
+    .officer-info strong {
+        display: block;
+        color: #303949;
+        font-size: 13px;
+        margin-bottom: 3px;
+    }
+
+    .officer-info span {
+        color: #9aa3b2;
+        font-size: 10px;
+    }
+
+
+    /* STATUS */
+
+    .review-status {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 10px;
+        border-radius: 999px;
+        font-size: 10px;
+        font-weight: 800;
+        white-space: nowrap;
+    }
+
+        .review-status span {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+        }
+
+        .review-status.pending {
+            background: #fff4df;
+            color: #b76a00;
+        }
+
+            .review-status.pending span {
+                background: #d97706;
+            }
+
+        .review-status.reviewed {
+            background: #eaf9ef;
+            color: #16803c;
+        }
+
+            .review-status.reviewed span {
+                background: #16a34a;
+            }
+
+
+    /* TITLE */
+
+    .advice-title {
+        border-bottom: 1px solid #edf0f4;
+        padding-bottom: 15px;
+        margin-bottom: 17px;
+    }
+
+        .advice-title h2 {
+            color: #202939;
+            font-size: 17px;
+            font-weight: 800;
+            margin: 0 0 7px;
+        }
+
+        .advice-title span {
+            color: #929aa7;
+            font-size: 11px;
+        }
+
+        .advice-title i {
+            margin-right: 5px;
+        }
+
+
+    /* CONTENT */
+
+    .content-label {
+        color: #7b8495;
+        font-size: 10px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: .7px;
+        margin-bottom: 8px;
+    }
+
+    .advice-content p {
+        color: #596477;
+        font-size: 13px;
+        line-height: 1.7;
+        margin: 0;
+        white-space: pre-line;
+    }
+
+
+    /* REVIEW */
+
+    .review-section {
+        border-top: 1px solid #edf0f4;
+        margin-top: 20px;
+        padding-top: 18px;
+    }
+
+    .response-input {
+        width: 100%;
+        resize: vertical;
+        min-height: 95px;
+        border: 1px solid #dfe4eb;
+        border-radius: 9px;
+        background: #f8fafc;
+        padding: 11px 12px;
+        font-size: 12px;
+        outline: none;
+        margin-bottom: 10px;
+    }
+
+        .response-input:focus {
+            border-color: #2563eb;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(37,99,235,.08);
+        }
+
+    .review-button {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        padding: 9px 13px;
+        border: 0;
+        border-radius: 8px;
+        background: #16a34a;
+        color: white;
+        font-size: 11px;
+        font-weight: 700;
+        cursor: pointer;
+    }
+
+        .review-button:hover {
+            background: #15803d;
+        }
+
+
+    /* RESPONSE */
+
+    .response-section {
+        margin-top: 20px;
+        border-radius: 10px;
+        background: #f7faf8;
+        border: 1px solid #dcefe1;
+        padding: 14px;
+    }
+
+    .response-heading {
+        color: #16803c;
+        font-size: 11px;
+        font-weight: 800;
+        margin-bottom: 8px;
+    }
+
+        .response-heading i {
+            margin-right: 5px;
+        }
+
+    .response-section p {
+        color: #596477;
+        font-size: 12px;
+        line-height: 1.6;
+        margin: 0;
+        white-space: pre-line;
+    }
+
+    .reviewed-note {
+        margin-top: 20px;
+        padding-top: 15px;
+        border-top: 1px solid #edf0f4;
+        color: #16803c;
+        font-size: 11px;
+        font-weight: 700;
+    }
+
+        .reviewed-note i {
+            margin-right: 5px;
+        }
+
+
+    /* EMPTY */
+
+    .management-card {
+        background: white;
+        border: 1px solid #e7ebf1;
+        border-radius: 16px;
+        overflow: hidden;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 70px 20px;
+    }
+
+    .empty-icon {
+        width: 68px;
+        height: 68px;
+        border-radius: 18px;
+        background: #eef4ff;
+        color: #2563eb;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: auto auto 17px;
+        font-size: 26px;
+    }
+
+    .empty-state h3 {
+        color: #202939;
+        font-size: 18px;
+        font-weight: 800;
+    }
+
+    .empty-state p {
+        color: #8b94a3;
+        font-size: 13px;
+    }
+
+
+    /* RESPONSIVE */
+
+    @@media(max-width:1000px) {
+
+        .stats-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .advice-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    @@media(max-width:700px) {
+
+        .advice-page {
+            padding: 22px 16px 40px;
+        }
+
+        .page-header h1 {
+            font-size: 27px;
+        }
+
+        .advice-header {
+            align-items: flex-start;
+            flex-direction: column;
+        }
+    }
+</style>

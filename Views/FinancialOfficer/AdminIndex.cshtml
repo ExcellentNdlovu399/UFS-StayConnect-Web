@@ -1,0 +1,900 @@
+@model IEnumerable<UFSStayConnect.Models.ApplicationUser>
+
+@{
+    ViewData["Title"] = "Financial Officers";
+    Layout = "~/Views/Admin/_AdminLayout.cshtml";
+
+    var officers = Model?.ToList()
+        ?? new List<UFSStayConnect.Models.ApplicationUser>();
+
+    var totalOfficers = officers.Count;
+    var activeOfficers = officers.Count(x => x.AccountStatus == "Active");
+    var inactiveOfficers = officers.Count(x => x.AccountStatus != "Active");
+}
+
+<div class="officers-page">
+
+    <!-- HEADER -->
+    <div class="page-header">
+
+        <div>
+            <div class="eyebrow">
+                <i class="fas fa-user-shield"></i>
+                STAFF AUTHORIZATION
+            </div>
+
+            <h1>Financial Officers</h1>
+
+            <p>
+                Authorize and manage financial officers who perform assigned
+                financial duties.
+            </p>
+        </div>
+
+        <a asp-action="Create" class="btn-primary-custom">
+            <i class="fas fa-user-plus"></i>
+            Add Financial Officer
+        </a>
+
+    </div>
+
+
+    <!-- ALERTS -->
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="system-alert success">
+            <i class="fas fa-check-circle"></i>
+
+            <span>@TempData["SuccessMessage"]</span>
+
+            <button type="button"
+                    onclick="this.parentElement.remove()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="system-alert error">
+            <i class="fas fa-exclamation-circle"></i>
+
+            <span>@TempData["ErrorMessage"]</span>
+
+            <button type="button"
+                    onclick="this.parentElement.remove()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+    }
+
+
+    <!-- STATS -->
+    <div class="stats-grid">
+
+        <div class="stat-card">
+
+            <div class="stat-icon blue">
+                <i class="fas fa-user-shield"></i>
+            </div>
+
+            <div>
+                <span>Total Officers</span>
+                <strong>@totalOfficers</strong>
+                <small>Authorized financial staff</small>
+            </div>
+
+        </div>
+
+
+        <div class="stat-card">
+
+            <div class="stat-icon green">
+                <i class="fas fa-user-check"></i>
+            </div>
+
+            <div>
+                <span>Active Officers</span>
+                <strong>@activeOfficers</strong>
+                <small>Currently authorized</small>
+            </div>
+
+        </div>
+
+
+        <div class="stat-card">
+
+            <div class="stat-icon orange">
+                <i class="fas fa-user-clock"></i>
+            </div>
+
+            <div>
+                <span>Inactive Officers</span>
+                <strong>@inactiveOfficers</strong>
+                <small>Access currently disabled</small>
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- OFFICERS CARD -->
+    <div class="management-card">
+
+        <div class="management-header">
+
+            <div>
+
+                <h2>
+                    <i class="fas fa-users-cog"></i>
+                    Authorized Financial Officers
+                </h2>
+
+                <p>
+                    Manage financial officer access and account status.
+                </p>
+
+            </div>
+
+            <div class="search-box">
+
+                <i class="fas fa-search"></i>
+
+                <input type="text"
+                       id="officerSearch"
+                       placeholder="Search officers..."
+                       autocomplete="off" />
+
+            </div>
+
+        </div>
+
+
+        @if (!officers.Any())
+        {
+            <div class="empty-state">
+
+                <div class="empty-icon">
+                    <i class="fas fa-user-shield"></i>
+                </div>
+
+                <h3>No Financial Officers</h3>
+
+                <p>
+                    No financial officers have been authorized yet.
+                </p>
+
+                <a asp-action="Create" class="btn-primary-custom">
+                    <i class="fas fa-user-plus"></i>
+                    Add Financial Officer
+                </a>
+
+            </div>
+        }
+        else
+        {
+            <div class="table-wrapper">
+
+                <table class="officers-table">
+
+                    <thead>
+
+                        <tr>
+                            <th>Officer</th>
+                            <th>Email</th>
+                            <th>Employee Number</th>
+                            <th>Status</th>
+                            <th>Created</th>
+                            <th class="actions-column">Actions</th>
+                        </tr>
+
+                    </thead>
+
+                    <tbody id="officerTable">
+
+                        @foreach (var officer in officers)
+                        {
+                            var fullName =
+                            $"{officer.FirstName} {officer.Surname}".Trim();
+
+                            var initials =
+                            $"{(string.IsNullOrWhiteSpace(officer.FirstName) ? "" : officer.FirstName.Substring(0, 1))}" +
+                            $"{(string.IsNullOrWhiteSpace(officer.Surname) ? "" : officer.Surname.Substring(0, 1))}";
+
+                            <tr class="officer-row">
+
+                                <!-- OFFICER -->
+                                <td>
+
+                                    <div class="officer-cell">
+
+                                        <div class="avatar">
+                                            @initials.ToUpper()
+                                        </div>
+
+                                        <div>
+                                            <strong>@fullName</strong>
+
+                                            <span>
+                                                Financial Officer
+                                            </span>
+                                        </div>
+
+                                    </div>
+
+                                </td>
+
+
+                                <!-- EMAIL -->
+                                <td>
+
+                                    <span class="email">
+                                        @officer.Email
+                                    </span>
+
+                                </td>
+
+
+                                <!-- EMPLOYEE NUMBER -->
+                                <td>
+
+                                    <span class="employee-number">
+                                        @(officer.EmployeeNumber ?? "—")
+                                    </span>
+
+                                </td>
+
+
+                                <!-- STATUS -->
+                                <td>
+
+                                    @if (officer.AccountStatus == "Active")
+                                    {
+                                        <span class="status active">
+                                            <span></span>
+                                            Active
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="status inactive">
+                                            <span></span>
+                                            @officer.AccountStatus
+                                        </span>
+                                    }
+
+                                </td>
+
+
+                                <!-- CREATED -->
+                                <td>
+
+                                    <span class="created-date">
+                                        @officer.DateCreated.ToLocalTime().ToString("dd/MM/yyyy")
+                                    </span>
+
+                                </td>
+
+
+                                <!-- ACTIONS -->
+                                <td class="actions-column">
+
+                                    <div class="action-buttons">
+
+                                        <form asp-action="ToggleOfficerStatus"
+                                              method="post">
+
+                                            @Html.AntiForgeryToken()
+
+                                            <input type="hidden"
+                                                   name="id"
+                                                   value="@officer.Id" />
+
+                                            @if (officer.AccountStatus == "Active")
+                                            {
+                                                <button type="submit"
+                                                        class="action-btn deactivate">
+
+                                                    <i class="fas fa-ban"></i>
+                                                    <span>Deactivate</span>
+
+                                                </button>
+                                            }
+                                            else
+                                            {
+                                                <button type="submit"
+                                                        class="action-btn activate">
+
+                                                    <i class="fas fa-check"></i>
+                                                    <span>Activate</span>
+
+                                                </button>
+                                            }
+
+                                        </form>
+
+
+                                        <a asp-action="ResetOfficerPassword"
+                                           asp-route-id="@officer.Id"
+                                           class="action-btn reset-password"
+                                           title="Set a new temporary password for this officer">
+                                            <i class="fas fa-key"></i>
+                                            <span>Reset password</span>
+                                        </a>
+
+                                        <form asp-action="DeleteOfficer"
+                                              method="post"
+                                              onsubmit="return confirm('Delete this Financial Officer account?');">
+
+                                            @Html.AntiForgeryToken()
+
+                                            <input type="hidden"
+                                                   name="id"
+                                                   value="@officer.Id" />
+
+                                            <button type="submit"
+                                                    class="delete-btn"
+                                                    title="Delete officer">
+
+                                                <i class="fas fa-trash"></i>
+
+                                            </button>
+
+                                        </form>
+
+                                    </div>
+
+                                </td>
+
+                            </tr>
+                        }
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+            <div id="noOfficerResults" class="no-results">
+
+                <i class="fas fa-search"></i>
+
+                <h3>No officers found</h3>
+
+                <p>
+                    Try another search term.
+                </p>
+
+            </div>
+        }
+
+    </div>
+
+</div>
+
+
+<style>
+
+    .officers-page {
+        padding: 30px 34px 50px;
+        background: #f6f8fb;
+        min-height: calc(100vh - 70px);
+    }
+
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        gap: 25px;
+        margin-bottom: 25px;
+    }
+
+    .eyebrow {
+        color: #2563eb;
+        font-size: 12px;
+        font-weight: 800;
+        letter-spacing: 1.4px;
+        margin-bottom: 7px;
+    }
+
+    .page-header h1 {
+        margin: 0;
+        color: #172033;
+        font-size: 31px;
+        font-weight: 800;
+    }
+
+    .page-header p {
+        color: #7b8494;
+        font-size: 14px;
+        margin: 7px 0 0;
+    }
+
+    .btn-primary-custom {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 11px 17px;
+        background: #2563eb;
+        color: white;
+        text-decoration: none;
+        border-radius: 9px;
+        font-size: 13px;
+        font-weight: 700;
+        border: 0;
+        transition: .2s ease;
+    }
+
+        .btn-primary-custom:hover {
+            background: #1d4ed8;
+            color: white;
+            transform: translateY(-1px);
+        }
+
+    .system-alert {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 13px 16px;
+        border-radius: 10px;
+        margin-bottom: 20px;
+        font-size: 13px;
+    }
+
+        .system-alert span {
+            flex: 1;
+        }
+
+        .system-alert button {
+            border: 0;
+            background: transparent;
+            cursor: pointer;
+            color: inherit;
+        }
+
+        .system-alert.success {
+            background: #effcf4;
+            color: #166534;
+            border: 1px solid #c6ead2;
+        }
+
+        .system-alert.error {
+            background: #fff1f2;
+            color: #b42332;
+            border: 1px solid #fecdd3;
+        }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(3,1fr);
+        gap: 18px;
+        margin-bottom: 24px;
+    }
+
+    .stat-card {
+        background: white;
+        border: 1px solid #e7ebf1;
+        border-radius: 14px;
+        padding: 20px;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        box-shadow: 0 5px 18px rgba(20,30,50,.04);
+    }
+
+    .stat-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+        .stat-icon.blue {
+            background: #eef4ff;
+            color: #2563eb;
+        }
+
+        .stat-icon.green {
+            background: #eaf9ef;
+            color: #16a34a;
+        }
+
+        .stat-icon.orange {
+            background: #fff4df;
+            color: #d97706;
+        }
+
+    .stat-card span {
+        display: block;
+        color: #7b8495;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    .stat-card strong {
+        display: block;
+        color: #172033;
+        font-size: 25px;
+        margin: 2px 0;
+    }
+
+    .stat-card small {
+        color: #9aa3b2;
+        font-size: 11px;
+    }
+
+    .management-card {
+        background: white;
+        border: 1px solid #e7ebf1;
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 7px 25px rgba(20,30,50,.045);
+    }
+
+    .management-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 20px;
+        padding: 22px 24px;
+        border-bottom: 1px solid #edf0f4;
+    }
+
+        .management-header h2 {
+            color: #172033;
+            font-size: 17px;
+            font-weight: 800;
+            margin: 0 0 4px;
+        }
+
+            .management-header h2 i {
+                color: #2563eb;
+                margin-right: 7px;
+            }
+
+        .management-header p {
+            color: #8a93a3;
+            font-size: 12px;
+            margin: 0;
+        }
+
+    .search-box {
+        position: relative;
+        width: 280px;
+    }
+
+        .search-box i {
+            position: absolute;
+            left: 13px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #9aa3b2;
+        }
+
+        .search-box input {
+            width: 100%;
+            border: 1px solid #dfe4eb;
+            background: #f8fafc;
+            border-radius: 9px;
+            padding: 10px 12px 10px 36px;
+            outline: none;
+            font-size: 13px;
+        }
+
+            .search-box input:focus {
+                border-color: #2563eb;
+                background: white;
+            }
+
+    .table-wrapper {
+        overflow-x: auto;
+    }
+
+    .officers-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+        .officers-table th {
+            background: #f8fafc;
+            color: #7b8495;
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            padding: 14px 22px;
+            border-bottom: 1px solid #e9edf2;
+            white-space: nowrap;
+        }
+
+        .officers-table td {
+            padding: 16px 22px;
+            border-bottom: 1px solid #f0f2f5;
+            vertical-align: middle;
+        }
+
+    .officer-row:hover {
+        background: #fafcff;
+    }
+
+    .officer-cell {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .avatar {
+        width: 42px;
+        height: 42px;
+        border-radius: 50%;
+        background: #eaf2ff;
+        color: #2563eb;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        font-weight: 800;
+    }
+
+    .officer-cell strong {
+        display: block;
+        color: #202939;
+        font-size: 13px;
+        margin-bottom: 3px;
+    }
+
+    .officer-cell span {
+        color: #9aa3b2;
+        font-size: 11px;
+    }
+
+    .email,
+    .employee-number,
+    .created-date {
+        color: #626d7e;
+        font-size: 13px;
+    }
+
+    .status {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        padding: 6px 10px;
+        border-radius: 999px;
+        font-size: 11px;
+        font-weight: 800;
+    }
+
+        .status span {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+        }
+
+        .status.active {
+            background: #eaf9ef;
+            color: #16803c;
+        }
+
+            .status.active span {
+                background: #16a34a;
+            }
+
+        .status.inactive {
+            background: #f0f1f3;
+            color: #68707d;
+        }
+
+            .status.inactive span {
+                background: #8b929d;
+            }
+
+    .actions-column {
+        text-align: right;
+        white-space: nowrap;
+    }
+
+    .action-buttons {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        gap: 6px;
+    }
+
+        .action-buttons form {
+            margin: 0;
+        }
+
+    .action-btn,
+    .delete-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        padding: 7px 10px;
+        border-radius: 8px;
+        background: white;
+        font-size: 11px;
+        font-weight: 700;
+        cursor: pointer;
+    }
+
+    .reset-password {
+        color: #1d4ed8;
+        border: 1px solid #bfdbfe;
+        text-decoration: none;
+        white-space: nowrap;
+    }
+
+    .reset-password:hover {
+        background: #eff6ff;
+        color: #1e40af;
+    }
+
+    .deactivate {
+        color: #d97706;
+        border: 1px solid #f4d49b;
+    }
+
+    .activate {
+        color: #15803d;
+        border: 1px solid #b9e4c6;
+    }
+
+    .delete-btn {
+        width: 34px;
+        height: 34px;
+        color: #dc2626;
+        border: 1px solid #fecaca;
+    }
+
+    .deactivate:hover {
+        background: #fff8e9;
+    }
+
+    .activate:hover {
+        background: #effbf2;
+    }
+
+    .delete-btn:hover {
+        background: #fff1f2;
+    }
+
+    .empty-state,
+    .no-results {
+        text-align: center;
+        padding: 65px 20px;
+    }
+
+    .empty-icon {
+        width: 68px;
+        height: 68px;
+        border-radius: 18px;
+        background: #eef4ff;
+        color: #2563eb;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: auto auto 17px;
+        font-size: 26px;
+    }
+
+    .empty-state h3,
+    .no-results h3 {
+        color: #202939;
+        font-size: 18px;
+        font-weight: 800;
+    }
+
+    .empty-state p,
+    .no-results p {
+        color: #8b94a3;
+        font-size: 13px;
+        margin-bottom: 20px;
+    }
+
+    .no-results {
+        display: none;
+    }
+
+        .no-results > i {
+            color: #929aa7;
+            font-size: 25px;
+            margin-bottom: 12px;
+        }
+
+    @@media(max-width:1000px) {
+
+        .stats-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .management-header {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .search-box {
+            width: 100%;
+        }
+    }
+
+    @@media(max-width:700px) {
+
+        .officers-page {
+            padding: 22px 16px;
+        }
+
+        .page-header {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .btn-primary-custom {
+            width: 100%;
+        }
+
+        .action-btn span {
+            display: none;
+        }
+
+        .action-btn {
+            width: 34px;
+            height: 34px;
+            padding: 0;
+        }
+    }
+</style>
+
+
+<script>
+
+    document.addEventListener("DOMContentLoaded", function () {
+
+        const search =
+            document.getElementById("officerSearch");
+
+        const rows =
+            document.querySelectorAll(".officer-row");
+
+        const noResults =
+            document.getElementById("noOfficerResults");
+
+        if (!search) return;
+
+        search.addEventListener("input", function () {
+
+            const term =
+                this.value.toLowerCase().trim();
+
+            let visible = 0;
+
+            rows.forEach(row => {
+
+                const text =
+                    row.innerText.toLowerCase();
+
+                const match =
+                    text.includes(term);
+
+                row.style.display =
+                    match ? "" : "none";
+
+                if (match) visible++;
+
+            });
+
+            if (noResults) {
+                noResults.style.display =
+                    visible === 0 ? "block" : "none";
+            }
+
+        });
+
+    });
+
+</script>

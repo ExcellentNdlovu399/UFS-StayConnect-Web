@@ -1,0 +1,587 @@
+@model IEnumerable<UFSStayConnect.Models.ApplicationUser>
+
+@{
+    ViewData["Title"] = "Customers";
+
+    var customers = Model?.ToList()
+        ?? new List<UFSStayConnect.Models.ApplicationUser>();
+
+    var totalCustomers = customers.Count;
+    var activeCustomers = customers.Count(x => x.AccountStatus == "Active");
+    var inactiveCustomers = customers.Count(x => x.AccountStatus != "Active");
+    var students = customers.Count(x => x.UserType == "Student");
+    var staff = customers.Count(x => x.UserType == "Staff");
+}
+
+<div class="fo-customers-page">
+
+    <!-- PAGE HEADER -->
+    <div class="customers-header">
+
+        <div>
+            <div class="page-eyebrow">
+                <i class="fa-solid fa-users me-2"></i>
+                CUSTOMER MANAGEMENT
+            </div>
+
+            <h1>Customers</h1>
+
+            <p>
+                Manage UFS students and staff customer accounts.
+            </p>
+        </div>
+
+        <a asp-action="CreateCustomer"
+           class="btn btn-primary add-customer-btn">
+            <i class="fa-solid fa-user-plus me-2"></i>
+            Add Customer
+        </a>
+
+    </div>
+
+
+    <!-- SUCCESS / ERROR MESSAGES -->
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success custom-alert">
+            <i class="fa-solid fa-circle-check me-2"></i>
+            @TempData["SuccessMessage"]
+        </div>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger custom-alert">
+            <i class="fa-solid fa-circle-exclamation me-2"></i>
+            @TempData["ErrorMessage"]
+        </div>
+    }
+
+
+    <!-- SUMMARY -->
+    <div class="customer-stats">
+
+        <div class="customer-stat-card">
+
+            <div class="stat-icon blue">
+                <i class="fa-solid fa-users"></i>
+            </div>
+
+            <div>
+                <span>Total Customers</span>
+                <strong>@totalCustomers</strong>
+                <small>Customer accounts</small>
+            </div>
+
+        </div>
+
+
+        <div class="customer-stat-card">
+
+            <div class="stat-icon green">
+                <i class="fa-solid fa-user-check"></i>
+            </div>
+
+            <div>
+                <span>Active</span>
+                <strong>@activeCustomers</strong>
+                <small>Can access the system</small>
+            </div>
+
+        </div>
+
+
+        <div class="customer-stat-card">
+
+            <div class="stat-icon gray">
+                <i class="fa-solid fa-user-slash"></i>
+            </div>
+
+            <div>
+                <span>Inactive</span>
+                <strong>@inactiveCustomers</strong>
+                <small>Sign-in disabled</small>
+            </div>
+
+        </div>
+
+
+        <div class="customer-stat-card">
+
+            <div class="stat-icon gold">
+                <i class="fa-solid fa-graduation-cap"></i>
+            </div>
+
+            <div>
+                <span>Students</span>
+                <strong>@students</strong>
+                <small>@staff staff accounts</small>
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- FILTER PANEL -->
+    <div class="filter-card">
+
+        <div class="filter-heading">
+
+            <div class="filter-title">
+                <div class="filter-icon">
+                    <i class="fa-solid fa-filter"></i>
+                </div>
+
+                <div>
+                    <strong>Find a Customer</strong>
+                    <span>Search and filter customer accounts</span>
+                </div>
+            </div>
+
+        </div>
+
+
+        <form method="get">
+
+            <div class="filter-grid">
+
+                <!-- SEARCH -->
+                <div class="filter-field search-field">
+
+                    <label for="search">Search</label>
+
+                    <div class="input-with-icon">
+
+                        <i class="fa-solid fa-magnifying-glass"></i>
+
+                        <input id="search"
+                               name="search"
+                               value="@ViewBag.Search"
+                               class="form-control"
+                               placeholder="Name, email, student or employee number" />
+
+                    </div>
+
+                </div>
+
+
+                <!-- TYPE -->
+                <div class="filter-field">
+
+                    <label for="type">Customer Type</label>
+
+                    <select id="type"
+                            name="type"
+                            class="form-select">
+
+                        <option value="">All Types</option>
+
+                        @if ((ViewBag.Type as string) == "Student")
+                        {
+                            <option value="Student" selected>Student</option>
+                        }
+                        else
+                        {
+                            <option value="Student">Student</option>
+                        }
+
+                        @if ((ViewBag.Type as string) == "Staff")
+                        {
+                            <option value="Staff" selected>Staff</option>
+                        }
+                        else
+                        {
+                            <option value="Staff">Staff</option>
+                        }
+
+                    </select>
+
+                </div>
+
+
+                <!-- STATUS -->
+                <div class="filter-field">
+
+                    <label for="status">Account Status</label>
+
+                    <select id="status"
+                            name="status"
+                            class="form-select">
+
+                        <option value="">All Statuses</option>
+
+                        @if ((ViewBag.Status as string) == "Active")
+                        {
+                            <option value="Active" selected>Active</option>
+                        }
+                        else
+                        {
+                            <option value="Active">Active</option>
+                        }
+
+                        @if ((ViewBag.Status as string) == "Inactive")
+                        {
+                            <option value="Inactive" selected>Inactive</option>
+                        }
+                        else
+                        {
+                            <option value="Inactive">Inactive</option>
+                        }
+
+                    </select>
+
+                </div>
+
+
+                <!-- BUTTONS -->
+                <div class="filter-actions">
+
+                    <button type="submit"
+                            class="btn btn-primary">
+
+                        <i class="fa-solid fa-filter me-2"></i>
+                        Apply Filters
+
+                    </button>
+
+                    <a asp-action="Customers"
+                       class="btn btn-light border">
+
+                        Clear
+
+                    </a>
+
+                </div>
+
+            </div>
+
+        </form>
+
+    </div>
+
+
+    <!-- CUSTOMER TABLE -->
+    <div class="customers-panel">
+
+        <div class="panel-top">
+
+            <div>
+                <span class="panel-eyebrow">
+                    CUSTOMER DIRECTORY
+                </span>
+
+                <h2>Customer Accounts</h2>
+
+                <p>
+                    @totalCustomers
+                    @(totalCustomers == 1 ? "customer" : "customers")
+                    displayed
+                </p>
+            </div>
+
+            <div class="directory-icon">
+                <i class="fa-solid fa-address-book"></i>
+            </div>
+
+        </div>
+
+
+        @if (customers.Any())
+        {
+            <div class="table-responsive">
+
+                <table class="customer-table">
+
+                    <thead>
+
+                        <tr>
+
+                            <th>Customer</th>
+
+                            <th>Number</th>
+
+                            <th>Type</th>
+
+                            <th>Email</th>
+
+                            <th>Status</th>
+
+                            <th class="text-end">
+                                Actions
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody>
+
+                        @foreach (var customer in customers)
+                        {
+                            var fullName =
+                            $"{customer.FirstName} {customer.Surname}".Trim();
+
+                            var number =
+                            customer.StudentNumber
+                            ?? customer.EmployeeNumber
+                            ?? "—";
+
+                            var isActive =
+                            customer.AccountStatus == "Active";
+
+                            <tr>
+
+                                <!-- CUSTOMER -->
+                                <td>
+
+                                    <div class="customer-cell">
+
+                                        <div class="customer-avatar">
+
+                                            @if (!string.IsNullOrWhiteSpace(customer.FirstName))
+                                            {
+                                                @customer.FirstName.Substring(0, 1).ToUpper()
+                                            }
+                                            else
+                                            {
+                                                <i class="fa-solid fa-user"></i>
+                                            }
+
+                                        </div>
+
+                                        <div>
+
+                                            <strong>
+                                                @fullName
+                                            </strong>
+
+                                            <span>
+                                                @customer.UserType account
+                                            </span>
+
+                                        </div>
+
+                                    </div>
+
+                                </td>
+
+
+                                <!-- NUMBER -->
+                                <td>
+
+                                    <span class="customer-number">
+                                        @number
+                                    </span>
+
+                                </td>
+
+
+                                <!-- TYPE -->
+                                <td>
+
+                                    @if (customer.UserType == "Student")
+                                    {
+                                        <span class="type-badge student">
+                                            <i class="fa-solid fa-graduation-cap"></i>
+                                            Student
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="type-badge staff">
+                                            <i class="fa-solid fa-briefcase"></i>
+                                            Staff
+                                        </span>
+                                    }
+
+                                </td>
+
+
+                                <!-- EMAIL -->
+                                <td>
+
+                                    <span class="email-cell">
+                                        @customer.Email
+                                    </span>
+
+                                </td>
+
+
+                                <!-- STATUS -->
+                                <td>
+
+                                    @if (isActive)
+                                    {
+                                        <span class="status-badge active">
+                                            <span></span>
+                                            Active
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="status-badge inactive">
+                                            <span></span>
+                                            Inactive
+                                        </span>
+                                    }
+
+                                </td>
+
+
+                                <!-- ACTIONS -->
+                                <td>
+
+                                    <div class="customer-actions">
+
+                                        <!-- VIEW -->
+                                        <a asp-action="CustomerDetails"
+                                           asp-route-id="@customer.Id"
+                                           class="action-button view"
+                                           title="View customer">
+
+                                            <i class="fa-solid fa-eye"></i>
+
+                                        </a>
+
+
+                                        <!-- EDIT -->
+                                        <a asp-action="EditCustomer"
+                                           asp-route-id="@customer.Id"
+                                           class="action-button edit"
+                                           title="Edit customer">
+
+                                            <i class="fa-solid fa-pen"></i>
+
+                                        </a>
+
+
+                                        <!-- RESET PASSWORD -->
+                                        <a asp-action="ResetCustomerPassword"
+                                           asp-route-id="@customer.Id"
+                                           class="action-button password"
+                                           title="Reset password">
+
+                                            <i class="fa-solid fa-key"></i>
+
+                                        </a>
+
+
+                                        <!-- ACTIVATE / DEACTIVATE -->
+                                        <form asp-action="ToggleCustomerStatus"
+                                              method="post"
+                                              class="action-form">
+
+                                            @Html.AntiForgeryToken()
+
+                                            <input type="hidden"
+                                                   name="id"
+                                                   value="@customer.Id" />
+
+                                            @if (isActive)
+                                            {
+                                                <button type="submit"
+                                                        class="action-button deactivate"
+                                                        title="Deactivate customer"
+                                                        onclick="return confirm('Deactivate this customer account?');">
+
+                                                    <i class="fa-solid fa-user-slash"></i>
+
+                                                </button>
+                                            }
+                                            else
+                                            {
+                                                <button type="submit"
+                                                        class="action-button activate"
+                                                        title="Activate customer">
+
+                                                    <i class="fa-solid fa-user-check"></i>
+
+                                                </button>
+                                            }
+
+                                        </form>
+
+
+                                        <!-- DELETE -->
+                                        <form asp-action="DeleteCustomer"
+                                              method="post"
+                                              class="action-form"
+                                              onsubmit="return confirm('Delete this customer account? Historical accounts with applications or payments cannot be deleted.');">
+
+                                            @Html.AntiForgeryToken()
+
+                                            <input type="hidden"
+                                                   name="id"
+                                                   value="@customer.Id" />
+
+                                            <button type="submit"
+                                                    class="action-button delete"
+                                                    title="Delete customer">
+
+                                                <i class="fa-solid fa-trash"></i>
+
+                                            </button>
+
+                                        </form>
+
+                                    </div>
+
+                                </td>
+
+                            </tr>
+                        }
+
+                    </tbody>
+
+                </table>
+
+            </div>
+        }
+        else
+        {
+            <!-- EMPTY STATE -->
+
+            <div class="empty-state">
+
+                <div class="empty-icon">
+                    <i class="fa-solid fa-users-slash"></i>
+                </div>
+
+                <h3>No Customers Found</h3>
+
+                <p>
+                    No customer accounts match your current search or filters.
+                </p>
+
+                <div class="empty-actions">
+
+                    <a asp-action="Customers"
+                       class="btn btn-light border">
+
+                        Clear Filters
+
+                    </a>
+
+                    <a asp-action="CreateCustomer"
+                       class="btn btn-primary">
+
+                        <i class="fa-solid fa-user-plus me-2"></i>
+                        Add Customer
+
+                    </a>
+
+                </div>
+
+            </div>
+        }
+
+    </div>
+
+</div>
+
+
+<style>
+
+   </style>

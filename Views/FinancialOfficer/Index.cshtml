@@ -1,0 +1,528 @@
+@using UFSStayConnect.Models
+
+@{
+    ViewData["Title"] = "Financial Officer Dashboard";
+
+    var recent = ViewBag.Recent as IEnumerable<Payment>
+                  ?? Enumerable.Empty<Payment>();
+
+    var customers = ViewBag.Customers ?? 0;
+    var pending = ViewBag.Pending ?? 0;
+
+    decimal today = Convert.ToDecimal(ViewBag.Today ?? 0);
+    decimal outstanding = Convert.ToDecimal(ViewBag.Outstanding ?? 0);
+}
+
+<div class="fo-dashboard">
+
+    <!-- HEADER -->
+
+    <div class="fo-dashboard-header">
+
+        <div>
+
+            <div class="fo-eyebrow">
+                FINANCIAL MANAGEMENT
+            </div>
+
+            <h1>Dashboard</h1>
+
+            <p>
+                Monitor customer accounts and payment activity
+                from one place.
+            </p>
+
+        </div>
+
+        <div class="fo-date">
+
+            <i class="fa-regular fa-calendar"></i>
+
+            @DateTime.Now.ToString("dd MMMM yyyy")
+
+        </div>
+
+    </div>
+
+
+    <!-- STATISTICS -->
+
+    <div class="fo-stat-grid">
+
+        <div class="fo-stat-card">
+
+            <div class="fo-stat-icon blue">
+                <i class="fa-solid fa-users"></i>
+            </div>
+
+            <div class="fo-stat-info">
+
+                <span>CUSTOMERS</span>
+
+                <strong>
+                    @customers
+                </strong>
+
+                <small>
+                    Registered accounts
+                </small>
+
+            </div>
+
+        </div>
+
+
+        <div class="fo-stat-card">
+
+            <div class="fo-stat-icon gold">
+                <i class="fa-solid fa-clock"></i>
+            </div>
+
+            <div class="fo-stat-info">
+
+                <span>PENDING PAYMENTS</span>
+
+                <strong>
+                    @pending
+                </strong>
+
+                <small>
+                    Awaiting verification
+                </small>
+
+            </div>
+
+        </div>
+
+
+        <div class="fo-stat-card">
+
+            <div class="fo-stat-icon green">
+                <i class="fa-solid fa-circle-check"></i>
+            </div>
+
+            <div class="fo-stat-info">
+
+                <span>PAID TODAY</span>
+
+                <strong>
+                    R @today.ToString("N2")
+                </strong>
+
+                <small>
+                    Payments received today
+                </small>
+
+            </div>
+
+        </div>
+
+
+        <div class="fo-stat-card">
+
+            <div class="fo-stat-icon red">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+            </div>
+
+            <div class="fo-stat-info">
+
+                <span>OUTSTANDING</span>
+
+                <strong>
+                    R @outstanding.ToString("N2")
+                </strong>
+
+                <small>
+                    Pending payment value
+                </small>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- QUICK ACCESS -->
+
+    <div class="fo-section">
+
+        <div class="fo-section-heading">
+
+            <div>
+
+                <h2>Quick Access</h2>
+
+                <p>
+                    Frequently used financial management areas.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="fo-quick-grid">
+
+            <a asp-controller="PaymentManagement"
+               asp-action="Index"
+               class="fo-quick-card">
+
+                <div class="fo-quick-icon">
+                    <i class="fa-solid fa-credit-card"></i>
+                </div>
+
+                <div>
+
+                    <h3>Payments</h3>
+
+                    <p>
+                        Review and verify customer payments.
+                    </p>
+
+                </div>
+
+                <i class="fa-solid fa-arrow-right fo-arrow"></i>
+
+            </a>
+
+
+            <a asp-controller="FinancialOfficer"
+               asp-action="Customers"
+               class="fo-quick-card">
+
+                <div class="fo-quick-icon">
+                    <i class="fa-solid fa-users"></i>
+                </div>
+
+                <div>
+
+                    <h3>Customers</h3>
+
+                    <p>
+                        Manage customer accounts and information.
+                    </p>
+
+                </div>
+
+                <i class="fa-solid fa-arrow-right fo-arrow"></i>
+
+            </a>
+
+
+            <a asp-controller="Report"
+               asp-action="Index"
+               class="fo-quick-card">
+
+                <div class="fo-quick-icon">
+                    <i class="fa-solid fa-chart-pie"></i>
+                </div>
+
+                <div>
+
+                    <h3>Reports</h3>
+
+                    <p>
+                        View financial and accommodation reports.
+                    </p>
+
+                </div>
+
+                <i class="fa-solid fa-arrow-right fo-arrow"></i>
+
+            </a>
+
+        </div>
+
+    </div>
+
+
+    <!-- RECENT PAYMENTS -->
+
+    <div class="fo-section recent-section">
+
+        <div class="fo-section-heading">
+
+            <div>
+
+                <h2>Recent Payments</h2>
+
+                <p>
+                    Latest payment activity recorded by the system.
+                </p>
+
+            </div>
+
+            <a asp-controller="PaymentManagement"
+               asp-action="Index"
+               class="fo-view-link">
+
+                View payments
+
+                <i class="fa-solid fa-arrow-right"></i>
+
+            </a>
+
+        </div>
+
+
+        <div class="fo-table-card">
+
+            @if (recent.Any())
+            {
+
+                <div class="table-responsive">
+
+                    <table class="fo-table">
+
+                        <thead>
+
+                            <tr>
+
+                                <th>Customer</th>
+
+                                <th>Payment Type</th>
+
+                                <th>Amount</th>
+
+                                <th>Date</th>
+
+                                <th>Status</th>
+
+                            </tr>
+
+                        </thead>
+
+
+                        <tbody>
+
+                            @foreach (var payment in recent)
+                            {
+
+                                var customerName = "Unknown Customer";
+
+                                if (payment.User != null)
+                                {
+                                    customerName =
+                                    $"{payment.User.FirstName} {payment.User.Surname}".Trim();
+                                }
+
+                                var status = payment.PaymentStatus;
+
+                                if (string.IsNullOrWhiteSpace(status))
+                                {
+                                    status = "Unknown";
+                                }
+
+
+                                <tr>
+
+                                    <!-- CUSTOMER -->
+
+                                    <td>
+
+                                        <div class="fo-customer">
+
+                                            <div class="fo-customer-avatar">
+
+                                                <i class="fa-solid fa-user"></i>
+
+                                            </div>
+
+                                            <div>
+
+                                                <strong>
+                                                    @customerName
+                                                </strong>
+
+                                                <span>
+                                                    @(payment.User?.UserType ?? "Customer")
+                                                </span>
+
+                                            </div>
+
+                                        </div>
+
+                                    </td>
+
+
+                                    <!-- PAYMENT TYPE -->
+
+                                    <td>
+
+                                        <div class="fo-payment-type">
+
+                                            <div class="fo-payment-type-icon">
+
+                                                <i class="fa-solid fa-receipt"></i>
+
+                                            </div>
+
+                                            <span>
+                                                @(payment.PaymentType?.Name ?? "Unknown")
+                                            </span>
+
+                                        </div>
+
+                                    </td>
+
+
+                                    <!-- AMOUNT -->
+
+                                    <td>
+
+                                        <strong class="fo-amount">
+
+                                            R @payment.Amount.ToString("N2")
+
+                                        </strong>
+
+                                    </td>
+
+
+                                    <!-- DATE -->
+
+                                    <td>
+
+                                        <span class="fo-date-text">
+
+                                            @payment.PaymentDate.ToLocalTime().ToString("dd MMM yyyy")
+
+                                        </span>
+
+                                    </td>
+
+
+                                    <!-- STATUS -->
+
+                                    <td>
+
+                                        @if (status.Equals(
+                                                                        "Paid",
+                                                                        StringComparison.OrdinalIgnoreCase))
+                                        {
+
+                                            <span class="fo-status paid">
+
+                                                <i class="fa-solid fa-circle-check"></i>
+
+                                                Paid
+
+                                            </span>
+
+                                        }
+                                        else if (status.Equals(
+                                        "Pending",
+                                        StringComparison.OrdinalIgnoreCase))
+                                        {
+
+                                            <span class="fo-status pending">
+
+                                                <i class="fa-solid fa-clock"></i>
+
+                                                Pending
+
+                                            </span>
+
+                                        }
+                                        else if (status.Equals(
+                                        "Rejected",
+                                        StringComparison.OrdinalIgnoreCase))
+                                        {
+
+                                            <span class="fo-status rejected">
+
+                                                <i class="fa-solid fa-circle-xmark"></i>
+
+                                                Rejected
+
+                                            </span>
+
+                                        }
+                                        else
+                                        {
+
+                                            <span class="fo-status other">
+
+                                                <i class="fa-solid fa-circle-info"></i>
+
+                                                @status
+
+                                            </span>
+
+                                        }
+
+                                    </td>
+
+                                </tr>
+
+                            }
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            }
+            else
+            {
+
+                <div class="fo-empty">
+
+                    <div class="fo-empty-icon">
+
+                        <i class="fa-solid fa-receipt"></i>
+
+                    </div>
+
+                    <h3>
+                        No recent payments
+                    </h3>
+
+                    <p>
+                        Payment activity will appear here when
+                        customers submit payments.
+                    </p>
+
+                </div>
+
+            }
+
+        </div>
+
+    </div>
+
+
+    <!-- INFORMATION -->
+
+    <div class="fo-information">
+
+        <div class="fo-information-icon">
+
+            <i class="fa-solid fa-shield-halved"></i>
+
+        </div>
+
+        <div>
+
+            <strong>
+                Financial records
+            </strong>
+
+            <p>
+                Verify payment information carefully before
+                approving transactions so customer records
+                remain accurate and traceable.
+            </p>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<style>
+
+    </style>

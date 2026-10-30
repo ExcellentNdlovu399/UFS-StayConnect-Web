@@ -1,0 +1,52 @@
+@model UFSStayConnect.ViewModels.RecordServiceUsageViewModel
+@using Microsoft.AspNetCore.Mvc.Rendering
+@{
+    ViewData["Title"] = "Record Service Usage";
+    var services = ViewBag.Services as IEnumerable<SelectListItem> ?? Enumerable.Empty<SelectListItem>();
+}
+<div class="container py-4" style="max-width:800px">
+    <div class="card shadow-sm border-0 rounded-4">
+        <div class="card-body p-4">
+            <h2 class="mb-1">Record Pay-as-you-go Usage</h2>
+            <p class="text-muted">@ViewBag.ApplicationLabel</p>
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+            <form asp-action="Create" method="post">
+                @Html.AntiForgeryToken()
+                <input asp-for="ApplicationID" type="hidden" />
+                <div class="mb-3">
+                    <label asp-for="ServiceID" class="form-label"></label>
+                    <select asp-for="ServiceID" asp-items="services" class="form-select">
+                        <option value="">-- Select a service --</option>
+                    </select>
+                    <span asp-validation-for="ServiceID" class="text-danger"></span>
+                </div>
+                <div class="row g-3">
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="PreviousReading" class="form-label"></label>
+                        <input asp-for="PreviousReading" class="form-control" type="number" min="0" step="0.001" />
+                        <span asp-validation-for="PreviousReading" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="CurrentReading" class="form-label"></label>
+                        <input asp-for="CurrentReading" class="form-control" type="number" min="0" step="0.001" />
+                        <span asp-validation-for="CurrentReading" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label asp-for="BillingDueDate" class="form-label"></label>
+                    <input asp-for="BillingDueDate" class="form-control" type="date" />
+                    <span asp-validation-for="BillingDueDate" class="text-danger"></span>
+                </div>
+                <div class="mb-3">
+                    <label asp-for="Notes" class="form-label"></label>
+                    <textarea asp-for="Notes" class="form-control" rows="3"></textarea>
+                    <span asp-validation-for="Notes" class="text-danger"></span>
+                </div>
+                <div class="alert alert-info">The charge is calculated from the accommodation's configured rate and saved as <strong>Unbilled</strong>. It will not automatically mark a payment as completed.</div>
+                <button type="submit" class="btn btn-primary">Calculate and Record Usage</button>
+                <a asp-controller="AccommodationCharge" asp-action="Manage" class="btn btn-outline-secondary ms-2">Cancel</a>
+            </form>
+        </div>
+    </div>
+</div>
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

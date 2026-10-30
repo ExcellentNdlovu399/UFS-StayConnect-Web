@@ -1,0 +1,846 @@
+@model UFSStayConnect.ViewModels.CustomerDashboardViewModel
+
+@{
+    ViewData["Title"] = "My Stay";
+
+    var fullName = $"{Model.FirstName} {Model.Surname}".Trim();
+
+    var hasAccommodation =
+        Model.ApprovedApplications > 0 &&
+        !string.IsNullOrWhiteSpace(Model.AccommodationName);
+
+    var hasPendingApplication =
+        Model.AccommodationStatus == "Application Pending";
+
+    var initials = "";
+
+    if (!string.IsNullOrWhiteSpace(Model.FirstName))
+    {
+        initials += Model.FirstName.Substring(0, 1).ToUpper();
+    }
+
+    if (!string.IsNullOrWhiteSpace(Model.Surname))
+    {
+        initials += Model.Surname.Substring(0, 1).ToUpper();
+    }
+}
+
+<div class="my-stay-page">
+
+    <!-- =========================================================
+         PAGE INTRO
+         ========================================================= -->
+
+    <section class="my-stay-intro">
+
+        <div>
+            <span class="my-stay-eyebrow">
+                UFS QwaQwa Accommodation
+            </span>
+
+            <h1>
+                Welcome back, @Model.FirstName
+            </h1>
+
+            <p>
+                Manage your accommodation, applications and payments
+                from one place.
+            </p>
+        </div>
+
+        <div class="my-stay-profile-mini">
+
+            <div class="my-stay-avatar">
+                @initials
+            </div>
+
+            <div>
+                <strong>@fullName</strong>
+
+                @if (!string.IsNullOrWhiteSpace(Model.StudentNumber))
+                {
+                    <span>@Model.StudentNumber</span>
+                }
+                else if (!string.IsNullOrWhiteSpace(Model.EmployeeNumber))
+                {
+                    <span>@Model.EmployeeNumber</span>
+                }
+                else
+                {
+                    <span>@Model.UserType</span>
+                }
+            </div>
+
+        </div>
+
+    </section>
+
+
+    
+@if (Model.ApprovedAccommodationItems != null &&
+     Model.ApprovedAccommodationItems.Any())
+{
+    <section class="my-approved-accommodations mb-5">
+        <div class="section-heading mb-4">
+            <div>
+                <span>YOUR RESIDENCES</span>
+                <h2>My approved accommodations</h2>
+                <p class="text-muted mb-0">
+                    You have @Model.ApprovedAccommodationItems.Count
+                    approved accommodation
+                    @(Model.ApprovedAccommodationItems.Count == 1
+                        ? "residence"
+                        : "residences").
+                </p>
+            </div>
+        </div>
+
+        <div class="approved-residences-grid">
+            @foreach (var item in Model.ApprovedAccommodationItems)
+            {
+                <article class="approved-residence-card">
+
+                    <div class="approved-residence-image">
+                        <img src="@Url.Content("~/images/accommodation/accommodation-10.jpg")"
+                             alt="@item.AccommodationName" />
+
+                        <div class="approved-residence-image-overlay"></div>
+
+                        <div class="approved-residence-image-content">
+                            <span class="approved-residence-status">
+                                <i class="fa-solid fa-circle-check"></i>
+                                @item.Status
+                            </span>
+
+                            <span class="approved-residence-application">
+                                Application #@item.ApplicationID
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="approved-residence-details">
+                        <span class="approved-residence-eyebrow">
+                            UFS QwaQwa Campus
+                        </span>
+
+                        <h3>@item.AccommodationName</h3>
+
+                        <div class="approved-residence-info">
+                            <div class="approved-residence-info-item">
+                                <div class="approved-residence-icon">
+                                    <i class="fa-solid fa-door-open"></i>
+                                </div>
+
+                                <div>
+                                    <span>ROOM</span>
+                                    <strong>
+                                        @(string.IsNullOrWhiteSpace(item.RoomNumber)
+                                            ? "Not assigned"
+                                            : item.RoomNumber)
+                                    </strong>
+                                </div>
+                            </div>
+
+                            <div class="approved-residence-info-item">
+                                <div class="approved-residence-icon">
+                                    <i class="fa-solid fa-house"></i>
+                                </div>
+
+                                <div>
+                                    <span>APPLICATION</span>
+                                    <strong>#@item.ApplicationID</strong>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="approved-residence-footer">
+                            <span>
+                                <i class="fa-solid fa-circle-check"></i>
+                                Approved allocation
+                            </span>
+
+                            <a asp-controller="Application"
+                               asp-action="Details"
+                               asp-route-id="@item.ApplicationID"
+                               class="approved-residence-button">
+                                View application
+                                <i class="fa-solid fa-arrow-right"></i>
+                            </a>
+                        </div>
+                    </div>
+
+                </article>
+            }
+        </div>
+    </section>
+}
+
+
+    @if (hasAccommodation)
+    {
+        <!-- =====================================================
+             CURRENT STAY
+             ===================================================== -->
+
+        <section class="stay-hero">
+
+            <div class="stay-hero-image">
+                <img src="~/images/accommodation/accommodation-10.jpg"
+                     alt="@Model.AccommodationName" />
+
+                <div class="stay-hero-overlay"></div>
+
+                <div class="stay-hero-content">
+
+                    <span class="stay-status-badge">
+                        <span class="status-dot"></span>
+                        Currently Allocated
+                    </span>
+
+                    <h2>
+                        @Model.AccommodationName
+                    </h2>
+
+                    <p class="stay-location">
+                        <i class="fa-solid fa-location-dot"></i>
+                        UFS QwaQwa Campus
+                    </p>
+
+                </div>
+
+            </div>
+
+            <div class="stay-hero-details">
+
+                <div class="stay-detail-heading">
+                    <span>MY CURRENT STAY</span>
+                    <h3>Your accommodation</h3>
+                </div>
+
+                <div class="stay-detail-grid">
+
+                    <div class="stay-detail-item">
+
+                        <div class="stay-detail-icon">
+                            <i class="fa-solid fa-door-open"></i>
+                        </div>
+
+                        <div>
+                            <span>Room</span>
+
+                            <strong>
+                                @(string.IsNullOrWhiteSpace(Model.RoomNumber)
+                                                            ? "Allocated"
+                                                            : Model.RoomNumber)
+                        </strong>
+                    </div>
+
+                    </div>
+
+
+                    <div class="stay-detail-item">
+
+                        <div class="stay-detail-icon">
+                            <i class="fa-solid fa-bed"></i>
+                        </div>
+
+                        <div>
+                            <span>Residence</span>
+
+                            <strong>
+                                @Model.AccommodationName
+                            </strong>
+                        </div>
+
+                    </div>
+
+
+                    <div class="stay-detail-item">
+
+                        <div class="stay-detail-icon">
+                            <i class="fa-solid fa-building"></i>
+                        </div>
+
+                        <div>
+                            <span>Available Rooms</span>
+
+                            <strong>
+                                @(Model.AvailableRooms?.ToString() ?? "—")
+                            </strong>
+                        </div>
+
+                    </div>
+
+
+                    <div class="stay-detail-item">
+
+                        <div class="stay-detail-icon">
+                            <i class="fa-solid fa-circle-check"></i>
+                        </div>
+
+                        <div>
+                            <span>Status</span>
+
+                            <strong class="text-approved">
+                                Approved
+                            </strong>
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="stay-hero-actions">
+
+                @if (Model.AccommodationID.HasValue)
+                    {
+                        <!--a asp-controller="Accommodation"
+                           asp-action="Details"
+                           asp-route-id="@Model.AccommodationID"
+                           class="btn-stay-primary">
+                            <i class="fa-solid fa-building"></i>
+                            View Residence
+                        </!--a-->
+                    }
+
+                    <!--a asp-controller="Application"
+                       asp-action="MyApplications"
+                       class="btn-stay-secondary">
+                        View Applications
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </!--a-->
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =====================================================
+             PAYMENT SUMMARY
+             ===================================================== -->
+
+        <section class="stay-section">
+
+            <div class="section-heading">
+
+                <div>
+                    <span>ACCOMMODATION ACCOUNT</span>
+                    <h2>Payments &amp; charges</h2>
+                </div>
+
+                <a asp-controller="Payment"
+                   asp-action="Index"
+                   class="section-link">
+                    View payment history
+                    <i class="fa-solid fa-arrow-right"></i>
+                </a>
+
+            </div>
+
+
+            <div class="payment-overview-grid">
+
+                <div class="payment-overview-card payment-due">
+
+                    <div class="payment-card-top">
+
+                        <div class="payment-card-icon">
+                            <i class="fa-solid fa-wallet"></i>
+                        </div>
+
+                        @if (Model.OutstandingBalance > 0)
+                        {
+                            <span class="payment-label warning">
+                                Amount due
+                            </span>
+                        }
+                        else
+                        {
+                            <span class="payment-label success">
+                                Up to date
+                            </span>
+                        }
+
+                    </div>
+
+                    <span class="payment-card-caption">
+                        Outstanding balance
+                    </span>
+
+                    <strong class="payment-amount">
+                        R @Model.OutstandingBalance.ToString("N2")
+                    </strong>
+
+                    @if (Model.OverdueBalance > 0)
+                    {
+                        <p class="payment-card-note overdue-note">
+                            <i class="fa-solid fa-circle-exclamation"></i>
+                            R @Model.OverdueBalance.ToString("N2") overdue
+                        </p>
+                    }
+                    else if (Model.DueSoonBalance > 0)
+                    {
+                        <p class="payment-card-note">
+                            <i class="fa-solid fa-clock"></i>
+                            R @Model.DueSoonBalance.ToString("N2") due soon
+                        </p>
+                    }
+                    else
+                    {
+                        <p class="payment-card-note">
+                            <i class="fa-solid fa-circle-check"></i>
+                            No overdue payments
+                        </p>
+                    }
+
+                </div>
+
+
+                <div class="payment-overview-card">
+
+                    <div class="payment-card-top">
+
+                        <div class="payment-card-icon">
+                            <i class="fa-solid fa-receipt"></i>
+                        </div>
+
+                        <span class="payment-label">
+                            Latest payment
+                        </span>
+
+                    </div>
+
+                    <span class="payment-card-caption">
+                        Most recent successful payment
+                    </span>
+
+                    <strong class="payment-amount">
+                        R @Model.RecentPaymentAmount.ToString("N2")
+                    </strong>
+
+                    <p class="payment-card-note">
+                        <i class="fa-solid fa-shield-check"></i>
+                        Payment record
+                    </p>
+
+                </div>
+
+
+                <div class="payment-overview-card">
+
+                    <div class="payment-card-top">
+
+                        <div class="payment-card-icon">
+                            <i class="fa-solid fa-file-invoice-dollar"></i>
+                        </div>
+
+                        <span class="payment-label">
+                            Charges
+                        </span>
+
+                    </div>
+
+                    <span class="payment-card-caption">
+                        Upcoming accommodation charges
+                    </span>
+
+                    <strong class="payment-amount payment-items-count">
+                        @Model.PaymentItems.Count
+                    </strong>
+
+                    <p class="payment-card-note">
+                        Active items requiring attention
+                    </p>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =====================================================
+             UPCOMING PAYMENTS
+             ===================================================== -->
+        @if (Model.PaymentItems != null && Model.PaymentItems.Any())
+        {
+            <section class="stay-section">
+
+                <div class="section-heading">
+
+                    <div>
+                        <span>PAYMENT SCHEDULE</span>
+                        <h2>Upcoming charges</h2>
+                    </div>
+
+                    <a asp-controller="Payment"
+                       asp-action="Index"
+                       class="section-link">
+                        Make a payment
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </a>
+
+                </div>
+
+
+                <div class="payment-list">
+
+                    @foreach (var item in Model.PaymentItems)
+                    {
+                        var statusClass =
+                        item.Status == "Overdue"
+                        ? "payment-status-overdue"
+                        : item.Status == "Paid"
+                        ? "payment-status-paid"
+                        : "payment-status-unpaid";
+
+                        <div class="payment-row">
+
+                            <div class="payment-row-icon">
+                                <i class="fa-solid fa-file-invoice"></i>
+                            </div>
+
+                            <div class="payment-row-main">
+
+                                <strong>
+                                    @item.PaymentTypeName
+                                </strong>
+
+                                <span>
+                                    Due @item.DueDate.ToString("dd MMM yyyy")
+                                </span>
+
+                            </div>
+
+                            <div class="payment-row-amount">
+
+                                <strong>
+                                    R @item.Amount.ToString("N2")
+                                </strong>
+
+                                <span class="@statusClass">
+                                    @item.Status
+                                </span>
+
+                            </div>
+
+                        </div>
+                    }
+
+                </div>
+
+            </section>
+        }
+
+
+        <!-- =====================================================
+             QUICK ACCESS
+             ===================================================== -->
+
+        <section class="stay-section">
+
+            <div class="section-heading">
+
+                <div>
+                    <span>QUICK ACCESS</span>
+                    <h2>Manage your stay</h2>
+                </div>
+
+            </div>
+
+
+            <div class="stay-actions-grid">
+
+                <a asp-controller="Accommodation"
+                   asp-action="Index"
+                   class="stay-action-card">
+
+                    <div class="stay-action-icon">
+                        <i class="fa-solid fa-building"></i>
+                    </div>
+
+                    <div>
+                        <strong>Explore residences</strong>
+                        <span>View available accommodation</span>
+                    </div>
+
+                    <i class="fa-solid fa-arrow-right action-arrow"></i>
+
+                </a>
+
+
+                <a asp-controller="Application"
+                   asp-action="Index"
+                   class="stay-action-card">
+
+                    <div class="stay-action-icon">
+                        <i class="fa-solid fa-file-lines"></i>
+                    </div>
+
+                    <div>
+                        <strong>My applications</strong>
+                        <span>Track your accommodation applications</span>
+                    </div>
+
+                    <i class="fa-solid fa-arrow-right action-arrow"></i>
+
+                </a>
+
+
+                <a asp-controller="Payment"
+                   asp-action="Index"
+                   class="stay-action-card">
+
+                    <div class="stay-action-icon">
+                        <i class="fa-solid fa-credit-card"></i>
+                    </div>
+
+                    <div>
+                        <strong>Payments</strong>
+                        <span>Manage accommodation payments</span>
+                    </div>
+
+                    <i class="fa-solid fa-arrow-right action-arrow"></i>
+
+                </a>
+
+
+                <a asp-controller="Notification"
+                   asp-action="Index"
+                   class="stay-action-card">
+
+                    <div class="stay-action-icon">
+                        <i class="fa-solid fa-bell"></i>
+                    </div>
+
+                    <div>
+                        <strong>Notifications</strong>
+                        <span>
+                            @Model.UnreadNotifications unread notification@(Model.UnreadNotifications == 1 ? "" : "s")
+                        </span>
+                    </div>
+
+                    <i class="fa-solid fa-arrow-right action-arrow"></i>
+
+                </a>
+
+            </div>
+
+        </section>
+
+    }
+    else if (hasPendingApplication)
+    {
+        <!-- =====================================================
+             APPLICATION PENDING
+             ===================================================== -->
+
+        <section class="stay-empty-hero">
+
+            <div class="empty-hero-content">
+
+                <span class="empty-eyebrow">
+                    APPLICATION IN PROGRESS
+                </span>
+
+                <h2>
+                    Your accommodation application is being reviewed.
+                </h2>
+
+                <p>
+                    Your application has been received. You can track
+                    its progress and view your submitted applications
+                    from your accommodation portal.
+                </p>
+
+                <div class="empty-hero-actions">
+
+                    <a asp-controller="Application"
+                       asp-action="Index"
+                       class="btn-stay-primary">
+                        <i class="fa-solid fa-file-lines"></i>
+                        Track my application
+                    </a>
+
+                    <a asp-controller="Accommodation"
+                       asp-action="Index"
+                       class="btn-stay-secondary">
+                        Explore residences
+                    </a>
+
+                </div>
+
+            </div>
+
+            <div class="empty-hero-icon">
+                <i class="fa-solid fa-hourglass-half"></i>
+            </div>
+
+        </section>
+
+
+        <section class="stay-section">
+
+            <div class="section-heading">
+
+                <div>
+                    <span>WHILE YOU WAIT</span>
+                    <h2>Explore accommodation</h2>
+                </div>
+
+            </div>
+
+            <div class="no-stay-info">
+
+                <div class="no-stay-info-icon">
+                    <i class="fa-solid fa-house"></i>
+                </div>
+
+                <div>
+                    <strong>Looking for another residence?</strong>
+
+                    <p>
+                        Browse available UFS accommodation options
+                        and review their facilities, services and
+                        availability.
+                    </p>
+                </div>
+
+                <a asp-controller="Accommodation"
+                   asp-action="Index"
+                   class="btn-stay-secondary">
+                    Browse accommodation
+                    <i class="fa-solid fa-arrow-right"></i>
+                </a>
+
+            </div>
+
+        </section>
+
+    }
+    else
+    {
+        <!-- =====================================================
+             NO ACCOMMODATION
+             ===================================================== -->
+
+        <section class="stay-empty-hero no-accommodation">
+
+            <div class="empty-hero-content">
+
+                <span class="empty-eyebrow">
+                    FIND YOUR UFS HOME
+                </span>
+
+                <h2>
+                    Your next stay starts here.
+                </h2>
+
+                <p>
+                    You don't currently have an approved accommodation
+                    allocation. Explore available residences and submit
+                    an application that suits you.
+                </p>
+
+                <div class="empty-hero-actions">
+
+                    <a asp-controller="Accommodation"
+                       asp-action="Index"
+                       class="btn-stay-primary">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        Explore accommodation
+                    </a>
+
+                    <a asp-controller="Application"
+                       asp-action="Index"
+                       class="btn-stay-secondary">
+                        My applications
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </a>
+
+                </div>
+
+            </div>
+
+            <div class="empty-hero-icon">
+                <i class="fa-solid fa-house-chimney"></i>
+            </div>
+
+        </section>
+
+
+        <section class="stay-section">
+
+            <div class="section-heading">
+
+                <div>
+                    <span>YOUR APPLICATION JOURNEY</span>
+                    <h2>Accommodation at a glance</h2>
+                </div>
+
+            </div>
+
+            <div class="journey-grid">
+
+                <div class="journey-card">
+
+                    <span class="journey-number">01</span>
+
+                    <div class="journey-icon">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                    </div>
+
+                    <h3>Explore</h3>
+
+                    <p>
+                        Compare available residences and
+                        find accommodation that suits you.
+                    </p>
+
+                </div>
+
+
+                <div class="journey-card">
+
+                    <span class="journey-number">02</span>
+
+                    <div class="journey-icon">
+                        <i class="fa-solid fa-file-signature"></i>
+                    </div>
+
+                    <h3>Apply</h3>
+
+                    <p>
+                        Submit your accommodation application
+                        and required documents.
+                    </p>
+
+                </div>
+
+
+                <div class="journey-card">
+
+                    <span class="journey-number">03</span>
+
+                    <div class="journey-icon">
+                        <i class="fa-solid fa-house-circle-check"></i>
+                    </div>
+
+                    <h3>Move in</h3>
+
+                    <p>
+                        Once approved, view your residence
+                        and allocated room from My Stay.
+                    </p>
+
+                </div>
+
+            </div>
+
+        </section>
+    }
+
+</div>

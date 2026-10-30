@@ -1,0 +1,1036 @@
+@using UFSStayConnect.Models
+
+@{
+    ViewData["Title"] = "Reports";
+
+    if (User.IsInRole("FinancialOfficer"))
+    {
+        Layout = "~/Views/FinancialOfficer/_FinancialOfficerLayout.cshtml";
+    }
+    else
+    {
+        Layout = "~/Views/Admin/_AdminLayout.cshtml";
+    }
+
+    var rows =
+        ViewBag.Rows as IEnumerable<Payment>
+        ?? Enumerable.Empty<Payment>();
+
+    var types =
+        ViewBag.PaymentTypes as IEnumerable<PaymentType>
+        ?? Enumerable.Empty<PaymentType>();
+}
+
+<div class="reports-page">
+
+    <!-- HEADER -->
+    <div class="page-header">
+
+        <div>
+
+            <div class="eyebrow">
+                <i class="fas fa-chart-line"></i>
+                ANALYTICS & REPORTING
+            </div>
+
+            <h1>Reports</h1>
+
+            <p>
+                Operational, accommodation and financial reporting.
+            </p>
+
+        </div>
+
+        <a asp-action="ExportCsv"
+           asp-route-status="@ViewBag.Status"
+           asp-route-paymentTypeId="@ViewBag.PaymentTypeId"
+           asp-route-from="@ViewBag.From"
+           asp-route-to="@ViewBag.To"
+           class="export-button">
+
+            <i class="fas fa-file-csv"></i>
+            Export CSV
+
+        </a>
+
+    </div>
+
+
+    <!-- FILTER CARD -->
+    <div class="filter-card">
+
+        <div class="filter-heading">
+
+            <div class="filter-icon">
+                <i class="fas fa-filter"></i>
+            </div>
+
+            <div>
+                <h2>Report Filters</h2>
+                <p>
+                    Select the criteria you want included in the report.
+                </p>
+            </div>
+
+        </div>
+
+
+        <form method="get" class="filter-form">
+
+            <!-- STATUS -->
+            <div class="filter-field">
+
+                <label>
+                    Status
+                </label>
+
+                <select name="status" class="form-control-custom">
+
+                    <option value=""
+                            selected="@(string.IsNullOrEmpty(ViewBag.Status?.ToString()))">
+                        All
+                    </option>
+
+                    <option value="Paid"
+                            selected="@(ViewBag.Status?.ToString() == "Paid")">
+                        Paid
+                    </option>
+
+                    <option value="Pending"
+                            selected="@(ViewBag.Status?.ToString() == "Pending")">
+                        Pending
+                    </option>
+
+                    <option value="Rejected"
+                            selected="@(ViewBag.Status?.ToString() == "Rejected")">
+                        Rejected
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <!-- PAYMENT TYPE -->
+            <div class="filter-field">
+
+                <label>
+                    Payment Type
+                </label>
+
+                <select name="paymentTypeId"
+                        class="form-control-custom">
+
+                    <option value="">All types</option>
+
+                    @foreach (var type in types)
+                    {
+                        <option value="@type.PaymentTypeID"
+                                selected="@(ViewBag.PaymentTypeId?.ToString() == type.PaymentTypeID.ToString())">
+                            @type.Name
+                        </option>
+                    }
+
+                </select>
+
+            </div>
+
+
+            <!-- FROM -->
+            <div class="filter-field">
+
+                <label>
+                    From
+                </label>
+
+                <input type="date"
+                       name="from"
+                       value="@ViewBag.From"
+                       class="form-control-custom" />
+
+            </div>
+
+
+            <!-- TO -->
+            <div class="filter-field">
+
+                <label>
+                    To
+                </label>
+
+                <input type="date"
+                       name="to"
+                       value="@ViewBag.To"
+                       class="form-control-custom" />
+
+            </div>
+
+
+            <!-- BUTTONS -->
+            <div class="filter-actions">
+
+                <button type="submit"
+                        class="generate-button">
+
+                    <i class="fas fa-chart-bar"></i>
+                    Generate
+
+                </button>
+
+                <a asp-action="Index"
+                   class="clear-button">
+
+                    Clear
+
+                </a>
+
+            </div>
+
+        </form>
+
+    </div>
+
+
+    <!-- SUMMARY -->
+    <div class="summary-grid">
+
+        <!-- CUSTOMERS -->
+        <div class="summary-card">
+
+            <div class="summary-icon blue">
+                <i class="fas fa-users"></i>
+            </div>
+
+            <div>
+                <span>Customers</span>
+                <strong>@ViewBag.Customers</strong>
+                <small>Registered customers</small>
+            </div>
+
+        </div>
+
+
+        <!-- ROOMS -->
+        <div class="summary-card">
+
+            <div class="summary-icon green">
+                <i class="fas fa-bed"></i>
+            </div>
+
+            <div>
+                <span>Available Rooms</span>
+                <strong>@ViewBag.AvailableRooms</strong>
+                <small>Currently available</small>
+            </div>
+
+        </div>
+
+
+        <!-- APPLICATIONS -->
+        <div class="summary-card">
+
+            <div class="summary-icon purple">
+                <i class="fas fa-file-alt"></i>
+            </div>
+
+            <div>
+                <span>Approved Applications</span>
+                <strong>@ViewBag.ApprovedApplications</strong>
+
+                <small>
+                    @ViewBag.PendingApplications pending
+                </small>
+
+            </div>
+
+        </div>
+
+
+        <!-- PAID -->
+        <div class="summary-card">
+
+            <div class="summary-icon orange">
+                <i class="fas fa-money-bill-wave"></i>
+            </div>
+
+            <div>
+                <span>Paid in Selected Period</span>
+
+                <strong class="money">
+                    R @(((decimal)ViewBag.Paid).ToString("N2"))
+                </strong>
+
+                <small>
+                    Pending:
+                    R @(((decimal)ViewBag.Pending).ToString("N2"))
+                </small>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- PAYMENT REPORT -->
+    <div class="report-card">
+
+        <div class="report-header">
+
+            <div>
+
+                <div class="report-title">
+
+                    <div class="report-icon">
+                        <i class="fas fa-table"></i>
+                    </div>
+
+                    <div>
+                        <h2>Payment Report</h2>
+
+                        <p>
+                            Transactions matching the selected filters.
+                        </p>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="record-count">
+                @rows.Count() records
+            </div>
+
+        </div>
+
+
+        <div class="table-wrapper">
+
+            <table class="reports-table">
+
+                <thead>
+
+                    <tr>
+
+                        <th>Reference</th>
+
+                        <th>Customer</th>
+
+                        <th>Accommodation</th>
+
+                        <th>Type</th>
+
+                        <th>Amount</th>
+
+                        <th>Status</th>
+
+                        <th>Date</th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    @foreach (var payment in rows)
+                    {
+                        <tr>
+
+                            <td>
+
+                                <span class="reference">
+                                    @payment.ReferenceNumber
+                                </span>
+
+                            </td>
+
+
+                            <td>
+
+                                @if (payment.User != null)
+                                {
+                                    <div class="customer-cell">
+
+                                        <div class="customer-avatar">
+
+                                            @(
+                                                                                (
+                                                                                (payment.User.FirstName ?? "")
+                                                                                .FirstOrDefault()
+                                                                                .ToString()
+                                                                                +
+                                                                                (
+                                                                                (payment.User.Surname ?? "")
+                                                                                .FirstOrDefault()
+                                                                                .ToString()
+                                                                                )
+                                                                                ).ToUpper()
+                                                                                )
+
+                                </div>
+
+                                        <span>
+                                            @payment.User.FirstName
+                                            @payment.User.Surname
+                                        </span>
+
+                                    </div>
+                                                        }
+                                else
+                                {
+                                    <span class="muted">
+                                        Unknown
+                                    </span>
+                                }
+
+                        </td>
+
+
+                        <td>
+
+                            <span class="table-text">
+                                @(payment.Application?.Accommodation?.Name
+                                                                ?? "—")
+                            </span>
+
+                            </td>
+
+
+                            <td>
+
+                                <span class="type-badge">
+                                    @(payment.PaymentType?.Name ?? "—")
+                                </span>
+
+                            </td>
+
+
+                            <td>
+
+                                <strong class="amount">
+                                    R @payment.Amount.ToString("N2")
+                                </strong>
+
+                            </td>
+
+
+                            <td>
+
+                            @if (payment.PaymentStatus == "Paid")
+                                {
+                                    <span class="status-badge paid">
+                                        <span></span>
+                                        Paid
+                                    </span>
+                                }
+                                else if (payment.PaymentStatus == "Pending")
+                                {
+                                    <span class="status-badge pending">
+                                        <span></span>
+                                        Pending
+                                    </span>
+                                }
+                                else if (payment.PaymentStatus == "Rejected")
+                                {
+                                    <span class="status-badge rejected">
+                                        <span></span>
+                                        Rejected
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="status-badge">
+                                        <span></span>
+                                        @payment.PaymentStatus
+                                    </span>
+                                }
+
+                            </td>
+
+
+                            <td>
+
+                                <span class="date">
+                                    @payment.PaymentDate.ToLocalTime().ToString("dd/MM/yyyy")
+                                </span>
+
+                            </td>
+
+                        </tr>
+                    }
+
+
+                    @if (!rows.Any())
+                    {
+                        <tr>
+
+                            <td colspan="7">
+
+                                <div class="empty-report">
+
+                                    <div>
+                                        <i class="fas fa-chart-bar"></i>
+                                    </div>
+
+                                    <h3>No Transactions Found</h3>
+
+                                    <p>
+                                        No transactions match the selected
+                                        filters.
+                                    </p>
+
+                                </div>
+
+                            </td>
+
+                        </tr>
+                    }
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<style>
+
+    .reports-page {
+        padding: 30px 34px 50px;
+        background: #f6f8fb;
+        min-height: calc(100vh - 70px);
+    }
+
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        gap: 25px;
+        margin-bottom: 25px;
+    }
+
+    .eyebrow {
+        color: #2563eb;
+        font-size: 12px;
+        font-weight: 800;
+        letter-spacing: 1.4px;
+        margin-bottom: 7px;
+    }
+
+    .page-header h1 {
+        margin: 0;
+        color: #172033;
+        font-size: 31px;
+        font-weight: 800;
+    }
+
+    .page-header p {
+        color: #7b8494;
+        font-size: 14px;
+        margin: 7px 0 0;
+    }
+
+    .export-button {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 11px 17px;
+        border: 1px solid #b9e4c6;
+        background: #effbf2;
+        color: #15803d;
+        border-radius: 9px;
+        text-decoration: none;
+        font-size: 13px;
+        font-weight: 700;
+        transition: .2s ease;
+    }
+
+        .export-button:hover {
+            background: #dcf7e4;
+            color: #166534;
+        }
+
+
+    /* FILTER */
+
+    .filter-card {
+        background: white;
+        border: 1px solid #e7ebf1;
+        border-radius: 16px;
+        padding: 22px 24px;
+        margin-bottom: 22px;
+        box-shadow: 0 7px 25px rgba(20,30,50,.045);
+    }
+
+    .filter-heading {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 20px;
+    }
+
+    .filter-icon {
+        width: 42px;
+        height: 42px;
+        border-radius: 11px;
+        background: #eef4ff;
+        color: #2563eb;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .filter-heading h2 {
+        color: #172033;
+        font-size: 16px;
+        font-weight: 800;
+        margin: 0 0 3px;
+    }
+
+    .filter-heading p {
+        color: #8a93a3;
+        font-size: 12px;
+        margin: 0;
+    }
+
+    .filter-form {
+        display: grid;
+        grid-template-columns: 1.1fr 1.3fr 1fr 1fr 1.3fr;
+        gap: 13px;
+        align-items: end;
+    }
+
+    .filter-field label {
+        display: block;
+        color: #626d7e;
+        font-size: 11px;
+        font-weight: 800;
+        margin-bottom: 7px;
+    }
+
+    .form-control-custom {
+        width: 100%;
+        min-height: 41px;
+        border: 1px solid #dfe4eb;
+        border-radius: 8px;
+        background: #f8fafc;
+        padding: 8px 11px;
+        color: #303949;
+        font-size: 13px;
+        outline: none;
+    }
+
+        .form-control-custom:focus {
+            border-color: #2563eb;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(37,99,235,.08);
+        }
+
+    .filter-actions {
+        display: flex;
+        gap: 7px;
+    }
+
+    .generate-button {
+        flex: 1;
+        min-height: 41px;
+        border: 0;
+        border-radius: 8px;
+        background: #2563eb;
+        color: white;
+        font-size: 12px;
+        font-weight: 700;
+        cursor: pointer;
+    }
+
+        .generate-button:hover {
+            background: #1d4ed8;
+        }
+
+    .clear-button {
+        min-height: 41px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0 14px;
+        border: 1px solid #dfe4eb;
+        border-radius: 8px;
+        color: #626d7e;
+        text-decoration: none;
+        font-size: 12px;
+        font-weight: 700;
+        background: white;
+    }
+
+        .clear-button:hover {
+            background: #f5f7fa;
+        }
+
+
+    /* SUMMARY */
+
+    .summary-grid {
+        display: grid;
+        grid-template-columns: repeat(4,1fr);
+        gap: 18px;
+        margin-bottom: 24px;
+    }
+
+    .summary-card {
+        background: white;
+        border: 1px solid #e7ebf1;
+        border-radius: 14px;
+        padding: 20px;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        box-shadow: 0 5px 18px rgba(20,30,50,.04);
+    }
+
+    .summary-icon {
+        width: 45px;
+        height: 45px;
+        border-radius: 11px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+
+        .summary-icon.blue {
+            background: #eef4ff;
+            color: #2563eb;
+        }
+
+        .summary-icon.green {
+            background: #eaf9ef;
+            color: #16a34a;
+        }
+
+        .summary-icon.purple {
+            background: #f2edff;
+            color: #7c3aed;
+        }
+
+        .summary-icon.orange {
+            background: #fff4df;
+            color: #d97706;
+        }
+
+    .summary-card span {
+        display: block;
+        color: #7b8495;
+        font-size: 11px;
+        font-weight: 700;
+    }
+
+    .summary-card strong {
+        display: block;
+        color: #172033;
+        font-size: 21px;
+        margin: 2px 0;
+    }
+
+    .summary-card small {
+        color: #9aa3b2;
+        font-size: 10px;
+    }
+
+    .summary-card .money {
+        font-size: 18px;
+    }
+
+
+    /* REPORT TABLE */
+
+    .report-card {
+        background: white;
+        border: 1px solid #e7ebf1;
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 7px 25px rgba(20,30,50,.045);
+    }
+
+    .report-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 20px 24px;
+        border-bottom: 1px solid #edf0f4;
+    }
+
+    .report-title {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .report-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        background: #eef4ff;
+        color: #2563eb;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .report-header h2 {
+        color: #172033;
+        font-size: 17px;
+        font-weight: 800;
+        margin: 0 0 3px;
+    }
+
+    .report-header p {
+        color: #8a93a3;
+        font-size: 12px;
+        margin: 0;
+    }
+
+    .record-count {
+        padding: 6px 10px;
+        border-radius: 999px;
+        background: #f0f3f7;
+        color: #68707d;
+        font-size: 11px;
+        font-weight: 700;
+    }
+
+    .table-wrapper {
+        overflow-x: auto;
+    }
+
+    .reports-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+        .reports-table th {
+            background: #f8fafc;
+            color: #7b8495;
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: .45px;
+            padding: 14px 20px;
+            border-bottom: 1px solid #e9edf2;
+            white-space: nowrap;
+        }
+
+        .reports-table td {
+            padding: 15px 20px;
+            border-bottom: 1px solid #f0f2f5;
+            vertical-align: middle;
+        }
+
+        .reports-table tbody tr:hover {
+            background: #fafcff;
+        }
+
+    .reference {
+        font-family: monospace;
+        font-size: 11px;
+        color: #526074;
+        background: #f5f7fa;
+        padding: 5px 7px;
+        border-radius: 5px;
+    }
+
+    .customer-cell {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        white-space: nowrap;
+    }
+
+    .customer-avatar {
+        width: 31px;
+        height: 31px;
+        border-radius: 50%;
+        background: #eef4ff;
+        color: #2563eb;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 10px;
+        font-weight: 800;
+    }
+
+    .customer-cell span {
+        color: #303949;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    .table-text,
+    .date {
+        color: #626d7e;
+        font-size: 12px;
+    }
+
+    .type-badge {
+        display: inline-flex;
+        padding: 5px 9px;
+        border-radius: 7px;
+        background: #f0f4ff;
+        color: #4b63a3;
+        font-size: 10px;
+        font-weight: 700;
+    }
+
+    .amount {
+        color: #202939;
+        font-size: 12px;
+        white-space: nowrap;
+    }
+
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 5px 9px;
+        border-radius: 999px;
+        font-size: 10px;
+        font-weight: 800;
+    }
+
+        .status-badge span {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+        }
+
+        .status-badge.paid {
+            background: #eaf9ef;
+            color: #16803c;
+        }
+
+            .status-badge.paid span {
+                background: #16a34a;
+            }
+
+        .status-badge.pending {
+            background: #fff4df;
+            color: #b76a00;
+        }
+
+            .status-badge.pending span {
+                background: #d97706;
+            }
+
+        .status-badge.rejected {
+            background: #fff0f1;
+            color: #c5303d;
+        }
+
+            .status-badge.rejected span {
+                background: #dc2626;
+            }
+
+        .status-badge:not(.paid):not(.pending):not(.rejected) {
+            background: #f0f1f3;
+            color: #68707d;
+        }
+
+            .status-badge:not(.paid):not(.pending):not(.rejected) span {
+                background: #8b929d;
+            }
+
+    .muted {
+        color: #9aa3b2;
+        font-size: 12px;
+    }
+
+
+    /* EMPTY */
+
+    .empty-report {
+        padding: 55px 20px;
+        text-align: center;
+    }
+
+        .empty-report > div {
+            width: 60px;
+            height: 60px;
+            border-radius: 16px;
+            background: #eef4ff;
+            color: #2563eb;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: auto auto 14px;
+            font-size: 23px;
+        }
+
+        .empty-report h3 {
+            color: #202939;
+            font-size: 17px;
+            font-weight: 800;
+            margin-bottom: 5px;
+        }
+
+        .empty-report p {
+            color: #8b94a3;
+            font-size: 12px;
+            margin: 0;
+        }
+
+
+    /* RESPONSIVE */
+
+    @@media(max-width:1100px) {
+
+        .filter-form {
+            grid-template-columns: repeat(2,1fr);
+        }
+
+        .filter-actions {
+            grid-column: span 2;
+        }
+
+        .summary-grid {
+            grid-template-columns: repeat(2,1fr);
+        }
+    }
+
+
+    @@media(max-width:700px) {
+
+        .reports-page {
+            padding: 22px 16px 40px;
+        }
+
+        .page-header {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .export-button {
+            width: 100%;
+        }
+
+        .filter-form {
+            grid-template-columns: 1fr;
+        }
+
+        .filter-actions {
+            grid-column: auto;
+        }
+
+        .summary-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .report-header {
+            align-items: flex-start;
+            gap: 12px;
+            flex-direction: column;
+        }
+    }
+</style>

@@ -1,0 +1,744 @@
+@model UFSStayConnect.Models.Accommodation
+
+@{
+    ViewData["Title"] = "Delete Accommodation";
+    Layout = "~/Views/Admin/_AdminLayout.cshtml";
+
+    var occupiedRooms = Math.Max(
+        0,
+        Model.TotalRooms - Model.AvailableRooms
+    );
+
+    var occupancyPercentage =
+        Model.TotalRooms > 0
+            ? Math.Round(
+                (double)occupiedRooms / Model.TotalRooms * 100,
+                1)
+            : 0;
+}
+
+<div class="admin-dashboard accommodation-delete-page">
+
+    <!-- =====================================================
+         PAGE HEADER
+         ===================================================== -->
+
+    <div class="dashboard-heading">
+
+        <div>
+
+            <div class="delete-page-label">
+                <i class="fa-solid fa-shield-halved"></i>
+                Accommodation Management
+            </div>
+
+            <h2>
+                Delete Accommodation
+            </h2>
+
+            <p>
+                Review the accommodation information before
+                permanently removing this residence.
+            </p>
+
+        </div>
+
+
+        <a asp-controller="Accommodation"
+           asp-action="Manage"
+           class="btn btn-outline-secondary">
+
+            <i class="fa-solid fa-arrow-left"></i>
+
+            Back to Accommodation
+
+        </a>
+
+    </div>
+
+
+    <!-- =====================================================
+         IMPORTANT WARNING
+         ===================================================== -->
+
+    <div class="delete-warning-banner">
+
+        <div class="delete-warning-icon">
+
+            <i class="fa-solid fa-triangle-exclamation"></i>
+
+        </div>
+
+
+        <div>
+
+            <strong>
+                You are about to permanently delete this residence
+            </strong>
+
+            <p>
+                This action cannot be undone. Review the information
+                below carefully before continuing.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         MAIN DELETE CARD
+         ===================================================== -->
+
+    <div class="delete-accommodation-card">
+
+
+        <!-- =================================================
+             IMAGE
+             ================================================= -->
+
+        <div class="delete-accommodation-image">
+
+            @if (!string.IsNullOrWhiteSpace(Model.ImagePath))
+            {
+                <img src="@Model.ImagePath"
+                     alt="@Model.Name" />
+            }
+            else
+            {
+                <div class="delete-no-image">
+
+                    <i class="fa-solid fa-house"></i>
+
+                    <span>
+                        No accommodation image
+                    </span>
+
+                </div>
+            }
+
+
+            <!-- IMAGE STATUS -->
+
+            <div class="delete-image-overlay">
+
+                @if (Model.Available)
+                {
+                    <span class="delete-status available">
+
+                        <i class="fa-solid fa-circle-check"></i>
+
+                        Currently Available
+
+                    </span>
+                }
+                else
+                {
+                    <span class="delete-status unavailable">
+
+                        <i class="fa-solid fa-circle-xmark"></i>
+
+                        Currently Unavailable
+
+                    </span>
+                }
+
+            </div>
+
+        </div>
+
+
+        <!-- =================================================
+             INFORMATION
+             ================================================= -->
+
+        <div class="delete-accommodation-info">
+
+
+            <!-- TITLE -->
+
+            <div class="delete-residence-heading">
+
+                <div>
+
+                    <span class="delete-reference">
+                        RESIDENCE
+                    </span>
+
+                    <h3>
+                        @Model.Name
+                    </h3>
+
+                    <p>
+                        <i class="fa-solid fa-location-dot"></i>
+
+                        @Model.Location
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <!-- DETAILS -->
+
+            <div class="delete-details-grid">
+
+
+                <!-- TYPE -->
+
+                <div class="delete-detail">
+
+                    <div class="delete-detail-icon blue">
+
+                        <i class="fa-solid fa-building"></i>
+
+                    </div>
+
+                    <div>
+
+                        <span>
+                            Accommodation Type
+                        </span>
+
+                        <strong>
+                            @Model.Type
+                        </strong>
+
+                    </div>
+
+                </div>
+
+
+                <!-- RENT -->
+
+                <div class="delete-detail">
+
+                    <div class="delete-detail-icon gold">
+
+                        <i class="fa-solid fa-money-bill-wave"></i>
+
+                    </div>
+
+                    <div>
+
+                        <span>
+                            Monthly Rent
+                        </span>
+
+                        <strong>
+                            R @Model.MonthlyRent.ToString("N2")
+                        </strong>
+
+                    </div>
+
+                </div>
+
+
+                <!-- BEDROOMS -->
+
+                <div class="delete-detail">
+
+                    <div class="delete-detail-icon blue">
+
+                        <i class="fa-solid fa-bed"></i>
+
+                    </div>
+
+                    <div>
+
+                        <span>
+                            Bedrooms
+                        </span>
+
+                        <strong>
+                            @Model.Bedrooms
+                        </strong>
+
+                    </div>
+
+                </div>
+
+
+                <!-- BATHROOMS -->
+
+                <div class="delete-detail">
+
+                    <div class="delete-detail-icon blue">
+
+                        <i class="fa-solid fa-bath"></i>
+
+                    </div>
+
+                    <div>
+
+                        <span>
+                            Bathrooms
+                        </span>
+
+                        <strong>
+                            @Model.Bathrooms
+                        </strong>
+
+                    </div>
+
+                </div>
+
+
+                <!-- TOTAL ROOMS -->
+
+                <div class="delete-detail">
+
+                    <div class="delete-detail-icon blue">
+
+                        <i class="fa-solid fa-door-open"></i>
+
+                    </div>
+
+                    <div>
+
+                        <span>
+                            Total Rooms
+                        </span>
+
+                        <strong>
+                            @Model.TotalRooms
+                        </strong>
+
+                    </div>
+
+                </div>
+
+
+                <!-- AVAILABLE ROOMS -->
+
+                <div class="delete-detail">
+
+                    <div class="delete-detail-icon green">
+
+                        <i class="fa-solid fa-door-open"></i>
+
+                    </div>
+
+                    <div>
+
+                        <span>
+                            Available Rooms
+                        </span>
+
+                        <strong>
+                            @Model.AvailableRooms
+                        </strong>
+
+                    </div>
+
+                </div>
+
+
+            </div>
+
+
+            <!-- =================================================
+                 OCCUPANCY
+                 ================================================= -->
+
+            <div class="delete-occupancy">
+
+                <div class="delete-occupancy-header">
+
+                    <div>
+
+                        <span>
+                            ROOM OCCUPANCY
+                        </span>
+
+                        <strong>
+                            @occupiedRooms of @Model.TotalRooms
+                            rooms occupied
+                        </strong>
+
+                    </div>
+
+                    <strong>
+                        @occupancyPercentage%
+                    </strong>
+
+                </div>
+
+
+                <div class="delete-progress">
+
+                    <div class="delete-progress-bar"
+                         style="width:@occupancyPercentage%;">
+                    </div>
+
+                </div>
+
+            </div>
+
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         DELETE FORM
+         ===================================================== -->
+
+    <div class="delete-action-panel">
+
+        <div class="delete-action-text">
+
+            <div class="delete-action-icon">
+
+                <i class="fa-solid fa-trash-can"></i>
+
+            </div>
+
+            <div>
+
+                <strong>
+                    Permanently remove this accommodation?
+                </strong>
+
+                <p>
+                    Please make sure this residence should no longer
+                    exist in UFS StayConnect before continuing.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <form asp-controller="Accommodation"
+              asp-action="DeleteConfirmed"
+              method="post"
+              id="deleteAccommodationForm">
+
+            @Html.AntiForgeryToken()
+
+            <input type="hidden"
+                   name="id"
+                   value="@Model.AccommodationID" />
+
+
+            <div class="delete-action-buttons">
+
+                <a asp-controller="Accommodation"
+                   asp-action="Manage"
+                   class="btn-delete-cancel">
+
+                    <i class="fa-solid fa-arrow-left"></i>
+
+                    Keep Accommodation
+
+                </a>
+
+
+                <button type="button"
+                        class="btn-delete-confirm"
+                        id="deleteAccommodationButton">
+
+                    <i class="fa-solid fa-trash-can"></i>
+
+                    Delete Accommodation
+
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+
+
+<!-- =========================================================
+     DELETE CONFIRMATION MODAL
+     ========================================================= -->
+
+<div class="delete-modal"
+     id="deleteAccommodationModal"
+     aria-hidden="true">
+
+
+    <!-- BACKDROP -->
+
+    <div class="delete-modal-backdrop"
+         id="deleteModalBackdrop">
+    </div>
+
+
+    <!-- MODAL -->
+
+    <div class="delete-modal-card"
+         role="dialog"
+         aria-modal="true"
+         aria-labelledby="deleteModalTitle">
+
+
+        <!-- WARNING ICON -->
+
+        <div class="delete-modal-icon">
+
+            <i class="fa-solid fa-trash-can"></i>
+
+        </div>
+
+
+        <!-- TITLE -->
+
+        <div class="delete-modal-content">
+
+            <span class="delete-modal-label">
+                PERMANENT ACTION
+            </span>
+
+            <h3 id="deleteModalTitle">
+                Delete @Model.Name?
+            </h3>
+
+            <p>
+                You are about to permanently remove
+                <strong>@Model.Name</strong>
+                from UFS StayConnect.
+            </p>
+
+            <p class="delete-modal-warning">
+
+                <i class="fa-solid fa-triangle-exclamation"></i>
+
+                This action cannot be undone.
+
+            </p>
+
+        </div>
+
+
+        <!-- ACTIONS -->
+
+        <div class="delete-modal-actions">
+
+
+            <button type="button"
+                    class="delete-modal-cancel"
+                    id="deleteModalCancel">
+
+                Cancel
+
+            </button>
+
+
+            <button type="button"
+                    class="delete-modal-confirm"
+                    id="deleteModalConfirm">
+
+                <i class="fa-solid fa-trash-can"></i>
+
+                Yes, Delete
+
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+
+@section Scripts {
+
+    <script>
+
+        document.addEventListener(
+            "DOMContentLoaded",
+            function () {
+
+
+                const deleteButton =
+                    document.getElementById(
+                        "deleteAccommodationButton"
+                    );
+
+
+                const deleteModal =
+                    document.getElementById(
+                        "deleteAccommodationModal"
+                    );
+
+
+                const deleteCancel =
+                    document.getElementById(
+                        "deleteModalCancel"
+                    );
+
+
+                const deleteConfirm =
+                    document.getElementById(
+                        "deleteModalConfirm"
+                    );
+
+
+                const deleteBackdrop =
+                    document.getElementById(
+                        "deleteModalBackdrop"
+                    );
+
+
+                const deleteForm =
+                    document.getElementById(
+                        "deleteAccommodationForm"
+                    );
+
+
+                /* =================================================
+                   OPEN MODAL
+                   ================================================= */
+
+                if (
+                    deleteButton &&
+                    deleteModal
+                ) {
+
+                    deleteButton.addEventListener(
+                        "click",
+                        function () {
+
+                            deleteModal.classList.add(
+                                "show"
+                            );
+
+                            deleteModal.setAttribute(
+                                "aria-hidden",
+                                "false"
+                            );
+
+                            document.body.style.overflow =
+                                "hidden";
+
+                            if (deleteCancel) {
+
+                                setTimeout(
+                                    function () {
+
+                                        deleteCancel.focus();
+
+                                    },
+                                    100
+                                );
+
+                            }
+
+                        }
+                    );
+
+                }
+
+
+                /* =================================================
+                   CLOSE MODAL
+                   ================================================= */
+
+                function closeDeleteModal() {
+
+                    if (!deleteModal) {
+                        return;
+                    }
+
+                    deleteModal.classList.remove(
+                        "show"
+                    );
+
+                    deleteModal.setAttribute(
+                        "aria-hidden",
+                        "true"
+                    );
+
+                    document.body.style.overflow =
+                        "";
+
+                }
+
+
+                /* =================================================
+                   CANCEL
+                   ================================================= */
+
+                if (deleteCancel) {
+
+                    deleteCancel.addEventListener(
+                        "click",
+                        closeDeleteModal
+                    );
+
+                }
+
+
+                /* =================================================
+                   BACKDROP
+                   ================================================= */
+
+                if (deleteBackdrop) {
+
+                    deleteBackdrop.addEventListener(
+                        "click",
+                        closeDeleteModal
+                    );
+
+                }
+
+
+                /* =================================================
+                   CONFIRM DELETE
+                   ================================================= */
+
+                if (deleteConfirm) {
+
+                    deleteConfirm.addEventListener(
+                        "click",
+                        function () {
+
+                            if (deleteForm) {
+
+                                deleteForm.submit();
+
+                            }
+
+                        }
+                    );
+
+                }
+
+
+                /* =================================================
+                   ESCAPE KEY
+                   ================================================= */
+
+                document.addEventListener(
+                    "keydown",
+                    function (event) {
+
+                        if (
+                            event.key === "Escape" &&
+                            deleteModal &&
+                            deleteModal.classList.contains("show")
+                        ) {
+
+                            closeDeleteModal();
+
+                        }
+
+                    }
+                );
+
+            }
+        );
+
+    </script>
+
+}

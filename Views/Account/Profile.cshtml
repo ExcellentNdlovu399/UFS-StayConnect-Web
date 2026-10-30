@@ -1,0 +1,989 @@
+@model UFSStayConnect.ViewModels.ProfileViewModel
+
+@{
+    ViewData["Title"] = "My Profile";
+}
+
+<div class="customer-profile-page">
+
+    <!-- =========================
+         PAGE HEADER
+         ========================= -->
+
+    <div class="profile-page-header">
+
+        <div>
+            <div class="profile-eyebrow">
+                <i class="fas fa-user-circle"></i>
+                ACCOUNT SETTINGS
+            </div>
+
+            <h1>My Profile</h1>
+
+            <p>
+                Manage your personal information and UFS StayConnect account details.
+            </p>
+        </div>
+
+        <div class="profile-header-icon">
+            <i class="fas fa-user"></i>
+        </div>
+
+    </div>
+
+
+    <!-- =========================
+         SUCCESS MESSAGE
+         ========================= -->
+    @if (TempData["Success"] != null)
+    {
+        <div class="profile-success-alert">
+
+            <div class="profile-success-icon">
+                <i class="fas fa-check"></i>
+            </div>
+
+            <div>
+                <strong>Changes saved</strong>
+                <span>@TempData["Success"]</span>
+            </div>
+
+        </div>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div role="alert" class="alert alert-warning mt-3 mb-4">
+            <i class="fas fa-lock me-2"></i> @TempData["ErrorMessage"]
+        </div>
+    }
+
+
+    <!-- =========================
+         PROFILE CONTENT
+         ========================= -->
+
+    <div class="profile-layout">
+
+        <!-- LEFT PROFILE CARD -->
+        <aside class="profile-summary-card">
+
+            <div class="profile-summary-top">
+
+                <div class="profile-avatar">
+                    <span>
+                        @(string.IsNullOrWhiteSpace(Model.FirstName)
+                                                ? "U"
+                                                : Model.FirstName.Substring(0, 1).ToUpper())
+                    </span>
+                </div>
+
+                <h2>
+                    @Model.FirstName @Model.Surname
+                </h2>
+
+                <p>
+                    @Model.Email
+                </p>
+
+            </div>
+
+
+            <div class="profile-account-status">
+
+                <span class="status-dot"></span>
+
+                <div>
+                    <strong>Active Account</strong>
+                    <small>UFS StayConnect</small>
+                </div>
+
+            </div>
+
+
+            <div class="profile-summary-divider"></div>
+
+
+            <div class="profile-summary-item">
+
+                <i class="fas fa-user-tag"></i>
+
+                <div>
+                    <span>Account Type</span>
+                    <strong>@Model.UserType</strong>
+                </div>
+
+            </div>
+
+
+            @if (Model.UserType == "Student")
+            {
+                <div class="profile-summary-item">
+
+                    <i class="fas fa-id-card"></i>
+
+                    <div>
+                        <span>Student Number</span>
+                        <strong>@Model.StudentNumber</strong>
+                    </div>
+
+                </div>
+            }
+
+            @if (Model.UserType == "Staff")
+            {
+                <div class="profile-summary-item">
+
+                    <i class="fas fa-id-badge"></i>
+
+                    <div>
+                        <span>Employee Number</span>
+                        <strong>@Model.EmployeeNumber</strong>
+                    </div>
+
+                </div>
+            }
+
+        </aside>
+
+
+        <!-- RIGHT EDIT CARD -->
+        <section class="profile-edit-card">
+
+            <div class="profile-card-heading">
+
+                <div>
+                    <span>PERSONAL INFORMATION</span>
+                    <h2>Profile Details</h2>
+                </div>
+
+                <div class="profile-heading-icon">
+                    <i class="fas fa-pen"></i>
+                </div>
+
+            </div>
+
+
+            <form asp-action="Profile"
+                  method="post">
+
+                @Html.AntiForgeryToken()
+
+                <div asp-validation-summary="ModelOnly"
+                     class="profile-validation">
+                </div>
+
+
+                <div class="profile-form-content">
+
+                    <!-- First Name -->
+                    <div class="profile-field">
+
+                        <label asp-for="FirstName">
+                            First Name
+                        </label>
+
+                        <div class="profile-input-wrapper">
+
+                            <i class="fas fa-user"></i>
+
+                            <input asp-for="FirstName"
+                                   class="profile-input"
+                                   autocomplete="given-name" />
+
+                        </div>
+
+                        <span asp-validation-for="FirstName"
+                              class="profile-field-error">
+                        </span>
+
+                    </div>
+
+
+                    <!-- Surname -->
+                    <div class="profile-field">
+
+                        <label asp-for="Surname">
+                            Surname
+                        </label>
+
+                        <div class="profile-input-wrapper">
+
+                            <i class="fas fa-user"></i>
+
+                            <input asp-for="Surname"
+                                   class="profile-input"
+                                   autocomplete="family-name" />
+
+                        </div>
+
+                        <span asp-validation-for="Surname"
+                              class="profile-field-error">
+                        </span>
+
+                    </div>
+
+
+                    <!-- Email -->
+                    <div class="profile-field">
+
+                        <label asp-for="Email">
+                            UFS Email Address
+                        </label>
+
+                        <div class="profile-input-wrapper profile-readonly">
+
+                            <i class="fas fa-envelope"></i>
+
+                            <input asp-for="Email"
+                                   class="profile-input"
+                                   readonly />
+
+                            <span class="readonly-badge">
+                                <i class="fas fa-lock"></i>
+                                Protected
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- User Type -->
+                    <div class="profile-field">
+
+                        <label asp-for="UserType">
+                            Account Type
+                        </label>
+
+                        <div class="profile-input-wrapper profile-readonly">
+
+                            <i class="fas fa-user-tag"></i>
+
+                            <input asp-for="UserType"
+                                   class="profile-input"
+                                   readonly />
+
+                            <span class="readonly-badge">
+                                <i class="fas fa-lock"></i>
+                                Protected
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- Student Number -->
+                    @if (Model.UserType == "Student")
+                    {
+                        <div class="profile-field">
+
+                            <label asp-for="StudentNumber">
+                                Student Number
+                            </label>
+
+                            <div class="profile-input-wrapper profile-readonly">
+
+                                <i class="fas fa-id-card"></i>
+
+                                <input asp-for="StudentNumber"
+                                       class="profile-input"
+                                       readonly />
+
+                                <span class="readonly-badge">
+                                    <i class="fas fa-lock"></i>
+                                    Protected
+                                </span>
+
+                            </div>
+
+                        </div>
+                    }
+
+
+                    <!-- Employee Number -->
+                    @if (Model.UserType == "Staff")
+                    {
+                        <div class="profile-field">
+
+                            <label asp-for="EmployeeNumber">
+                                Employee Number
+                            </label>
+
+                            <div class="profile-input-wrapper profile-readonly">
+
+                                <i class="fas fa-id-badge"></i>
+
+                                <input asp-for="EmployeeNumber"
+                                       class="profile-input"
+                                       readonly />
+
+                                <span class="readonly-badge">
+                                    <i class="fas fa-lock"></i>
+                                    Protected
+                                </span>
+
+                            </div>
+
+                        </div>
+                    }
+
+
+                    <!-- Phone -->
+                    <div class="profile-field">
+
+                        <label asp-for="PhoneNumber">
+                            Phone Number
+                        </label>
+
+                        <div class="profile-input-wrapper">
+
+                            <i class="fas fa-phone"></i>
+
+                            <input asp-for="PhoneNumber"
+                                   class="profile-input"
+                                   autocomplete="tel"
+                                   placeholder="Enter your phone number" />
+
+                        </div>
+
+                        <span asp-validation-for="PhoneNumber"
+                              class="profile-field-error">
+                        </span>
+
+                    </div>
+
+
+                    <!-- Information -->
+                    <div class="profile-info-box">
+
+                        <div class="profile-info-icon">
+                            <i class="fas fa-circle-info"></i>
+                        </div>
+
+                        <div>
+
+                            <strong>Account information</strong>
+
+                            <p>
+                                Your UFS email address, account type and
+                                student/staff number are protected account
+                                information and cannot be changed from this page.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- Form Footer -->
+                <div class="profile-form-footer">
+
+                    @if (User.IsInRole("FinancialOfficer"))
+                    {
+                        <div class="profile-password-btn" aria-disabled="true" title="Financial Officer passwords are managed by an Administrator">
+                            <i class="fas fa-lock"></i>
+                            Password managed by Administrator
+                        </div>
+                    }
+                    else
+                    {
+                        <a asp-action="ChangePassword" class="profile-password-btn">
+                            <i class="fas fa-key"></i>
+                            Change Password
+                        </a>
+                    }
+
+
+                    <button type="submit"
+                            class="profile-save-btn">
+
+                        <i class="fas fa-floppy-disk"></i>
+                        Save Changes
+
+                    </button>
+
+                </div>
+
+            </form>
+
+        </section>
+
+    </div>
+
+</div>
+
+
+<style>
+
+    /* =========================================================
+           UFS STAYCONNECT - CUSTOMER PROFILE
+           ========================================================= */
+
+    .customer-profile-page {
+        max-width: 1180px;
+        margin: 0 auto;
+        padding: 34px 30px 60px;
+    }
+
+
+    /* =========================
+           HEADER
+           ========================= */
+
+    .profile-page-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 25px;
+        margin-bottom: 24px;
+    }
+
+    .profile-eyebrow {
+        margin-bottom: 7px;
+        color: #b8860b;
+        font-size: 0.72rem;
+        font-weight: 800;
+        letter-spacing: 1.4px;
+    }
+
+        .profile-eyebrow i {
+            margin-right: 5px;
+        }
+
+    .profile-page-header h1 {
+        margin: 0;
+        color: #123b73;
+        font-size: 2rem;
+        font-weight: 800;
+    }
+
+    .profile-page-header p {
+        margin: 7px 0 0;
+        color: #6b7280;
+        font-size: 0.93rem;
+    }
+
+    .profile-header-icon {
+        width: 60px;
+        height: 60px;
+        flex-shrink: 0;
+        border-radius: 14px;
+        background: #123b73;
+        color: #f4c430;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.35rem;
+    }
+
+
+    /* =========================
+           SUCCESS
+           ========================= */
+
+    .profile-success-alert {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 20px;
+        padding: 14px 17px;
+        border: 1px solid #c9ecd7;
+        border-radius: 10px;
+        background: #edf9f2;
+        color: #176b3c;
+    }
+
+    .profile-success-icon {
+        width: 32px;
+        height: 32px;
+        flex-shrink: 0;
+        border-radius: 50%;
+        background: #d7f2e2;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .profile-success-alert strong,
+    .profile-success-alert span {
+        display: block;
+    }
+
+    .profile-success-alert strong {
+        font-size: 0.82rem;
+    }
+
+    .profile-success-alert span {
+        margin-top: 2px;
+        font-size: 0.77rem;
+    }
+
+
+    /* =========================
+           LAYOUT
+           ========================= */
+
+    .profile-layout {
+        display: grid;
+        grid-template-columns: 310px minmax(0, 1fr);
+        gap: 20px;
+        align-items: start;
+    }
+
+
+    /* =========================
+           SUMMARY CARD
+           ========================= */
+
+    .profile-summary-card {
+        overflow: hidden;
+        background: #ffffff;
+        border: 1px solid #e2e7ee;
+        border-radius: 15px;
+        box-shadow: 0 7px 24px rgba(8,20,38,0.055);
+    }
+
+    .profile-summary-top {
+        padding: 30px 22px 24px;
+        text-align: center;
+        background: #123b73;
+        border-bottom: 4px solid #f4c430;
+    }
+
+    .profile-avatar {
+        width: 78px;
+        height: 78px;
+        margin: 0 auto 15px;
+        border: 3px solid #f4c430;
+        border-radius: 50%;
+        background: #ffffff;
+        color: #123b73;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 5px 18px rgba(0,0,0,0.16);
+    }
+
+        .profile-avatar span {
+            font-size: 1.7rem;
+            font-weight: 850;
+        }
+
+    .profile-summary-top h2 {
+        margin: 0;
+        color: #ffffff;
+        font-size: 1.05rem;
+        font-weight: 800;
+    }
+
+    .profile-summary-top p {
+        margin: 5px 0 0;
+        color: rgba(255,255,255,0.7);
+        font-size: 0.73rem;
+        word-break: break-word;
+    }
+
+
+    /* =========================
+           STATUS
+           ========================= */
+
+    .profile-account-status {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin: 18px;
+        padding: 11px 12px;
+        border-radius: 9px;
+        background: #edf8f1;
+    }
+
+    .status-dot {
+        width: 8px;
+        height: 8px;
+        flex-shrink: 0;
+        border-radius: 50%;
+        background: #198754;
+    }
+
+    .profile-account-status strong {
+        display: block;
+        color: #176b3c;
+        font-size: 0.75rem;
+    }
+
+    .profile-account-status small {
+        display: block;
+        margin-top: 2px;
+        color: #6f8b79;
+        font-size: 0.65rem;
+    }
+
+
+    .profile-summary-divider {
+        height: 1px;
+        margin: 0 18px;
+        background: #edf0f4;
+    }
+
+
+    /* =========================
+           SUMMARY ITEMS
+           ========================= */
+
+    .profile-summary-item {
+        display: flex;
+        align-items: center;
+        gap: 11px;
+        padding: 16px 20px;
+    }
+
+        .profile-summary-item + .profile-summary-item {
+            border-top: 1px solid #f0f2f5;
+        }
+
+        .profile-summary-item > i {
+            width: 34px;
+            height: 34px;
+            flex-shrink: 0;
+            border-radius: 8px;
+            background: #edf3f9;
+            color: #123b73;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.78rem;
+        }
+
+        .profile-summary-item span {
+            display: block;
+            color: #8a94a2;
+            font-size: 0.65rem;
+        }
+
+        .profile-summary-item strong {
+            display: block;
+            margin-top: 3px;
+            color: #344054;
+            font-size: 0.78rem;
+            word-break: break-word;
+        }
+
+
+    /* =========================
+           EDIT CARD
+           ========================= */
+
+    .profile-edit-card {
+        overflow: hidden;
+        background: #ffffff;
+        border: 1px solid #e2e7ee;
+        border-radius: 15px;
+        box-shadow: 0 7px 24px rgba(8,20,38,0.055);
+    }
+
+    .profile-card-heading {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 22px 27px;
+        background: #123b73;
+        color: #ffffff;
+        border-bottom: 4px solid #f4c430;
+    }
+
+        .profile-card-heading > div:first-child > span {
+            color: #f4c430;
+            font-size: 0.67rem;
+            font-weight: 800;
+            letter-spacing: 1.2px;
+        }
+
+        .profile-card-heading h2 {
+            margin: 3px 0 0;
+            color: #ffffff;
+            font-size: 1.08rem;
+            font-weight: 800;
+        }
+
+    .profile-heading-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 9px;
+        background: rgba(255,255,255,0.12);
+        color: #f4c430;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+
+    /* =========================
+           FORM
+           ========================= */
+
+    .profile-form-content {
+        padding: 27px;
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 19px 17px;
+    }
+
+    .profile-field {
+        min-width: 0;
+    }
+
+        .profile-field label {
+            display: block;
+            margin-bottom: 7px;
+            color: #344054;
+            font-size: 0.77rem;
+            font-weight: 800;
+        }
+
+    .profile-input-wrapper {
+        position: relative;
+        display: flex;
+        align-items: center;
+    }
+
+        .profile-input-wrapper > i {
+            position: absolute;
+            left: 13px;
+            z-index: 1;
+            color: #8290a2;
+            font-size: 0.78rem;
+            pointer-events: none;
+        }
+
+    .profile-input {
+        width: 100%;
+        min-height: 43px;
+        padding: 0 13px 0 37px;
+        border: 1px solid #dfe5ec;
+        border-radius: 8px;
+        outline: none;
+        background: #ffffff;
+        color: #29384d;
+        font-size: 0.82rem;
+        transition: all 0.2s ease;
+    }
+
+        .profile-input:focus {
+            border-color: #123b73;
+            box-shadow: 0 0 0 3px rgba(18,59,115,0.08);
+        }
+
+    .profile-readonly .profile-input {
+        padding-right: 90px;
+        background: #f6f8fa;
+        color: #697586;
+        cursor: not-allowed;
+    }
+
+    .readonly-badge {
+        position: absolute;
+        right: 9px;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        padding: 4px 6px;
+        border-radius: 5px;
+        background: #e9edf2;
+        color: #7b8491;
+        font-size: 0.57rem;
+        font-weight: 700;
+    }
+
+    .profile-field-error {
+        display: block;
+        margin-top: 5px;
+        color: #c0392b;
+        font-size: 0.68rem;
+    }
+
+
+    /* =========================
+           VALIDATION
+           ========================= */
+
+    .profile-validation {
+        margin: 20px 27px 0;
+        color: #c0392b;
+        font-size: 0.77rem;
+    }
+
+        .profile-validation ul {
+            margin-bottom: 0;
+        }
+
+
+    /* =========================
+           INFORMATION
+           ========================= */
+
+    .profile-info-box {
+        grid-column: 1 / -1;
+        display: flex;
+        align-items: flex-start;
+        gap: 11px;
+        margin-top: 3px;
+        padding: 14px 15px;
+        border: 1px solid #dce7f4;
+        border-radius: 9px;
+        background: #f5f9fe;
+    }
+
+    .profile-info-icon {
+        width: 32px;
+        height: 32px;
+        flex-shrink: 0;
+        border-radius: 8px;
+        background: #e3edf9;
+        color: #123b73;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .profile-info-box strong {
+        display: block;
+        color: #123b73;
+        font-size: 0.75rem;
+    }
+
+    .profile-info-box p {
+        margin: 3px 0 0;
+        color: #6b7280;
+        font-size: 0.7rem;
+        line-height: 1.5;
+    }
+
+
+    /* =========================
+           FOOTER
+           ========================= */
+
+    .profile-form-footer {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 10px;
+        padding: 17px 27px;
+        border-top: 1px solid #edf0f4;
+        background: #fafbfc;
+    }
+
+    .profile-password-btn,
+    .profile-save-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        min-height: 41px;
+        padding: 0 16px;
+        border-radius: 8px;
+        font-size: 0.78rem;
+        font-weight: 750;
+        text-decoration: none;
+        transition: all 0.2s ease;
+    }
+
+    .profile-password-btn {
+        border: 1px solid #d9e1eb;
+        background: #ffffff;
+        color: #123b73;
+    }
+
+        .profile-password-btn:hover {
+            background: #f1f5f9;
+            color: #123b73;
+        }
+
+    .profile-save-btn {
+        border: 1px solid #123b73;
+        background: #123b73;
+        color: #ffffff;
+        cursor: pointer;
+    }
+
+        .profile-save-btn:hover {
+            background: #0d2d58;
+            border-color: #0d2d58;
+            color: #ffffff;
+            transform: translateY(-1px);
+        }
+
+
+    /* =========================
+           RESPONSIVE
+           ========================= */
+
+    @@media (max-width: 900px) {
+
+        .profile-layout {
+            grid-template-columns: 1fr;
+        }
+
+        .profile-summary-card {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+        }
+
+        .profile-summary-top {
+            grid-row: span 2;
+        }
+
+        .profile-account-status {
+            margin-bottom: 8px;
+        }
+    }
+
+    @@media (max-width: 650px) {
+
+        .customer-profile-page {
+            padding: 25px 16px 45px;
+        }
+
+        .profile-page-header {
+            align-items: flex-start;
+        }
+
+        .profile-header-icon {
+            display: none;
+        }
+
+        .profile-summary-card {
+            display: block;
+        }
+
+        .profile-form-content {
+            grid-template-columns: 1fr;
+            padding: 21px;
+        }
+
+        .profile-info-box {
+            grid-column: auto;
+        }
+
+        .profile-card-heading {
+            padding: 20px;
+        }
+
+        .profile-form-footer {
+            padding: 15px 20px;
+            flex-direction: column-reverse;
+            align-items: stretch;
+        }
+
+        .profile-password-btn,
+        .profile-save-btn {
+            width: 100%;
+        }
+    }
+
+</style>

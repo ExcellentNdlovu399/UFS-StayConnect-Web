@@ -1,0 +1,25 @@
+UFS StayConnect - unified Payments table fix
+===========================================
+
+Implemented changes
+-------------------
+1. Administrator-assigned active CustomerCharge records are now loaded into PaymentController.Index and displayed in the same Views/Payment/Index.cshtml table as accommodation charges.
+2. CustomerPaymentViewModel distinguishes a regular AccommodationCharge from a CustomerCharge and carries the assignment title and typed ID.
+3. The existing Payments table posts regular charge IDs under `ids` and administrator-assigned charge IDs under `customerChargeIds`. This prevents ID collisions between the two database tables.
+4. PaymentCheckoutViewModel and the checkout page carry the two ID lists separately. Checkout rebuilds charges and amounts from the database on both GET and POST.
+5. Checkout creates a Payment linked to either AccommodationChargeID or CustomerChargeID. The submitted status remains Pending so the existing Financial Officer verification process still applies.
+6. Pending assigned charges cannot be submitted a second time while verification is outstanding; paid and rejected statuses are reflected in the Payments table.
+7. The separate customer navigation link was removed. The legacy CustomerCharge/Mine URL redirects to Payment/Index.
+8. The migration AddIndividualCustomerCharges was already present in the project.
+
+Database note
+-------------
+The project has an AddIndividualCustomerCharges migration. This project’s startup is configured to apply AppDbContext migrations automatically; if automatic migration is disabled in your local environment, apply the migration through your normal EF Core deployment process before testing.
+
+Verification note
+-----------------
+The files were checked for the integration paths and the ID distinction. A `dotnet build` could not be run in this environment because the .NET SDK is not installed here. Please build the project in Visual Studio and resolve any environment-specific SQL Server or configuration issues shown there.
+
+Important
+---------
+Card/EFT submission is recorded as Pending for review; this code does not connect to a live bank or payment gateway and does not store card number or CVV.

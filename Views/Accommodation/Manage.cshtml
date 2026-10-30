@@ -1,0 +1,1239 @@
+@model IEnumerable<UFSStayConnect.Models.Accommodation>
+
+@{
+    ViewData["Title"] = "Accommodation Management";
+    Layout = "~/Views/Admin/_AdminLayout.cshtml";
+
+    var accommodations = Model?.ToList()
+        ?? new List<UFSStayConnect.Models.Accommodation>();
+
+    var totalAccommodation = accommodations.Count;
+    var availableAccommodation = accommodations.Count(a => a.Available);
+    var unavailableAccommodation = accommodations.Count(a => !a.Available);
+
+    var totalRooms = accommodations.Sum(a =>
+        a.TotalRooms > 0
+            ? a.TotalRooms
+            : a.Rooms?.Count ?? 0);
+
+    var availableRooms = accommodations.Sum(a => a.AvailableRooms);
+
+    var occupiedRooms = Math.Max(0, totalRooms - availableRooms);
+
+    var occupancyPercentage = totalRooms > 0
+        ? Math.Round((double)occupiedRooms / totalRooms * 100, 1)
+        : 0;
+}
+
+<style>
+
+    /* =========================================================
+           ACCOMMODATION MANAGEMENT
+           ========================================================= */
+
+    .accommodation-page {
+        padding: 4px 0 35px;
+    }
+
+    .accommodation-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 20px;
+        margin-bottom: 28px;
+    }
+
+        .accommodation-header h2 {
+            margin: 0;
+            font-size: 28px;
+            font-weight: 800;
+            color: #10233f;
+            letter-spacing: -0.4px;
+        }
+
+        .accommodation-header p {
+            margin: 7px 0 0;
+            color: #718096;
+            font-size: 14px;
+        }
+
+    .add-residence-btn {
+        border-radius: 10px;
+        padding: 11px 18px;
+        font-weight: 700;
+        box-shadow: 0 5px 15px rgba(13, 110, 253, .15);
+    }
+
+
+    /* =========================================================
+           ALERTS
+           ========================================================= */
+
+    .accommodation-alert {
+        border: 0;
+        border-radius: 12px;
+        padding: 14px 17px;
+        margin-bottom: 22px;
+        box-shadow: 0 5px 20px rgba(15, 23, 42, .05);
+    }
+
+
+    /* =========================================================
+           STAT CARDS
+           ========================================================= */
+
+    .accommodation-stats {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 18px;
+        margin-bottom: 28px;
+    }
+
+    .accommodation-stat {
+        background: #ffffff;
+        border: 1px solid #edf1f7;
+        border-radius: 16px;
+        padding: 20px;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        box-shadow: 0 8px 25px rgba(15, 23, 42, .045);
+        transition: .2s ease;
+    }
+
+        .accommodation-stat:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 30px rgba(15, 23, 42, .08);
+        }
+
+    .stat-icon {
+        width: 48px;
+        height: 48px;
+        min-width: 48px;
+        border-radius: 13px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 19px;
+    }
+
+        .stat-icon.blue {
+            background: #eaf2ff;
+            color: #1769ff;
+        }
+
+        .stat-icon.green {
+            background: #eafaf1;
+            color: #159447;
+        }
+
+        .stat-icon.orange {
+            background: #fff5e7;
+            color: #e88a16;
+        }
+
+        .stat-icon.purple {
+            background: #f2edff;
+            color: #7146d9;
+        }
+
+    .stat-content span {
+        display: block;
+        color: #718096;
+        font-size: 12px;
+        font-weight: 600;
+        margin-bottom: 3px;
+    }
+
+    .stat-content strong {
+        display: block;
+        color: #10233f;
+        font-size: 24px;
+        font-weight: 800;
+        line-height: 1.1;
+    }
+
+    .stat-content small {
+        color: #9aa6b2;
+        font-size: 11px;
+    }
+
+
+    /* =========================================================
+           MANAGEMENT PANEL
+           ========================================================= */
+
+    .management-panel {
+        background: #ffffff;
+        border: 1px solid #edf1f7;
+        border-radius: 18px;
+        box-shadow: 0 8px 28px rgba(15, 23, 42, .045);
+        overflow: hidden;
+    }
+
+    .management-toolbar {
+        padding: 21px 24px;
+        border-bottom: 1px solid #edf1f7;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 18px;
+        flex-wrap: wrap;
+    }
+
+        .management-toolbar h3 {
+            margin: 0;
+            font-size: 17px;
+            font-weight: 800;
+            color: #10233f;
+        }
+
+        .management-toolbar p {
+            margin: 4px 0 0;
+            color: #8793a3;
+            font-size: 13px;
+        }
+
+    .toolbar-controls {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .search-box {
+        position: relative;
+    }
+
+        .search-box i {
+            position: absolute;
+            left: 13px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #9aa6b2;
+            font-size: 13px;
+        }
+
+        .search-box input {
+            width: 245px;
+            height: 40px;
+            padding: 0 13px 0 37px;
+            border: 1px solid #e1e7ef;
+            border-radius: 9px;
+            outline: none;
+            font-size: 13px;
+            transition: .2s ease;
+        }
+
+            .search-box input:focus {
+                border-color: #1769ff;
+                box-shadow: 0 0 0 3px rgba(23, 105, 255, .08);
+            }
+
+    .filter-select {
+        height: 40px;
+        border: 1px solid #e1e7ef;
+        border-radius: 9px;
+        padding: 0 34px 0 12px;
+        color: #465568;
+        font-size: 13px;
+        background: #fff;
+        outline: none;
+    }
+
+
+    /* =========================================================
+           RESIDENCE GRID
+           ========================================================= */
+
+    .residence-grid {
+        padding: 24px;
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 20px;
+    }
+
+    .residence-card {
+        background: #fff;
+        border: 1px solid #e9eef5;
+        border-radius: 16px;
+        overflow: hidden;
+        transition: .22s ease;
+        position: relative;
+    }
+
+        .residence-card:hover {
+            transform: translateY(-4px);
+            border-color: #d7e2f1;
+            box-shadow: 0 15px 35px rgba(15, 23, 42, .09);
+        }
+
+
+    /* =========================================================
+           IMAGE
+           ========================================================= */
+
+    .residence-image {
+        height: 185px;
+        background: #edf2f7;
+        position: relative;
+        overflow: hidden;
+    }
+
+        .residence-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform .35s ease;
+        }
+
+    .residence-card:hover .residence-image img {
+        transform: scale(1.04);
+    }
+
+    .residence-image-placeholder {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, #edf4ff, #f5f7fb);
+        color: #8da2bd;
+        font-size: 42px;
+    }
+
+    .availability-label {
+        position: absolute;
+        top: 13px;
+        right: 13px;
+        padding: 6px 10px;
+        border-radius: 999px;
+        font-size: 11px;
+        font-weight: 700;
+        backdrop-filter: blur(8px);
+    }
+
+        .availability-label.available {
+            background: rgba(220, 252, 231, .94);
+            color: #15803d;
+        }
+
+        .availability-label.unavailable {
+            background: rgba(241, 245, 249, .95);
+            color: #64748b;
+        }
+
+
+    /* =========================================================
+           CARD CONTENT
+           ========================================================= */
+
+    .residence-content {
+        padding: 18px;
+    }
+
+    .residence-type {
+        display: inline-flex;
+        align-items: center;
+        padding: 5px 9px;
+        border-radius: 7px;
+        background: #eef4ff;
+        color: #2563eb;
+        font-size: 10px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: .4px;
+        margin-bottom: 9px;
+    }
+
+    .residence-name {
+        font-size: 18px;
+        font-weight: 800;
+        color: #10233f;
+        margin: 0 0 7px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .residence-location {
+        color: #7b8797;
+        font-size: 12px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        margin-bottom: 17px;
+    }
+
+        .residence-location i {
+            color: #1769ff;
+        }
+
+
+    /* =========================================================
+           RESIDENCE INFO
+           ========================================================= */
+
+    .residence-info-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+        margin-bottom: 17px;
+    }
+
+    .info-box {
+        background: #f8fafc;
+        border-radius: 9px;
+        padding: 10px;
+    }
+
+        .info-box span {
+            display: block;
+            font-size: 10px;
+            color: #8b98a8;
+            margin-bottom: 3px;
+        }
+
+        .info-box strong {
+            display: block;
+            color: #25364d;
+            font-size: 13px;
+            font-weight: 750;
+        }
+
+
+    /* =========================================================
+           OCCUPANCY
+           ========================================================= */
+
+    .occupancy-section {
+        margin-bottom: 18px;
+    }
+
+    .occupancy-heading {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 7px;
+    }
+
+        .occupancy-heading span {
+            font-size: 11px;
+            color: #788697;
+            font-weight: 600;
+        }
+
+        .occupancy-heading strong {
+            font-size: 11px;
+            color: #26384e;
+        }
+
+    .occupancy-bar {
+        height: 7px;
+        background: #edf1f6;
+        border-radius: 20px;
+        overflow: hidden;
+    }
+
+    .occupancy-progress {
+        height: 100%;
+        border-radius: 20px;
+        background: linear-gradient(90deg, #1769ff, #4f8cff);
+    }
+
+
+    /* =========================================================
+           CARD ACTIONS
+           ========================================================= */
+
+    .residence-actions {
+        border-top: 1px solid #edf1f7;
+        padding-top: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+    }
+
+    .primary-actions {
+        display: flex;
+        gap: 6px;
+    }
+
+    .action-btn {
+        width: 34px;
+        height: 34px;
+        border-radius: 8px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+    }
+
+    .manage-btn {
+        border: 1px solid #dce5f0;
+        background: #f8fafc;
+        color: #46586d;
+        border-radius: 8px;
+        padding: 8px 11px;
+        font-size: 11px;
+        font-weight: 700;
+    }
+
+        .manage-btn:hover {
+            background: #eef4ff;
+            color: #1769ff;
+            border-color: #d7e4ff;
+        }
+
+
+    /* =========================================================
+           EMPTY STATE
+           ========================================================= */
+
+    .empty-state {
+        padding: 75px 25px;
+        text-align: center;
+    }
+
+    .empty-icon {
+        width: 76px;
+        height: 76px;
+        margin: 0 auto 18px;
+        border-radius: 20px;
+        background: #eef4ff;
+        color: #1769ff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 28px;
+    }
+
+    .empty-state h4 {
+        margin: 0 0 7px;
+        color: #26384e;
+        font-weight: 800;
+    }
+
+    .empty-state p {
+        color: #8b98a8;
+        font-size: 13px;
+        max-width: 430px;
+        margin: 0 auto 20px;
+    }
+
+
+    /* =========================================================
+           RESPONSIVE
+           ========================================================= */
+
+    @@media (max-width: 1200px) {
+        .accommodation-stats {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .residence-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+    }
+
+    @@media (max-width: 768px) {
+
+        .accommodation-header {
+            flex-direction: column;
+        }
+
+        .accommodation-stats {
+            grid-template-columns: 1fr;
+        }
+
+        .residence-grid {
+            grid-template-columns: 1fr;
+            padding: 16px;
+        }
+
+        .management-toolbar {
+            align-items: stretch;
+        }
+
+        .toolbar-controls {
+            width: 100%;
+        }
+
+        .search-box,
+        .search-box input,
+        .filter-select {
+            width: 100%;
+        }
+    }
+</style>
+
+
+<div class="accommodation-page">
+
+    <!-- =====================================================
+         PAGE HEADER
+         ====================================================== -->
+
+    <div class="accommodation-header">
+
+        <div>
+            <h2>
+                <i class="fa-solid fa-building me-2"
+                   style="color:#1769ff;"></i>
+
+                Accommodation Management
+            </h2>
+
+            <p>
+                Manage residences, rooms, services, charges and availability.
+            </p>
+        </div>
+
+        <a asp-controller="Accommodation"
+           asp-action="Create"
+           class="btn btn-primary add-residence-btn">
+
+            <i class="fa-solid fa-plus me-2"></i>
+            Add Residence
+
+        </a>
+
+    </div>
+
+
+    <!-- =====================================================
+         ALERTS
+         ====================================================== -->
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success accommodation-alert alert-dismissible fade show"
+             role="alert">
+
+            <i class="fa-solid fa-circle-check me-2"></i>
+
+            @TempData["SuccessMessage"]
+
+            <button type="button"
+                    class="btn-close"
+                    data-bs-dismiss="alert">
+            </button>
+
+        </div>
+    }
+
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger accommodation-alert alert-dismissible fade show"
+             role="alert">
+
+            <i class="fa-solid fa-circle-exclamation me-2"></i>
+
+            @TempData["ErrorMessage"]
+
+            <button type="button"
+                    class="btn-close"
+                    data-bs-dismiss="alert">
+            </button>
+
+        </div>
+    }
+
+
+    <!-- =====================================================
+         SUMMARY CARDS
+         ====================================================== -->
+
+    <div class="accommodation-stats">
+
+        <div class="accommodation-stat">
+
+            <div class="stat-icon blue">
+                <i class="fa-solid fa-building"></i>
+            </div>
+
+            <div class="stat-content">
+
+                <span>Total Residences</span>
+
+                <strong>@totalAccommodation</strong>
+
+                <small>Registered residences</small>
+
+            </div>
+
+        </div>
+
+
+        <div class="accommodation-stat">
+
+            <div class="stat-icon green">
+                <i class="fa-solid fa-circle-check"></i>
+            </div>
+
+            <div class="stat-content">
+
+                <span>Available Residences</span>
+
+                <strong>@availableAccommodation</strong>
+
+                <small>Currently accepting applications</small>
+
+            </div>
+
+        </div>
+
+
+        <div class="accommodation-stat">
+
+            <div class="stat-icon orange">
+                <i class="fa-solid fa-door-open"></i>
+            </div>
+
+            <div class="stat-content">
+
+                <span>Available Rooms</span>
+
+                <strong>@availableRooms</strong>
+
+                <small>@occupiedRooms occupied of @totalRooms rooms</small>
+
+            </div>
+
+        </div>
+
+
+        <div class="accommodation-stat">
+
+            <div class="stat-icon purple">
+                <i class="fa-solid fa-chart-pie"></i>
+            </div>
+
+            <div class="stat-content">
+
+                <span>Overall Occupancy</span>
+
+                <strong>@occupancyPercentage%</strong>
+
+                <small>@totalRooms total rooms</small>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         MANAGEMENT PANEL
+         ====================================================== -->
+
+    <div class="management-panel">
+
+        <div class="management-toolbar">
+
+            <div>
+
+                <h3>Residence Directory</h3>
+
+                <p>
+                    View and manage all UFSStayConnect residences.
+                </p>
+
+            </div>
+
+
+            <div class="toolbar-controls">
+
+                <div class="search-box">
+
+                    <i class="fa-solid fa-magnifying-glass"></i>
+
+                    <input type="text"
+                           id="residenceSearch"
+                           placeholder="Search residences..." />
+
+                </div>
+
+
+                <select id="availabilityFilter"
+                        class="filter-select">
+
+                    <option value="all">
+                        All Status
+                    </option>
+
+                    <option value="available">
+                        Available
+                    </option>
+
+                    <option value="unavailable">
+                        Unavailable
+                    </option>
+
+                </select>
+
+            </div>
+
+        </div>
+
+
+        <!-- =================================================
+             RESIDENCE CARDS
+             ================================================== -->
+        @if (accommodations.Any())
+        {
+            <div class="residence-grid"
+                 id="residenceGrid">
+
+                @foreach (var accommodation in accommodations)
+                {
+                    var residenceTotalRooms =
+                    accommodation.TotalRooms > 0
+                    ? accommodation.TotalRooms
+                    : accommodation.Rooms?.Count ?? 0;
+
+                    var residenceAvailableRooms =
+                    Math.Max(0, accommodation.AvailableRooms);
+
+                    var residenceOccupiedRooms =
+                    Math.Max(
+                    0,
+                    residenceTotalRooms - residenceAvailableRooms
+                    );
+
+                    var residenceOccupancy =
+                    residenceTotalRooms > 0
+                    ? Math.Round(
+                    (double)residenceOccupiedRooms /
+                    residenceTotalRooms * 100,
+                    1)
+                    : 0;
+
+                    var searchText =
+                    $"{accommodation.Name} {accommodation.Location} {accommodation.Type}"
+                    .ToLowerInvariant();
+
+                    <div class="residence-card residence-item"
+                         data-search="@searchText"
+                         data-status="@(accommodation.Available ? "available" : "unavailable")">
+
+
+                        <!-- IMAGE -->
+
+                        <div class="residence-image">
+
+                            @if (!string.IsNullOrWhiteSpace(accommodation.ImagePath))
+                            {
+                                <img src="@accommodation.ImagePath"
+                                     alt="@accommodation.Name" />
+                            }
+                            else
+                            {
+                                <div class="residence-image-placeholder">
+
+                                    <i class="fa-solid fa-building"></i>
+
+                                </div>
+                            }
+
+
+                            @if (accommodation.Available)
+                            {
+                                <span class="availability-label available">
+
+                                    <i class="fa-solid fa-circle-check me-1"></i>
+                                    Available
+
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="availability-label unavailable">
+
+                                    <i class="fa-solid fa-circle-xmark me-1"></i>
+                                    Unavailable
+
+                                </span>
+                            }
+
+                        </div>
+
+
+                        <!-- CONTENT -->
+
+                        <div class="residence-content">
+
+                            <span class="residence-type">
+                                @accommodation.Type
+                            </span>
+
+
+                            <h3 class="residence-name"
+                                title="@accommodation.Name">
+
+                                @accommodation.Name
+
+                            </h3>
+
+
+                            <div class="residence-location">
+
+                                <i class="fa-solid fa-location-dot"></i>
+
+                                <span>
+                                    @accommodation.Location
+                                </span>
+
+                            </div>
+
+
+                            <!-- INFORMATION -->
+
+                            <div class="residence-info-grid">
+
+                                <div class="info-box">
+
+                                    <span>Monthly Rent</span>
+
+                                    <strong>
+                                        R @accommodation.MonthlyRent.ToString("N2")
+                                    </strong>
+
+                                </div>
+
+
+                                <div class="info-box">
+
+                                    <span>Total Rooms</span>
+
+                                    <strong>
+                                        @residenceTotalRooms
+                                    </strong>
+
+                                </div>
+
+
+                                <div class="info-box">
+
+                                    <span>Available Rooms</span>
+
+                                    <strong>
+                                        @residenceAvailableRooms
+                                    </strong>
+
+                                </div>
+
+
+                                <div class="info-box">
+
+                                    <span>Occupied Rooms</span>
+
+                                    <strong>
+                                        @residenceOccupiedRooms
+                                    </strong>
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- OCCUPANCY -->
+
+                            <div class="occupancy-section">
+
+                                <div class="occupancy-heading">
+
+                                    <span>
+                                        Room Occupancy
+                                    </span>
+
+                                    <strong>
+                                        @residenceOccupancy%
+                                    </strong>
+
+                                </div>
+
+                                <div class="occupancy-bar">
+
+                                    <div class="occupancy-progress"
+                                         style="width:@Math.Min(100, residenceOccupancy)%;">
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- ACTIONS -->
+
+                            <div class="residence-actions">
+
+                                <div class="primary-actions">
+
+                                    <!-- DETAILS -->
+
+                                    <a asp-controller="Accommodation"
+                                       asp-action="Details"
+                                       asp-route-id="@accommodation.AccommodationID"
+                                       class="btn btn-sm btn-outline-primary action-btn"
+                                       title="View Details">
+
+                                        <i class="fa-solid fa-eye"></i>
+
+                                    </a>
+
+
+                                    <!-- EDIT -->
+
+                                    <a asp-controller="Accommodation"
+                                       asp-action="Edit"
+                                       asp-route-id="@accommodation.AccommodationID"
+                                       class="btn btn-sm btn-outline-warning action-btn"
+                                       title="Edit Residence">
+
+                                        <i class="fa-solid fa-pen"></i>
+
+                                    </a>
+
+
+                                    <!-- DELETE -->
+
+                                    <a asp-controller="Accommodation"
+                                       asp-action="Delete"
+                                       asp-route-id="@accommodation.AccommodationID"
+                                       class="btn btn-sm btn-outline-danger action-btn"
+                                       title="Delete Residence">
+
+                                        <i class="fa-solid fa-trash"></i>
+
+                                    </a>
+
+                                </div>
+
+
+                                <!-- MANAGEMENT -->
+
+                                <div class="dropdown">
+
+                                    <button class="manage-btn dropdown-toggle"
+                                            type="button"
+                                            data-bs-toggle="dropdown"
+                                            aria-expanded="false">
+
+                                        Manage
+
+                                    </button>
+
+                                    <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0">
+
+                                        <li>
+
+                                            <a class="dropdown-item"
+                                               asp-controller="Room"
+                                               asp-action="Manage"
+                                               asp-route-accommodationId="@accommodation.AccommodationID">
+
+                                                <i class="fa-solid fa-door-open me-2 text-primary"></i>
+                                                Manage Rooms
+
+                                            </a>
+
+                                        </li>
+
+
+                                        <li>
+
+                                            <a class="dropdown-item"
+                                               asp-controller="Service"
+                                               asp-action="Assign"
+                                               asp-route-accommodationId="@accommodation.AccommodationID">
+
+                                                <i class="fa-solid fa-bolt me-2 text-info"></i>
+                                                Manage Services
+
+                                            </a>
+
+                                        </li>
+
+
+                                        <li>
+
+                                            <a class="dropdown-item"
+                                               asp-controller="AccommodationCharge"
+                                               asp-action="Manage"
+                                               asp-route-accommodationId="@accommodation.AccommodationID">
+
+                                                <i class="fa-solid fa-money-bill-wave me-2 text-success"></i>
+                                                Manage Charges
+
+                                            </a>
+
+                                        </li>
+
+                                    </ul>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+                }
+
+            </div>
+
+
+            <!-- NO SEARCH RESULTS -->
+
+            <div id="noSearchResults"
+                 class="empty-state d-none">
+
+                <div class="empty-icon">
+
+                    <i class="fa-solid fa-magnifying-glass"></i>
+
+                </div>
+
+                <h4>No Residences Found</h4>
+
+                <p>
+                    No accommodation matches your current search or filter.
+                </p>
+
+            </div>
+
+        }
+        else
+        {
+            <!-- =================================================
+                 EMPTY DATABASE STATE
+                 ================================================== -->
+
+            <div class="empty-state">
+
+                <div class="empty-icon">
+
+                    <i class="fa-solid fa-building-circle-xmark"></i>
+
+                </div>
+
+                <h4>No Accommodation Found</h4>
+
+                <p>
+                    There are currently no accommodation records
+                    registered in UFSStayConnect.
+                </p>
+
+                <a asp-controller="Accommodation"
+                   asp-action="Create"
+                   class="btn btn-primary">
+
+                    <i class="fa-solid fa-plus me-2"></i>
+                    Add First Residence
+
+                </a>
+
+            </div>
+        }
+
+    </div>
+
+</div>
+
+
+<script>
+
+    document.addEventListener("DOMContentLoaded", function () {
+
+        const searchInput =
+            document.getElementById("residenceSearch");
+
+        const filter =
+            document.getElementById("availabilityFilter");
+
+        const cards =
+            document.querySelectorAll(".residence-item");
+
+        const noResults =
+            document.getElementById("noSearchResults");
+
+
+        function filterResidences() {
+
+            const searchValue =
+                searchInput.value
+                    .toLowerCase()
+                    .trim();
+
+            const filterValue =
+                filter.value;
+
+            let visibleCount = 0;
+
+
+            cards.forEach(function (card) {
+
+                const searchText =
+                    card.dataset.search || "";
+
+                const status =
+                    card.dataset.status || "";
+
+
+                const matchesSearch =
+                    searchText.includes(searchValue);
+
+                const matchesFilter =
+                    filterValue === "all" ||
+                    status === filterValue;
+
+
+                if (matchesSearch && matchesFilter) {
+
+                    card.style.display = "";
+
+                    visibleCount++;
+
+                }
+                else {
+
+                    card.style.display = "none";
+
+                }
+
+            });
+
+
+            if (noResults) {
+
+                noResults.classList.toggle(
+                    "d-none",
+                    visibleCount !== 0
+                );
+
+            }
+
+        }
+
+
+        if (searchInput) {
+            searchInput.addEventListener(
+                "input",
+                filterResidences
+            );
+        }
+
+
+        if (filter) {
+            filter.addEventListener(
+                "change",
+                filterResidences
+            );
+        }
+
+    });
+
+</script>

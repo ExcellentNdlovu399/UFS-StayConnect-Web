@@ -1,0 +1,694 @@
+@model UFSStayConnect.Models.PaymentType
+
+@{
+    ViewData["Title"] = "Add Payment Type";
+}
+
+<div class="admin-payment-type-page">
+
+    <!-- Page Header -->
+    <div class="admin-page-header">
+
+        <div>
+            <div class="admin-eyebrow">
+                <i class="fas fa-wallet"></i>
+                PAYMENT MANAGEMENT
+            </div>
+
+            <h1>Add Payment Type</h1>
+
+            <p>
+                Create a new charge type that can be assigned to accommodation residences.
+            </p>
+        </div>
+
+        <a asp-action="Index" class="admin-back-button">
+            <i class="fas fa-arrow-left"></i>
+            Back to Payment Types
+        </a>
+
+    </div>
+
+
+    <div class="admin-form-layout">
+
+        <!-- Information Card -->
+        <aside class="admin-form-info">
+
+            <div class="admin-info-icon">
+                <i class="fas fa-file-invoice-dollar"></i>
+            </div>
+
+            <div class="admin-info-label">
+                PAYMENT TYPE
+            </div>
+
+            <h2>Create a Charge</h2>
+
+            <p>
+                Payment types define the different charges that can be
+                applied to students living in UFS accommodation.
+            </p>
+
+
+            <div class="admin-info-list">
+
+                <div>
+                    <i class="fas fa-check"></i>
+                    <span>Give the charge a clear name.</span>
+                </div>
+
+                <div>
+                    <i class="fas fa-check"></i>
+                    <span>Provide a useful description.</span>
+                </div>
+
+                <div>
+                    <i class="fas fa-check"></i>
+                    <span>Activate the type when it is ready to use.</span>
+                </div>
+
+            </div>
+
+        </aside>
+
+
+        <!-- Form -->
+        <section class="admin-form-card">
+
+            <div class="admin-form-card-header">
+
+                <div>
+                    <span>NEW PAYMENT TYPE</span>
+                    <h2>Charge Configuration</h2>
+                </div>
+
+                <div class="admin-form-header-icon">
+                    <i class="fas fa-plus"></i>
+                </div>
+
+            </div>
+
+
+            <form asp-action="Create" method="post">
+
+                @Html.AntiForgeryToken()
+
+                <div asp-validation-summary="ModelOnly"
+                     class="admin-validation">
+                </div>
+
+
+                <div class="admin-form-body">
+
+                    <!-- Name -->
+                    <div class="admin-field">
+
+                        <label asp-for="Name">
+                            Payment Type Name
+                        </label>
+
+                        <div class="admin-input-wrapper">
+
+                            <i class="fas fa-tag"></i>
+
+                            <input asp-for="Name"
+                                   class="admin-input"
+                                   placeholder="e.g. Water"
+                                   autocomplete="off" />
+
+                        </div>
+
+                        <span asp-validation-for="Name"
+                              class="admin-field-error">
+                        </span>
+
+                    </div>
+
+
+                    <!-- Description -->
+                    <div class="admin-field">
+
+                        <label asp-for="Description">
+                            Description
+                        </label>
+
+                        <div class="admin-textarea-wrapper">
+
+                            <i class="fas fa-align-left"></i>
+
+                            <textarea asp-for="Description"
+                                      class="admin-textarea"
+                                      rows="5"
+                                      maxlength="1000"
+                                      placeholder="Describe what this charge covers..."></textarea>
+
+                        </div>
+
+                        <div class="admin-field-help">
+                            Provide a short explanation that will help administrators
+                            and financial staff identify this charge.
+                        </div>
+
+                        <span asp-validation-for="Description"
+                              class="admin-field-error">
+                        </span>
+
+                    </div>
+
+
+                    <!-- Active -->
+                    <div class="admin-active-box">
+
+                        <div class="admin-active-icon">
+                            <i class="fas fa-toggle-on"></i>
+                        </div>
+
+                        <div class="admin-active-text">
+
+                            <label asp-for="IsActive">
+                                Active Payment Type
+                            </label>
+
+                            <span>
+                                Active payment types can be used when creating
+                                accommodation charges.
+                            </span>
+
+                        </div>
+
+                        <div class="admin-switch">
+
+                            <input asp-for="IsActive"
+                                   class="admin-switch-input" />
+
+                            <label asp-for="IsActive"
+                                   class="admin-switch-label">
+                            </label>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- Footer -->
+                <div class="admin-form-footer">
+
+                    <a asp-action="Index"
+                       class="admin-cancel-button">
+
+                        <i class="fas fa-xmark"></i>
+                        Cancel
+
+                    </a>
+
+                    <button type="submit"
+                            class="admin-save-button">
+
+                        <i class="fas fa-floppy-disk"></i>
+                        Save Payment Type
+
+                    </button>
+
+                </div>
+
+            </form>
+
+        </section>
+
+    </div>
+
+</div>
+
+
+<style>
+
+    /* =========================================================
+           ADMIN PAYMENT TYPE FORM
+           ========================================================= */
+
+    .admin-payment-type-page {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 32px 30px 60px;
+    }
+
+
+    /* =========================
+           HEADER
+           ========================= */
+
+    .admin-page-header {
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-between;
+        gap: 25px;
+        margin-bottom: 25px;
+    }
+
+    .admin-eyebrow {
+        margin-bottom: 7px;
+        color: #b8860b;
+        font-size: 0.72rem;
+        font-weight: 800;
+        letter-spacing: 1.4px;
+    }
+
+        .admin-eyebrow i {
+            margin-right: 5px;
+        }
+
+    .admin-page-header h1 {
+        margin: 0;
+        color: #123b73;
+        font-size: 1.9rem;
+        font-weight: 800;
+    }
+
+    .admin-page-header p {
+        margin: 7px 0 0;
+        color: #6b7280;
+        font-size: 0.88rem;
+    }
+
+    .admin-back-button {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        min-height: 41px;
+        padding: 0 15px;
+        border: 1px solid #d9e1eb;
+        border-radius: 8px;
+        background: #ffffff;
+        color: #123b73;
+        font-size: 0.77rem;
+        font-weight: 750;
+        text-decoration: none;
+        white-space: nowrap;
+        transition: all 0.2s ease;
+    }
+
+        .admin-back-button:hover {
+            background: #f3f6f9;
+            color: #123b73;
+        }
+
+
+    /* =========================
+           LAYOUT
+           ========================= */
+
+    .admin-form-layout {
+        display: grid;
+        grid-template-columns: 300px minmax(0, 1fr);
+        gap: 20px;
+        align-items: start;
+    }
+
+
+    /* =========================
+           INFO
+           ========================= */
+
+    .admin-form-info {
+        padding: 27px 24px;
+        background: #123b73;
+        color: #ffffff;
+        border-radius: 14px;
+        border-bottom: 4px solid #f4c430;
+        box-shadow: 0 7px 24px rgba(8,20,38,0.08);
+    }
+
+    .admin-info-icon {
+        width: 52px;
+        height: 52px;
+        margin-bottom: 20px;
+        border: 2px solid #f4c430;
+        border-radius: 11px;
+        background: rgba(255,255,255,0.08);
+        color: #f4c430;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.15rem;
+    }
+
+    .admin-info-label {
+        color: #f4c430;
+        font-size: 0.65rem;
+        font-weight: 800;
+        letter-spacing: 1.2px;
+    }
+
+    .admin-form-info h2 {
+        margin: 4px 0 9px;
+        font-size: 1.15rem;
+        font-weight: 800;
+    }
+
+    .admin-form-info > p {
+        margin: 0;
+        color: rgba(255,255,255,0.72);
+        font-size: 0.76rem;
+        line-height: 1.65;
+    }
+
+    .admin-info-list {
+        margin-top: 24px;
+        padding-top: 19px;
+        border-top: 1px solid rgba(255,255,255,0.12);
+    }
+
+        .admin-info-list div {
+            display: flex;
+            align-items: flex-start;
+            gap: 9px;
+            margin-top: 12px;
+        }
+
+        .admin-info-list i {
+            color: #f4c430;
+            font-size: 0.65rem;
+            margin-top: 3px;
+        }
+
+        .admin-info-list span {
+            color: rgba(255,255,255,0.72);
+            font-size: 0.71rem;
+            line-height: 1.45;
+        }
+
+
+    /* =========================
+           FORM CARD
+           ========================= */
+
+    .admin-form-card {
+        overflow: hidden;
+        background: #ffffff;
+        border: 1px solid #e2e7ee;
+        border-radius: 14px;
+        box-shadow: 0 7px 24px rgba(8,20,38,0.055);
+    }
+
+    .admin-form-card-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 21px 25px;
+        border-bottom: 1px solid #e8ecf1;
+    }
+
+        .admin-form-card-header span {
+            color: #b8860b;
+            font-size: 0.65rem;
+            font-weight: 800;
+            letter-spacing: 1.2px;
+        }
+
+        .admin-form-card-header h2 {
+            margin: 3px 0 0;
+            color: #123b73;
+            font-size: 1.05rem;
+            font-weight: 800;
+        }
+
+    .admin-form-header-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 9px;
+        background: #edf3f9;
+        color: #123b73;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+
+    /* =========================
+           FORM BODY
+           ========================= */
+
+    .admin-form-body {
+        padding: 27px 25px;
+    }
+
+    .admin-field {
+        margin-bottom: 22px;
+    }
+
+        .admin-field label {
+            display: block;
+            margin-bottom: 7px;
+            color: #344054;
+            font-size: 0.77rem;
+            font-weight: 800;
+        }
+
+    .admin-input-wrapper,
+    .admin-textarea-wrapper {
+        position: relative;
+    }
+
+        .admin-input-wrapper > i,
+        .admin-textarea-wrapper > i {
+            position: absolute;
+            left: 13px;
+            top: 14px;
+            z-index: 1;
+            color: #8290a2;
+            font-size: 0.77rem;
+            pointer-events: none;
+        }
+
+    .admin-input {
+        width: 100%;
+        min-height: 44px;
+        padding: 0 13px 0 37px;
+        border: 1px solid #dfe5ec;
+        border-radius: 8px;
+        outline: none;
+        color: #29384d;
+        background: #ffffff;
+        font-size: 0.82rem;
+        transition: all 0.2s ease;
+    }
+
+        .admin-input:focus,
+        .admin-textarea:focus {
+            border-color: #123b73;
+            box-shadow: 0 0 0 3px rgba(18,59,115,0.08);
+        }
+
+    .admin-textarea {
+        width: 100%;
+        padding: 13px 13px 13px 37px;
+        resize: vertical;
+        border: 1px solid #dfe5ec;
+        border-radius: 8px;
+        outline: none;
+        color: #29384d;
+        font-size: 0.82rem;
+        line-height: 1.55;
+        transition: all 0.2s ease;
+    }
+
+    .admin-field-help {
+        margin-top: 6px;
+        color: #8a94a2;
+        font-size: 0.67rem;
+    }
+
+    .admin-field-error {
+        display: block;
+        margin-top: 5px;
+        color: #c0392b;
+        font-size: 0.68rem;
+    }
+
+
+    /* =========================
+           ACTIVE SWITCH
+           ========================= */
+
+    .admin-active-box {
+        display: flex;
+        align-items: center;
+        gap: 13px;
+        padding: 15px;
+        border: 1px solid #dce7f4;
+        border-radius: 9px;
+        background: #f5f9fe;
+    }
+
+    .admin-active-icon {
+        width: 38px;
+        height: 38px;
+        flex-shrink: 0;
+        border-radius: 8px;
+        background: #e3edf9;
+        color: #123b73;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .admin-active-text {
+        flex: 1;
+    }
+
+        .admin-active-text label {
+            display: block;
+            margin: 0;
+            color: #123b73;
+            font-size: 0.77rem;
+            font-weight: 800;
+            cursor: pointer;
+        }
+
+        .admin-active-text span {
+            display: block;
+            margin-top: 3px;
+            color: #6b7280;
+            font-size: 0.67rem;
+            line-height: 1.45;
+        }
+
+    .admin-switch {
+        flex-shrink: 0;
+    }
+
+    .admin-switch-input {
+        width: 2.5rem !important;
+        height: 1.35rem;
+        cursor: pointer;
+    }
+
+        .admin-switch-input:checked {
+            background-color: #123b73;
+            border-color: #123b73;
+        }
+
+
+    /* =========================
+           VALIDATION
+           ========================= */
+
+    .admin-validation {
+        margin: 20px 25px 0;
+        color: #c0392b;
+        font-size: 0.77rem;
+    }
+
+
+    /* =========================
+           FOOTER
+           ========================= */
+
+    .admin-form-footer {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+        padding: 16px 25px;
+        background: #fafbfc;
+        border-top: 1px solid #edf0f4;
+    }
+
+    .admin-cancel-button,
+    .admin-save-button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        min-height: 41px;
+        padding: 0 16px;
+        border-radius: 8px;
+        font-size: 0.77rem;
+        font-weight: 750;
+        text-decoration: none;
+        transition: all 0.2s ease;
+    }
+
+    .admin-cancel-button {
+        border: 1px solid #d9e1eb;
+        background: #ffffff;
+        color: #596579;
+    }
+
+        .admin-cancel-button:hover {
+            background: #f1f4f7;
+            color: #344054;
+        }
+
+    .admin-save-button {
+        border: 1px solid #123b73;
+        background: #123b73;
+        color: #ffffff;
+        cursor: pointer;
+    }
+
+        .admin-save-button:hover {
+            background: #0d2d58;
+            border-color: #0d2d58;
+            color: #ffffff;
+            transform: translateY(-1px);
+        }
+
+
+    /* =========================
+           RESPONSIVE
+           ========================= */
+
+    @@media (max-width: 850px) {
+
+        .admin-form-layout {
+            grid-template-columns: 1fr;
+        }
+
+        .admin-form-info {
+            display: none;
+        }
+    }
+
+    @@media (max-width: 600px) {
+
+        .admin-payment-type-page {
+            padding: 25px 16px 45px;
+        }
+
+        .admin-page-header {
+            align-items: flex-start;
+            flex-direction: column;
+        }
+
+        .admin-back-button {
+            width: 100%;
+        }
+
+        .admin-form-body {
+            padding: 21px;
+        }
+
+        .admin-form-card-header {
+            padding: 20px;
+        }
+
+        .admin-form-footer {
+            padding: 15px 20px;
+            flex-direction: column-reverse;
+        }
+
+        .admin-cancel-button,
+        .admin-save-button {
+            width: 100%;
+        }
+    }
+
+</style>
+
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

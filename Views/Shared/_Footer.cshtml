@@ -1,0 +1,222 @@
+<!-- ================= FOOTER ================= -->
+
+<footer class="site-footer">
+
+    <div class="container">
+
+        <div class="footer-grid">
+
+            <!-- BRAND -->
+
+            <div class="footer-brand">
+
+                <div class="footer-logo">
+
+                    <img src="~/images/ufs-emblem.png"
+                         alt="University of the Free State"
+                         class="ufs-emblem" />
+
+                    <div>
+
+                        <h4>UFS StayConnect</h4>
+
+                        <span>
+                            University of the Free State
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <p>
+                    Your trusted platform for finding, applying for,
+                    and managing accommodation at the University of
+                    the Free State, QwaQwa Campus.
+                </p>
+
+
+                <div class="footer-campus">
+
+                    <i class="fa-solid fa-location-dot"></i>
+
+                    <span>
+                        QwaQwa Campus, Phuthaditjhaba
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <!-- PORTAL -->
+
+            <div class="footer-column">
+
+                <h5>StayConnect</h5>
+
+                <ul>
+
+                    <li>
+                        <a asp-controller="Home"
+                           asp-action="Index">
+                            Home
+                        </a>
+                    </li>
+
+                    <li>
+                        <a asp-controller="Accommodation"
+                           asp-action="Index">
+                            Accommodation
+                        </a>
+                    </li>
+
+                    @if (User.Identity != null &&
+                                        User.Identity.IsAuthenticated)
+                    {
+                        <li>
+                            <a asp-controller="Payment"
+                               asp-action="Index">
+                                Payments
+                            </a>
+                        </li>
+
+                        <li>
+                            <a asp-controller="Account"
+                               asp-action="Profile">
+                                My Profile
+                            </a>
+                        </li>
+                    }
+
+                </ul>
+
+            </div>
+
+
+            <!-- SUPPORT -->
+
+            <div class="footer-column">
+
+                <h5>Support</h5>
+
+                <ul>
+
+                    <li>
+                        <a href="#">
+                            Housing Office
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="#">
+                            Finance Office
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="#">
+                            IT Service Desk
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="#">
+                            Frequently Asked Questions
+                        </a>
+                    </li>
+
+                </ul>
+
+            </div>
+
+
+            <!-- CONTACT -->
+
+            <div class="footer-column">
+
+                <h5>Contact Us</h5>
+
+                <ul class="contact-list">
+
+                    <li>
+
+                        <i class="fa-solid fa-envelope"></i>
+
+                        <span>
+                            housing@ufs.ac.za
+                        </span>
+
+                    </li>
+
+                    <li>
+
+                        <i class="fa-solid fa-phone"></i>
+
+                        <span>
+                            +27 58 718 5000
+                        </span>
+
+                    </li>
+
+                    <li>
+
+                        <i class="fa-solid fa-location-dot"></i>
+
+                        <span>
+                            Intsika Building
+                        </span>
+
+                    </li>
+
+                </ul>
+
+            </div>
+
+        </div>
+
+
+        <!-- FOOTER DIVIDER -->
+
+        <div class="footer-divider"></div>
+
+
+        <!-- FOOTER BOTTOM -->
+
+        <div class="footer-bottom">
+
+            <div>
+
+                <strong>
+                    UFS StayConnect
+                </strong>
+
+                <span>
+                    &copy; 2026 University of the Free State —
+                    QwaQwa Campus
+                </span>
+
+            </div>
+
+
+            <div class="footer-links">
+
+                <a href="#">
+                    Privacy
+                </a>
+
+                <a href="#">
+                    Terms
+                </a>
+
+                <a href="#">
+                    Accessibility
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</footer>

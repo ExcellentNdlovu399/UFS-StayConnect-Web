@@ -1,0 +1,460 @@
+@model UFSStayConnect.Models.Accommodation
+
+@{
+    ViewData["Title"] = Model.Name;
+
+    if (User.IsInRole("Admin"))
+    {
+        Layout = "~/Views/Admin/_AdminLayout.cshtml";
+    }
+    else if (User.IsInRole("FinancialOfficer"))
+    {
+        Layout = "~/Views/FinancialOfficer/_FinancialOfficerLayout.cshtml";
+    }
+    else if (User.IsInRole("Customer"))
+    {
+        // Student/Staff distinction should come from the logged-in user's UserType
+        Layout = "~/Views/Shared/_CustomerLayout.cshtml";
+    }
+}
+
+<div class="accommodation-details-page">
+
+    <!-- =====================================================
+         BREADCRUMB
+         ===================================================== -->
+
+    <div class="accommodation-breadcrumb">
+
+        <a asp-controller="Accommodation"
+           asp-action="Index">
+
+            <i class="fa-solid fa-arrow-left"></i>
+
+            Find Accommodation
+
+        </a>
+
+        <span>/</span>
+
+        <span>@Model.Name</span>
+
+    </div>
+
+
+    <!-- =====================================================
+         MAIN RESIDENCE HERO
+         ===================================================== -->
+
+    <section class="residence-profile">
+
+        <!-- IMAGE -->
+
+        <div class="residence-main-image">
+
+            @if (!string.IsNullOrWhiteSpace(Model.ImagePath))
+            {
+                <img src="@Model.ImagePath"
+                     alt="@Model.Name" />
+            }
+            else
+            {
+                <div class="residence-image-placeholder">
+
+                    <i class="fa-solid fa-house"></i>
+
+                    <span>
+                        No image available
+                    </span>
+
+                </div>
+            }
+
+
+            @if (Model.Available && Model.AvailableRooms > 0)
+            {
+                <div class="residence-availability">
+
+                    <span></span>
+
+                    Available now
+
+                </div>
+            }
+            else
+            {
+                <div class="residence-availability unavailable">
+
+                    <span></span>
+
+                    Currently unavailable
+
+                </div>
+            }
+
+        </div>
+
+
+        <!-- BASIC INFORMATION -->
+
+        <div class="residence-profile-content">
+
+            <span class="residence-type-label">
+                @Model.Type
+            </span>
+
+
+            <h1>
+                @Model.Name
+            </h1>
+
+
+            <div class="residence-location">
+
+                <i class="fa-solid fa-location-dot"></i>
+
+                <span>
+                    @Model.Location
+                </span>
+
+            </div>
+
+
+            <div class="residence-price">
+
+                <span>
+                    Monthly rent
+                </span>
+
+                <strong>
+                    R @Model.MonthlyRent.ToString("N2")
+                </strong>
+
+                <small>
+                    / month
+                </small>
+
+            </div>
+
+
+            <!-- QUICK FACTS -->
+
+            <div class="residence-facts">
+
+                <div class="residence-fact">
+
+                    <div class="residence-fact-icon">
+                        <i class="fa-solid fa-bed"></i>
+                    </div>
+
+                    <div>
+                        <strong>
+                            @Model.Bedrooms
+                        </strong>
+
+                        <span>
+                            Bedroom@(Model.Bedrooms == 1 ? "" : "s")
+                        </span>
+                    </div>
+
+                </div>
+
+
+                <div class="residence-fact">
+
+                    <div class="residence-fact-icon">
+                        <i class="fa-solid fa-bath"></i>
+                    </div>
+
+                    <div>
+                        <strong>
+                            @Model.Bathrooms
+                        </strong>
+
+                        <span>
+                            Bathroom@(Model.Bathrooms == 1 ? "" : "s")
+                        </span>
+                    </div>
+
+                </div>
+
+
+              
+                </div>
+
+            </div>
+
+
+            <!-- APPLICATION -->
+
+            <div class="residence-application">
+
+                @if (Model.Available && Model.AvailableRooms > 0)
+                {
+                    @if (User.Identity?.IsAuthenticated == true &&
+                                    User.IsInRole("Customer"))
+                    {
+                        <a asp-controller="Application"
+                           asp-action="Apply"
+                           asp-route-accommodationId="@Model.AccommodationID"
+                           class="residence-apply-btn">
+
+                            <i class="fa-solid fa-file-signature"></i>
+
+                            Apply for accommodation
+
+                            <i class="fa-solid fa-arrow-right"></i>
+
+                        </a>
+                    }
+                    else if (User.Identity?.IsAuthenticated != true)
+                    {
+                        <a asp-controller="Application"
+                           asp-action="Apply"
+                           asp-route-accommodationId="@Model.AccommodationID"
+                           class="residence-apply-btn">
+
+                            <i class="fa-solid fa-right-to-bracket"></i>
+
+                            Login to apply
+
+                            <i class="fa-solid fa-arrow-right"></i>
+
+                        </a>
+                    }
+                }
+                else
+                {
+                    <div class="residence-unavailable-message">
+
+                        <i class="fa-solid fa-circle-exclamation"></i>
+
+                        <div>
+                            <strong>
+                                Currently unavailable
+                            </strong>
+
+                            <span>
+                                There are currently no rooms available
+                                at this residence.
+                            </span>
+                        </div>
+
+                    </div>
+                }
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         INFORMATION
+         ===================================================== -->
+
+    <div class="residence-information-grid">
+
+
+        <!-- DESCRIPTION -->
+
+        <section class="residence-info-card">
+
+            <div class="residence-section-heading">
+
+                <div class="residence-section-icon">
+                    <i class="fa-solid fa-house"></i>
+                </div>
+
+                <div>
+
+                    <span>
+                        ABOUT THE RESIDENCE
+                    </span>
+
+                    <h2>
+                        About @Model.Name
+                    </h2>
+
+                </div>
+
+            </div>
+
+
+            <div class="residence-description">
+
+                @if (!string.IsNullOrWhiteSpace(Model.Description))
+                {
+                    <p>
+                        @Model.Description
+                    </p>
+                }
+                else
+                {
+                    <p class="muted-description">
+                        No additional description has been provided
+                        for this residence.
+                    </p>
+                }
+
+            </div>
+
+        </section>
+
+
+        <!-- SERVICES -->
+
+        <section class="residence-info-card">
+
+            <div class="residence-section-heading">
+
+                <div class="residence-section-icon">
+                    <i class="fa-solid fa-bolt"></i>
+                </div>
+
+                <div>
+
+                    <span>
+                        FACILITIES &amp; SERVICES
+                    </span>
+
+                    <h2>
+                        What's included
+                    </h2>
+
+                </div>
+
+            </div>
+
+
+            @if (Model.AccommodationServices != null &&
+                        Model.AccommodationServices.Any(x => x.Service != null))
+            {
+                <div class="residence-services">
+
+                    @foreach (var item in Model.AccommodationServices
+                                    .Where(x => x.Service != null))
+                    {
+                        <div class="residence-service">
+
+                            <div class="service-check">
+                                <i class="fa-solid fa-check"></i>
+                            </div>
+
+                            <span>
+                                @item.Service!.ServiceName
+                            </span>
+
+                        </div>
+                    }
+
+                </div>
+            }
+            else
+            {
+                <div class="no-services">
+
+                    <i class="fa-solid fa-circle-info"></i>
+
+                    <span>
+                        No additional services have been configured
+                        for this residence.
+                    </span>
+
+                </div>
+            }
+
+        </section>
+
+    </div>
+
+
+    <!-- =====================================================
+         RESIDENCE SUMMARY
+         ===================================================== -->
+
+    <section class="residence-summary">
+
+        <div class="residence-summary-heading">
+
+            <span>
+                RESIDENCE AT A GLANCE
+            </span>
+
+            <h2>
+                Key information
+            </h2>
+
+        </div>
+
+
+        <div class="residence-summary-grid">
+
+            <div>
+
+                <i class="fa-solid fa-building"></i>
+
+                <span>
+                    Accommodation type
+                </span>
+
+                <strong>
+                    @Model.Type
+                </strong>
+
+            </div>
+
+
+            <div>
+
+                <i class="fa-solid fa-bed"></i>
+
+                <span>
+                    Bedrooms
+                </span>
+
+                <strong>
+                    @Model.Bedrooms
+                </strong>
+
+            </div>
+
+
+            <div>
+
+                <i class="fa-solid fa-bath"></i>
+
+                <span>
+                    Bathrooms
+                </span>
+
+                <strong>
+                    @Model.Bathrooms
+                </strong>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         BACK
+         ===================================================== -->
+
+    <div class="residence-back">
+
+        <a asp-controller="Accommodation"
+           asp-action="Index">
+
+            <i class="fa-solid fa-arrow-left"></i>
+
+            Back to accommodation
+
+        </a>
+
+    </div>
+
+</div>
