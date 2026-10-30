@@ -1,4 +1,3 @@
-
 # Build outputs
 bin/
 obj/
@@ -11,6 +10,7 @@ artifacts/
 *.suo
 
 # Local configuration and secrets
+appsettings.json
 appsettings.Development.json
 appsettings.Production.json
 secrets.json
@@ -20,44 +20,23 @@ secrets.json
 .env.*
 
 # Database files and backups
+Database/
 *.mdf
 *.ldf
 *.bak
 *.bacpac
 
-# Logs
+# Logs and temporary files
 *.log
-
-# Temporary files
 *.tmp
 *.temp
-
-# Published deployment packages
-app.zip
-publish/
-
-# Production configuration and secrets
-appsettings.Production.json
-
-# Publishing credentials
-Properties/PublishProfiles/*.pubxml
-
-# Local database files and backups
-*.mdf
-*.ldf
-*.bak
-*.bacpac
-
-
-# Private application configuration
-appsettings.json
-
-# Database scripts - review before publishing
-Database/
-
-# Duplicate view backup folder
-Properties/Views/
 
 # Deployment publishing profiles
 Properties/PublishProfiles/
 *.pubxml
+
+# Duplicate view backup folder
+Properties/Views/
+
+# Archives
+app.zip
